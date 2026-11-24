@@ -260,6 +260,18 @@ button {
 .fk-toggle[aria-pressed='true'] { background: var(--olive); color: var(--cream); }
 .fk-toggle[aria-pressed='false'] { background: var(--sand); color: var(--ink); }
 .fk-build { font-size: 13px; opacity: 0.7; direction: rtl; text-align: right; }
+.fk-speeds { display: flex; gap: 6px; }
+.fk-speed {
+  min-width: 56px;
+  min-height: 56px;
+  padding: 4px 8px 0;
+  border-radius: 18px;
+  border: 3px solid var(--ink);
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--sand);
+}
+.fk-speed[aria-pressed='true'] { background: var(--olive); color: var(--cream); }
 .fk-voice-status { font-size: 16px; line-height: 1.4; direction: rtl; }
 .fk-close {
   align-self: center;
@@ -364,3 +376,30 @@ button {
   45% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   100% { transform: translate(-50%, -110%) scale(1); opacity: 0; }
 }
+
+/* Amman: two identical choice buttons, or one action button, above the bubble */
+.fk-choice {
+  position: absolute;
+  left: calc(var(--safe-left) + 10px);
+  right: calc(var(--safe-right) + 10px);
+  top: 36%; /* above the floor, so the shards, water and rug stay in view */
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  animation: fk-rise 0.35s ease-out;
+}
+.fk-choice-btn {
+  flex: 0 1 170px;
+  min-height: 72px;
+  padding: 6px 10px 2px;
+  border-radius: 36px;
+  background: var(--cream);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  box-shadow: 0 5px 0 var(--ink);
+  font-size: 26px;
+  font-weight: 700;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+}
+.fk-choice-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
+@keyframes fk-rise { from { opacity: 0; transform: translateY(14px); } }

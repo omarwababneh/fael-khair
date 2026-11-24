@@ -8,11 +8,12 @@ import { hasAudio } from './assets';
 import { getLine } from './content';
 import { music } from './music';
 import { ui } from './ui';
+import { getVoiceSpeed, VOICE_RATES } from './settings';
 
 const synth: SpeechSynthesis | null = 'speechSynthesis' in window ? window.speechSynthesis : null;
 
-// The owner found the spec's 0.9 too slow: speak at the phone's natural speed.
-const RATE = 1.0;
+// The owner found the spec's 0.9 too slow: natural speed by default, and the
+// parent can choose slower or faster in the parents' corner.
 
 function readingTime(text: string): number {
   return Math.max(1800, text.length * 85 + 700);
@@ -119,7 +120,7 @@ class VoiceSystem {
         const u = new SpeechSynthesisUtterance(line.tts);
         u.voice = this.voice;
         u.lang = this.voice.lang;
-        u.rate = RATE;
+        u.rate = VOICE_RATES[getVoiceSpeed()];
         u.onend = finish;
         u.onerror = finish;
         this.utter = u; // keep a reference: iOS drops events of collected utterances
