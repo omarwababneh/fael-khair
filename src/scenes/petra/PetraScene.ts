@@ -42,7 +42,7 @@ interface Nook { x: number; y: number; used: boolean; ring: Phaser.GameObjects.I
 // Laid out on the path in bg_petra_siq (visible from about y = 480 down):
 // nearer obstacles lower and bigger, farther ones higher and smaller.
 const OBSTACLES: ObstacleDef[] = [
-  { key: 'rock_a', kind: 'rock', x: 228, y: 646, w: 58, follow: 0.5, weight: 0.15 },
+  { key: 'rock_a', kind: 'rock', x: 184, y: 656, w: 58, follow: 0.5, weight: 0.15 },
   { key: 'rock_b', kind: 'rock', x: 168, y: 608, w: 62, follow: 0.33, weight: 0.35 },
   { key: 'rock_c', kind: 'rock', x: 236, y: 584, w: 66, follow: 0.24, weight: 0.55 },
   { key: 'thorn_branch', kind: 'branch', x: 192, y: 556, w: 124, follow: 0.3, weight: 0.25, grip: 0.3 },
@@ -52,8 +52,8 @@ const OBSTACLES: ObstacleDef[] = [
 
 // Glowing nooks at the foot of the canyon walls. Any obstacle fits any free nook.
 const NOOKS = [
-  { x: 52, y: 606 }, { x: 340, y: 566 }, { x: 74, y: 548 },
-  { x: 312, y: 518 }, { x: 98, y: 498 }, { x: 286, y: 482 },
+  { x: 36, y: 604 }, { x: 358, y: 524 }, { x: 56, y: 544 },
+  { x: 330, y: 490 }, { x: 82, y: 492 }, { x: 302, y: 460 },
 ];
 
 const BOY = { x: 108, y: 706, h: 128 };
@@ -129,7 +129,10 @@ export class PetraScene extends BaseScene {
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.onMove(p));
     this.input.on('pointerup', (p: Phaser.Input.Pointer) => this.onUp(p));
     this.input.on('pointerupoutside', (p: Phaser.Input.Pointer) => this.onUp(p));
-    this.input.on('pointerdown', () => this.resetIdle());
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      this.resetIdle();
+      this.pickAt(p);
+    });
 
     // Birds by day, now and then.
     this.time.addEvent({ delay: 7000, loop: true, callback: () => Math.random() < 0.7 && sfx('birds', { volume: 0.5 }) });
@@ -159,20 +162,40 @@ export class PetraScene extends BaseScene {
     const img = this.add.image(def.x, def.y, def.key).setDepth(20 + def.y / 1000);
     const base = fitWidth(img, def.w);
     const o: Obstacle = { ...def, img, base, placed: false, thornSaid: false };
-    // Forgiving hit area: at least 64 points tall and 18 points of extra margin.
-    const dispH = img.frame.height * base;
-    const padX = 18 / base;
-    const padY = Math.max(18, (64 - dispH) / 2) / base;
-    img.setInteractive(
-      new Phaser.Geom.Rectangle(-padX, -padY, img.frame.width + padX * 2, img.frame.height + padY * 2),
-      Phaser.Geom.Rectangle.Contains,
-    );
-    img.on('pointerdown', (p: Phaser.Input.Pointer, lx: number) => this.onDown(o, p, lx));
     if (def.kind === 'branch' && def.grip) {
       // The smooth end glows, so he knows where to hold it.
       o.ring = glowRing(this, this.gripPoint(o).x, this.gripPoint(o).y, 26, 21);
     }
     this.obstacles.push(o);
+  }
+
+  /**
+   * Which obstacle did he touch? Rocks answer to an oval a little larger than
+   * the rock; branches to a band along the branch. Overlaps go to the closest
+   * fit, so a thin branch no longer steals touches meant for the rock behind it.
+   */
+  private pickAt(p: Phaser.Input.Pointer): void {
+    if (this.finished || this.dragging) return;
+    let best: Obstacle | null = null;
+    let bestScore = Infinity;
+    for (const o of this.obstacles) {
+      if (o.placed) continue;
+      const w = o.img.frame.width * o.base, h = o.img.frame.height * o.base;
+      const dx = p.worldX - o.img.x, dy = p.worldY - o.img.y;
+      let score = Infinity;
+      if (o.kind === 'rock') {
+        const d = (dx / (w / 2 + 12)) ** 2 + (dy / (h / 2 + 12)) ** 2;
+        if (d <= 1) score = d;
+      } else {
+        const band = Math.max(18, h / 2 + 8);
+        if (Math.abs(dx) <= w / 2 + 12 && Math.abs(dy) <= band) score = 0.25 * (dy / band) ** 2;
+      }
+      if (score < bestScore) { bestScore = score; best = o; }
+    }
+    if (!best) return;
+    const w = best.img.frame.width * best.base;
+    const localX = ((p.worldX - (best.img.x - w / 2)) / w) * best.img.frame.width;
+    this.onDown(best, p, localX);
   }
 
   private gripPoint(o: Obstacle): Phaser.Math.Vector2 {
@@ -237,9 +260,11 @@ export class PetraScene extends BaseScene {
     const free = this.nooks.filter((n) => !n.used);
     if (!free.length) return null;
     const x = o.img.x, y = o.img.y;
+    // He has to actually drag it: a tap-and-release never places an obstacle.
+    if (Phaser.Math.Distance.Between(x, y, o.x, o.y) < 40) return null;
     const dist = (n: Nook) => Phaser.Math.Distance.Between(x, y, n.x, n.y);
     const nearest = free.reduce((a, b) => (dist(a) <= dist(b) ? a : b));
-    if (dist(nearest) < 105) return nearest;
+    if (dist(nearest) < 85) return nearest;
     // Forgiving: anything dragged well over to a side goes to that side's nearest nook.
     const side = x < 115 ? 'L' : x > 275 ? 'R' : null;
     if (!side) return null;
@@ -276,7 +301,7 @@ export class PetraScene extends BaseScene {
     this.tweens.killTweensOf(o.img);
     const left = nook.x < 195;
     const end = o.kind === 'branch'
-      ? { rotation: left ? -1.3 : 1.3, scale: o.base * 0.62 }
+      ? { rotation: left ? 0.22 : -0.22, scale: o.base * 0.62 }
       : { rotation: (left ? -1 : 1) * 0.12, scale: o.base * 0.88 };
     this.tweens.add({
       targets: o.img,
@@ -435,6 +460,7 @@ export class PetraScene extends BaseScene {
     this.tweens.add({ targets: this.boy, y: VANISH.y + 10, x: VANISH.x - 12, scale: 0.3, alpha: { from: 1, to: 0 }, duration: 4200, ease: 'Sine.easeIn' });
     this.time.delayedCall(500, () => {
       if (!this.alive) return;
+      this.cartImg.setFlipX(true); // the cart heads left, into the Siq
       this.tweens.add({ targets: this.cart, y: VANISH.y + 14, x: VANISH.x + 14, scale: 0.3, alpha: { from: 1, to: 0 }, duration: 4400, ease: 'Sine.easeIn' });
       this.tweens.add({ targets: this.cartImg, angle: { from: -1.2, to: 1.2 }, duration: 260, yoyo: true, repeat: -1 });
       this.time.addEvent({ delay: 900, repeat: 4, callback: () => sfx('creak', { volume: 0.6 }) });

@@ -29,8 +29,8 @@ export const PINS: Pin[] = [
   { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 135, y: 252, lx: 232, ly: 250, adventure: true },
   { id: 'jerash', name: 'جَرَش', line: 'map_jerash', x: 118, y: 298, lx: 232, ly: 300 },
   { id: 'amman', name: 'عَمّان', line: 'map_amman', x: 125, y: 342, lx: 246, ly: 362, adventure: true },
-  { id: 'deadsea', name: 'البَحْر المَيِّت', line: 'map_deadsea', x: 30, y: 412, lx: 116, ly: 432 },
-  { id: 'petra', name: 'البَتْرا', line: 'map_petra', x: 80, y: 470, lx: 212, ly: 470, scene: 'petra', adventure: true },
+  { id: 'deadsea', name: 'البَحْر المَيِّت', line: 'map_deadsea', x: 30, y: 412, lx: 118, ly: 424 },
+  { id: 'petra', name: 'البَتْرا', line: 'map_petra', x: 138, y: 482, lx: 222, ly: 482, scene: 'petra', adventure: true },
   { id: 'wadirum', name: 'وادي رَمّ', line: 'map_wadirum', x: 172, y: 545, lx: 290, ly: 576 },
   { id: 'aqaba', name: 'العَقَبة', line: 'map_aqaba', x: 62, y: 628, lx: 158, ly: 650 },
 ];
@@ -52,6 +52,7 @@ export class MapScene extends BaseScene {
   private sunDisc!: Phaser.GameObjects.Arc;
   private tint: Phaser.GameObjects.Rectangle | null = null;
   private removeLock: (() => void) | null = null;
+  private hits: Array<{ pin: Pin; c: Phaser.GameObjects.Container; label: HTMLElement; pinBox: Phaser.Geom.Rectangle; labelBox: Phaser.Geom.Rectangle }> = [];
 
   constructor() {
     super('map');
@@ -61,6 +62,7 @@ export class MapScene extends BaseScene {
     // Fields survive a scene restart; clear references to last visit's objects.
     this.tint = null;
     this.idleTimer = undefined;
+    this.hits = [];
     this.setup();
     this.busy = false;
     ui.setPill(null);
@@ -83,7 +85,10 @@ export class MapScene extends BaseScene {
       this.removeLock = null;
     });
 
-    this.input.on('pointerdown', () => this.resetIdle());
+    this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
+      this.resetIdle();
+      this.tapAt(ptr.worldX, ptr.worldY);
+    });
     void this.greet();
   }
 
@@ -173,15 +178,32 @@ export class MapScene extends BaseScene {
     const lw = Math.max(56, label.offsetWidth);
     const lh = Math.max(40, label.offsetHeight);
     const c = this.add.container(p.x, p.y, [ring, dot]).setDepth(10);
-    // Generous hit area: one box covering the pin and its name (at least 56 points).
-    const left = Math.min(-30, p.lx - lw / 2 - p.x - 4);
-    const right = Math.max(30, p.lx + lw / 2 - p.x + 4);
-    const top = Math.min(-30, p.ly - lh / 2 - p.y - 4);
-    const bottom = Math.max(30, p.ly + lh / 2 - p.y + 4);
-    c.setInteractive(new Phaser.Geom.Rectangle(left, top, right - left, bottom - top), Phaser.Geom.Rectangle.Contains);
+    // Tap area: the pin (a 56-point square) plus the name's box. Overlaps are
+    // settled by whichever pin or name is closest to the finger (see tapAt).
+    this.hits.push({
+      pin: p, c, label,
+      pinBox: new Phaser.Geom.Rectangle(p.x - 28, p.y - 28, 56, 56),
+      labelBox: new Phaser.Geom.Rectangle(p.lx - lw / 2 - 4, p.ly - lh / 2 - 4, lw + 8, lh + 8),
+    });
     // Gentle life: every pin breathes a little, out of step with the others.
     this.tweens.add({ targets: ring, scale: ring.scale * 1.15, duration: 1300 + Math.random() * 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: Math.random() * 800 });
-    c.on('pointerdown', () => this.tapPin(p, c, label));
+
+  }
+
+  /** The place whose pin or name is closest to the finger, among those it touches. */
+  private tapAt(x: number, y: number): void {
+    const dist = (r: Phaser.Geom.Rectangle) => {
+      const dx = Math.max(r.x - x, 0, x - r.right), dy = Math.max(r.y - y, 0, y - r.bottom);
+      return Math.hypot(dx, dy) + Math.hypot(x - r.centerX, y - r.centerY) * 0.01;
+    };
+    let best: (typeof this.hits)[number] | null = null;
+    let bestD = Infinity;
+    for (const h of this.hits) {
+      if (!h.pinBox.contains(x, y) && !h.labelBox.contains(x, y)) continue;
+      const d = Math.min(dist(h.pinBox), dist(h.labelBox));
+      if (d < bestD) { bestD = d; best = h; }
+    }
+    if (best) void this.tapPin(best.pin, best.c, best.label);
   }
 
   private async tapPin(p: Pin, c: Phaser.GameObjects.Container, label: HTMLElement): Promise<void> {
