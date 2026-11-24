@@ -323,7 +323,9 @@ export class PetraScene extends BaseScene {
   private pose(key: string, holdMs = 0): void {
     this.poseTimer?.remove();
     this.boyImg.setTexture(key);
-    fitHeight(this.boyImg, BOY.h);
+    // The lifting picture shows him bent over, about 0.81 of his standing
+    // height, so it is drawn shorter. Otherwise he would grow while lifting.
+    fitHeight(this.boyImg, BOY.h * (key === 'boy_lift' ? 0.81 : 1));
     if (holdMs) this.poseTimer = this.time.delayedCall(holdMs, () => this.pose('boy_idle'));
   }
 
