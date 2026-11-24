@@ -11,7 +11,7 @@ Every change merged into the project publishes itself in about 2 minutes. The re
 3. **With the internet still on,** open the game once from the new home-screen icon and wait about 10 seconds. This saves the whole game on the phone.
 4. From then on it works with no internet, including in airplane mode.
 
-**After an update:** fully close the game (swipe it away) and open it again, twice. The phone picks up the new version on the next opening. The version line in the parents' corner shows which version the phone has.
+**Updates install themselves.** When a new version is published, the game switches to it the next time the start screen shows, never in the middle of a day. The version line in the parents' corner shows which version the phone has. (Only a device that still runs a version from before 24 November 2026 needs one manual refresh: close and reopen the game twice on the iPhone, or press Ctrl+Shift+R on a computer.)
 
 ## How a day goes (about 10 minutes)
 
