@@ -15,6 +15,12 @@ export function layoutLabels(): void {
   layer.style.transform = `translate(${left}px, ${top}px) scale(${s})`;
 }
 
+/** Fade the whole label layer, in step with the camera fades. */
+export function fadeLabels(to: 0 | 1, ms: number): void {
+  layer.style.transition = `opacity ${ms}ms ease`;
+  layer.style.opacity = String(to);
+}
+
 export function clearLabels(): void {
   layer.replaceChildren();
 }

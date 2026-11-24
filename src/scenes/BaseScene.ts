@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { DESIGN_H, DESIGN_W, view, vp } from '../core/viewport';
-import { clearLabels, layoutLabels } from '../core/labels';
+import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
@@ -25,6 +25,8 @@ export abstract class BaseScene extends Phaser.Scene {
       this.time.removeAllEvents();
     });
     this.cameras.main.fadeIn(350, 243, 223, 180);
+    fadeLabels(0, 0);
+    requestAnimationFrame(() => fadeLabels(1, 350));
   }
 
   /** Fit the 390 x 844 design frame inside the screen. */
@@ -67,6 +69,7 @@ export abstract class BaseScene extends Phaser.Scene {
     ui.setHome(null);
     this.input.enabled = false;
     this.cameras.main.fadeOut(350, 243, 223, 180);
+    fadeLabels(0, 350);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start(key, data));
   }
 
