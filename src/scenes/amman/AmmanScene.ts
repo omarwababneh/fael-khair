@@ -220,7 +220,7 @@ export class AmmanScene extends BaseScene {
       onComplete: () => {
         sfx('bounce', { weight: 0.6, volume: 0.8 });
         // The ball drops back down; the jar topples off the shelf.
-        this.tweens.add({ targets: this.ball, x: BALL.x + 30, duration: 800, ease: 'Linear' });
+        this.tweens.add({ targets: this.ball, x: BALL.x - 46, duration: 800, ease: 'Linear' }); // rests between the boy and the shards
         this.tweens.add({ targets: this.ball, y: FLOOR - BALL.d / 2, duration: 800, ease: 'Bounce.easeOut' });
         this.tweens.add({ targets: this.jar, x: JAR.x + 4, angle: 28, duration: 260, ease: 'Sine.easeOut' });
         this.tweens.add({ targets: this.jar, y: FLOOR - 26, angle: 150, x: SHARDS[1].x, duration: 520, delay: 260, ease: 'Quad.easeIn', onComplete: () => this.breakJar() });
@@ -455,6 +455,8 @@ export class AmmanScene extends BaseScene {
 
   private showHint(): void {
     const again = () => this.kickIdle();
+    // Never interrupt a drag that is in progress.
+    if (this.pointerId !== -1) return again();
     if (this.state === 'play') {
       this.hint.show('tap', { x: this.ball.x, y: this.ball.y }, undefined, again);
     } else if (this.state === 'hide') {
