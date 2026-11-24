@@ -24,5 +24,10 @@ The background music in `public/assets/audio/music/` is by Kevin MacLeod (incomp
 | `ummqais.m4a` | "Merry Go" |
 | `amman.m4a` | "Fluffing a Duck" |
 | `irbid.m4a` | "Sneaky Snitch" |
+| `jerash.m4a` | "Bumbly March" |
+| `deadsea.m4a` | "Wallpaper" |
+| `aqaba.m4a` | "Life of Riley" |
+
+The last three are ready for places that are not built yet. They play once those places exist under the keys `jerash`, `deadsea` and `aqaba`.
 
 The license requires this credit to stay wherever the game is shared. It must also be shown inside the game, in the parents' corner.
