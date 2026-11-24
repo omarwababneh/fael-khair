@@ -44,7 +44,10 @@ const SUN_PATH = [
   { x: 134, y: 94, color: 0xff9c38 },
   { x: 72, y: 116, color: 0xff7b36 },
 ];
-const WARMTH = [0, 0.05, 0.1, 0.15, 0.22];
+const WARMTH = [0, 0.05, 0.1, 0.15, 0.3];
+const DAY_TINT = 0xff9a4a;
+const DUSK_TINT = 0xa48ac8; // after all four places, the sky turns to dusk
+const tintFor = (step: number) => (step >= 4 ? DUSK_TINT : DAY_TINT);
 
 export class MapScene extends BaseScene {
   private busy = false;
@@ -53,6 +56,7 @@ export class MapScene extends BaseScene {
   private sunDisc!: Phaser.GameObjects.Arc;
   private tint: Phaser.GameObjects.Rectangle | null = null;
   private removeLock: (() => void) | null = null;
+  private duskGlow: Phaser.GameObjects.Image | null = null;
   private hits: Array<{ pin: Pin; c: Phaser.GameObjects.Container; label: HTMLElement; pinBox: Phaser.Geom.Rectangle; labelBox: Phaser.Geom.Rectangle }> = [];
 
   constructor() {
@@ -62,6 +66,7 @@ export class MapScene extends BaseScene {
   create(): void {
     // Fields survive a scene restart; clear references to last visit's objects.
     this.tint = null;
+    this.duskGlow = null;
     this.idleTimer = undefined;
     this.hits = [];
     this.setup();
@@ -152,10 +157,12 @@ export class MapScene extends BaseScene {
     if (!animate) {
       this.sun.setPosition(s.x, s.y);
       this.sunDisc.setFillStyle(s.color);
-      this.tint?.setFillStyle(0xff9a4a, warmth);
+      this.tint?.setFillStyle(tintFor(step), warmth);
+      if (step >= 4) this.wadiRumGlows();
       return;
     }
     sfx('chime', { volume: 0.5 });
+    if (step >= 4) this.time.delayedCall(1500, () => this.alive && this.wadiRumGlows());
     this.tweens.add({ targets: this.sun, x: s.x, y: s.y, duration: 1500, ease: 'Sine.easeInOut' });
     this.tweens.addCounter({
       from: 0, to: 1, duration: 1500,
@@ -164,9 +171,19 @@ export class MapScene extends BaseScene {
           Phaser.Display.Color.ValueToColor(this.sunDisc.fillColor),
           Phaser.Display.Color.ValueToColor(s.color), 1, tw.getValue() ?? 0);
         this.sunDisc.setFillStyle(Phaser.Display.Color.GetColor(c.r, c.g, c.b));
-        this.tint?.setFillStyle(0xff9a4a, Phaser.Math.Linear(this.tint.fillAlpha, warmth, tw.getValue() ?? 0));
+        this.tint?.setFillStyle(tintFor(step), Phaser.Math.Linear(this.tint.fillAlpha, warmth, tw.getValue() ?? 0));
       },
     });
+  }
+
+  /** After all four places, the Wadi Rum pin glows softly: the night is ready. */
+  private wadiRumGlows(): void {
+    if (this.duskGlow) return;
+    const p = PINS.find((x) => x.id === 'wadirum');
+    if (!p) return;
+    const g = this.add.image(p.x, p.y, 'fx_glow').setDisplaySize(110, 110).setDepth(9).setAlpha(0).setBlendMode(Phaser.BlendModes.ADD);
+    this.tweens.add({ targets: g, alpha: { from: 0.45, to: 0.9 }, scale: g.scale * 1.12, duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    this.duskGlow = g;
   }
 
   private makePin(p: Pin): void {
@@ -213,7 +230,9 @@ export class MapScene extends BaseScene {
     this.tweens.add({ targets: c, scale: { from: 1.3, to: 1 }, duration: 450, ease: 'Back.easeOut' });
     this.tweens.add({ targets: c, y: { from: p.y - 14, to: p.y }, duration: 450, ease: 'Bounce.easeOut' });
     replay(label, 'is-bouncing');
-    if (!p.scene) {
+    // Wadi Rum is scenery until all four places are done; then it opens the night ending.
+    const scene = p.id === 'wadirum' ? (sunStep() >= 4 ? 'wadirum' : undefined) : p.scene;
+    if (!scene) {
       void Voice.say(p.line);
       return;
     }
@@ -222,7 +241,7 @@ export class MapScene extends BaseScene {
     const said = Voice.say(p.line);
     await Promise.race([said, this.wait(3500)]);
     if (!this.alive) return;
-    this.goTo(p.scene);
+    this.goTo(scene);
   }
 
   private openParent(): void {

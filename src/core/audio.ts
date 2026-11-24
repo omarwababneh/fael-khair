@@ -104,6 +104,21 @@ class AudioEngine {
     return p;
   }
 
+  /** Play a file directly (not on the music or effects buses). Resolves when it ends. */
+  async playFile(url: string): Promise<boolean> {
+    const ctx = this.ctx;
+    if (!ctx) return false;
+    const buf = await this.load(url);
+    if (!buf) return false;
+    return new Promise((resolve) => {
+      const s = ctx.createBufferSource();
+      s.buffer = buf;
+      s.connect(this.master);
+      s.onended = () => resolve(true);
+      s.start();
+    });
+  }
+
   onHiddenChange(fn: (hidden: boolean) => void): void {
     this.listeners.push(fn);
   }

@@ -7,7 +7,7 @@ export type SfxName =
   | 'thud' | 'dust' | 'grab' | 'step' | 'chime' | 'prick' | 'pop'
   | 'creak' | 'birds' | 'whoosh' | 'slide'
   | 'splash' | 'pour' | 'lap' | 'bark' | 'bounce' | 'shatter' | 'sweep'
-  | 'wipe' | 'knock' | 'door' | 'rustle' | 'rope';
+  | 'wipe' | 'knock' | 'door' | 'rustle' | 'rope' | 'twinkle';
 
 interface Opts { weight?: number; volume?: number }
 
@@ -160,6 +160,10 @@ const makers: Record<SfxName, (ctx: AudioContext, t: number, o: Required<Opts>) 
     return [g];
   },
   rustle: (ctx, t) => [noise(ctx, t, 0.5, 'bandpass', 3200, 0.8, 0.08, 0.15)],
+  twinkle: (ctx, t) => {
+    const f = 1800 + Math.random() * 1400;
+    return [tone(ctx, t, 'sine', f, f * 1.02, 0.5, 0.05, 0.01), tone(ctx, t + 0.04, 'sine', f * 1.5, f * 1.5, 0.35, 0.025, 0.01)];
+  },
   rope: (ctx, t) => {
     const o = ctx.createOscillator();
     o.type = 'triangle';
@@ -198,3 +202,80 @@ export function sfx(name: SfxName, opts: Opts = {}): void {
   for (const node of makers[name](ctx, ctx.currentTime + 0.005, o)) node.connect(out);
 }
 
+
+/** All sound effects, including night ambience, fade out or back in. */
+export function setSfxMuted(muted: boolean, seconds = 0.8): void {
+  audio.ramp('sfx', muted ? 0 : 0.9, seconds);
+}
+
+/**
+ * Night ambience (Wadi Rum): soft wind and distant crickets, on the sound
+ * effects bus. A file at sfx/night.m4a replaces it. Returns a stop function.
+ */
+export function nightAmbience(): () => void {
+  const ctx = audio.ctx;
+  if (!ctx) return () => undefined;
+  const out = ctx.createGain();
+  out.gain.value = 0;
+  out.gain.linearRampToValueAtTime(1, ctx.currentTime + 2);
+  out.connect(audio.buses.sfx);
+  const nodes: AudioScheduledSourceNode[] = [];
+  let timer = 0;
+  if (hasAudio('sfx', 'night')) {
+    void audio.load('assets/audio/sfx/night.m4a').then((buf) => {
+      if (!buf) return;
+      const s = ctx.createBufferSource();
+      s.buffer = buf;
+      s.loop = true;
+      s.connect(out);
+      s.start();
+      nodes.push(s);
+    });
+  } else {
+    // Wind: looping filtered noise with a slow swell.
+    const wind = ctx.createBufferSource();
+    wind.buffer = audio.noiseBuffer();
+    wind.loop = true;
+    const f = ctx.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.value = 420;
+    const g = ctx.createGain();
+    g.gain.value = 0.05;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.09;
+    const lg = ctx.createGain();
+    lg.gain.value = 0.03;
+    lfo.connect(lg).connect(g.gain);
+    wind.connect(f).connect(g).connect(out);
+    wind.start();
+    lfo.start();
+    nodes.push(wind, lfo);
+    // Crickets: short high chirps in small groups.
+    timer = window.setInterval(() => {
+      if (ctx.state !== 'running') return;
+      const t = ctx.currentTime;
+      const base = 4200 + Math.random() * 600;
+      for (let i = 0; i < 3; i++) {
+        const o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = base;
+        const cg = ctx.createGain();
+        env(cg, t + i * 0.07, 0.018, 0.005, 0.04);
+        o.connect(cg).connect(out);
+        o.start(t + i * 0.07);
+        o.stop(t + i * 0.07 + 0.08);
+      }
+    }, 900 + Math.random() * 500);
+  }
+  return () => {
+    window.clearInterval(timer);
+    const t = ctx.currentTime;
+    out.gain.cancelScheduledValues(t);
+    out.gain.setValueAtTime(out.gain.value, t);
+    out.gain.linearRampToValueAtTime(0, t + 0.8);
+    window.setTimeout(() => {
+      for (const n of nodes) { try { n.stop(); } catch { /* stopped */ } }
+      out.disconnect();
+    }, 1000);
+  };
+}

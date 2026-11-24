@@ -72,6 +72,9 @@ export const ART: Record<string, [number, number]> = {
   food_labneh: [400, 340],
   food_tomatoes: [460, 360],
   food_apples: [460, 360],
+  // Wadi Rum
+  bg_wadirum_night: [1170, 1755],
+  boy_sit_back: [500, 600],
 };
 
 /** Optional art: used if delivered, otherwise skipped (never a placeholder). */

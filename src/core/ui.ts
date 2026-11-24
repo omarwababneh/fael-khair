@@ -1,11 +1,80 @@
 // Interface chrome drawn as HTML on top of the game canvas, so it stays crisp,
 // right-to-left, and inside the iPhone safe area.
+import parentsJson from '../../content/parents.json';
+import linesContent from '../../content/lines.json';
+import { getLine, registry } from './content';
+
+const parentsContent = parentsJson as { starters: Record<string, string[]>; invitation: string };
 
 const ICONS = {
   home: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15.5 16 5l12 10.5" fill="none" stroke="#4a2c17" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13.5V27h6v-7h4v7h6V13.5" fill="#c8623a" stroke="#4a2c17" stroke-width="2.6" stroke-linejoin="round"/></svg>`,
   speaker: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#c8623a" stroke="#4a2c17" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5c1.6 1.2 2.5 2.8 2.5 4.5s-.9 3.3-2.5 4.5M24.5 8c2.6 2.1 4 4.9 4 8s-1.4 5.9-4 8" fill="none" stroke="#4a2c17" stroke-width="2.4" stroke-linecap="round"/></svg>`,
   lock: `<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="9" rx="2" fill="#4a2c17"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9" fill="none" stroke="#4a2c17" stroke-width="2"/></svg>`,
 };
+
+const PLACE_NAMES: Record<string, string> = { petra: 'البَتْرا', ummqais: 'أُمّ قَيْس', amman: 'عَمّان', irbid: 'إِرْبِد' };
+
+function section(title: string, ...children: HTMLElement[]): HTMLDetailsElement {
+  const d = el('details', 'fk-section');
+  const s = el('summary', '');
+  s.textContent = title;
+  d.append(s, ...children);
+  return d;
+}
+
+/**
+ * Parents' corner sections (GAME_SPEC.md section 10). Nothing here is about the
+ * child: no statistics, no history of what he chose, nothing tracked.
+ */
+function parentSections(): HTMLElement[] {
+  // Conversation starters, three per place.
+  const talk: HTMLElement[] = [];
+  for (const [id, qs] of Object.entries(parentsContent.starters)) {
+    const h = el('h3', '');
+    h.textContent = PLACE_NAMES[id] ?? id;
+    const ul = el('ul', '');
+    for (const q of qs) {
+      const li = el('li', '');
+      li.textContent = q;
+      ul.append(li);
+    }
+    talk.push(h, ul);
+  }
+  // An optional invitation: never tracked, confirmed or tied to the game.
+  const inv = el('p', 'fk-invite');
+  inv.textContent = parentsContent.invitation;
+  // Recording guide: every line the father can record, by file name.
+  const note = el('p', '');
+  note.textContent = 'سجّل كل جملة بصوتك، واحفظها باسمها (مثلاً start.m4a) داخل مجلد:';
+  const path = el('p', 'fk-path');
+  path.textContent = 'public/assets/audio/vo/';
+  const note2 = el('p', '');
+  note2.textContent = 'اللعبة بتستعمل تسجيلك تلقائياً بدل صوت الجهاز. الآية الكريمة لا تُقرأ بصوت الجهاز أبداً.';
+  const list = el('ul', 'fk-lines');
+  for (const id of Object.keys(linesContent)) {
+    const line = getLine(id);
+    if (!line.speakable && !line.script) continue;
+    const li = el('li', '');
+    const file = el('span', 'fk-file');
+    file.textContent = `${id}.m4a`;
+    const txt = el('span', '');
+    txt.textContent = line.script;
+    li.append(file, txt);
+    list.append(li);
+  }
+  // Review status of the religious content registry.
+  const pending = registry.filter((r) => r.approval_status !== 'approved').length;
+  const review = el('p', '');
+  review.textContent = pending
+    ? `${pending} من ${registry.length} نصوص دينية بانتظار مراجعتك في content/registry.json.`
+    : 'كل النصوص الدينية تمّت مراجعتها.';
+  return [
+    section('أسئلة للحديث مع ابنك', ...talk),
+    section('فكرة لليوم', inv),
+    section('دليل التسجيل', note, path, note2, list),
+    section('مراجعة النصوص الدينية', review),
+  ];
+}
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, html = ''): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
@@ -124,6 +193,45 @@ class UI {
     return () => wrap.remove();
   }
 
+  /**
+   * The ayah: a still, respectful text block (GAME_SPEC.md sections 2 and 4E).
+   * It only fades in and out. It cannot be touched, dragged or collected.
+   */
+  showAyah(text: string, reference: string): { hide: (ms: number) => Promise<void> } {
+    const wrap = el('div', 'fk-ayah');
+    // Hidden from screen readers too: no synthetic voice may ever read the ayah.
+    wrap.setAttribute('aria-hidden', 'true');
+    const t = el('p', 'fk-ayah-text');
+    t.textContent = text;
+    const r = el('p', 'fk-ayah-ref');
+    r.textContent = reference;
+    wrap.append(t, r);
+    this.root.append(wrap);
+    requestAnimationFrame(() => wrap.classList.add('is-shown'));
+    return {
+      hide: (ms: number) => new Promise((res) => {
+        wrap.style.transitionDuration = `${ms}ms`;
+        wrap.classList.remove('is-shown');
+        window.setTimeout(() => { wrap.remove(); res(); }, ms + 50);
+      }),
+    };
+  }
+
+  /** The closing button of the day. */
+  showDone(label: string, onTap: () => void): () => void {
+    const wrap = el('div', 'fk-done-wrap');
+    const b = el('button', 'fk-go fk-done');
+    b.textContent = label;
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      wrap.remove();
+      onTap();
+    });
+    wrap.append(b);
+    this.root.append(wrap);
+    return () => wrap.remove();
+  }
+
   /** Small lock button: hold for 3 seconds (a ring fills) to open the parent area. */
   showLock(onOpen: () => void): () => void {
     const btn = el('button', 'fk-lock');
@@ -209,7 +317,10 @@ class UI {
     });
     const build = el('div', 'fk-build');
     build.textContent = `نسخة: \u2066${__BUILD__}\u2069`;
-    card.append(h, row, speedRow, voice, build, close);
+    // The longer sections fold away so the card stays short.
+    const scroll = el('div', 'fk-parent-scroll');
+    scroll.append(voice, ...parentSections());
+    card.append(h, row, speedRow, scroll, build, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());
     this.root.append(wrap);

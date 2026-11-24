@@ -2,6 +2,8 @@ import './style.css';
 import Phaser from 'phaser';
 import { loadIndex } from './core/assets';
 import { setupUpdates } from './core/update';
+import { audio } from './core/audio';
+import { session } from './core/session';
 import { measure, vp } from './core/viewport';
 import { BootScene } from './scenes/boot/BootScene';
 import { StartScene } from './scenes/start/StartScene';
@@ -10,13 +12,16 @@ import { PetraScene } from './scenes/petra/PetraScene';
 import { UmmQaisScene } from './scenes/ummqais/UmmQaisScene';
 import { AmmanScene } from './scenes/amman/AmmanScene';
 import { IrbidScene } from './scenes/irbid/IrbidScene';
+import { WadiRumScene } from './scenes/wadirum/WadiRumScene';
 
 // No page zoom, no pinch, no double-tap zoom, no long-press callouts, no pull-to-refresh.
 const block = (e: Event) => e.preventDefault();
 document.addEventListener('gesturestart', block, { passive: false });
 document.addEventListener('dblclick', block, { passive: false });
 document.addEventListener('contextmenu', block);
-document.addEventListener('touchmove', block, { passive: false });
+document.addEventListener('touchmove', (e) => {
+  if (!(e.target as Element | null)?.closest?.('.fk-parent-scroll')) e.preventDefault();
+}, { passive: false });
 
 async function boot(): Promise<void> {
   measure();
@@ -36,7 +41,7 @@ async function boot(): Promise<void> {
     render: { antialias: true, powerPreference: 'high-performance' },
     input: { activePointers: 2 },
     fps: { target: 60 },
-    scene: [BootScene, StartScene, MapScene, PetraScene, UmmQaisScene, AmmanScene, IrbidScene],
+    scene: [BootScene, StartScene, MapScene, PetraScene, UmmQaisScene, AmmanScene, IrbidScene, WadiRumScene],
   });
 
   let pending = 0;
@@ -58,7 +63,7 @@ async function boot(): Promise<void> {
   setupUpdates(game);
 
   // Harmless debug handle for testing in a desktop browser.
-  (window as unknown as { fk: unknown }).fk = { game };
+  (window as unknown as { fk: unknown }).fk = { game, session, audio };
 }
 
 void boot();
