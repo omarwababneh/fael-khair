@@ -59,12 +59,15 @@ export abstract class BaseScene extends Phaser.Scene {
 
   /** Text drawn in the world (pin labels, small exclamations). */
   protected text(x: number, y: number, s: string, size: number, color = '#4a2c17'): Phaser.GameObjects.Text {
-    return this.add.text(x, y, s, {
+    // Phaser's `rtl` option breaks on iPhone Safari (it ignores the canvas
+    // direction, so only one letter showed). Drawing left-to-right is safe:
+    // Arabic letters still join and run right to left on their own, and the
+    // right-to-left marks (U+200F) keep punctuation such as "!" on the correct side.
+    return this.add.text(x, y, `\u200F${s}\u200F`, {
       fontFamily: FONT,
       fontSize: `${size}px`,
       fontStyle: 'bold',
       color,
-      rtl: true,
       resolution: Math.max(1, vp.zoom),
       padding: { x: 4, y: 6 },
     }).setOrigin(0.5);
