@@ -153,7 +153,9 @@ class UI {
       wrap.remove();
       opts.onClose();
     });
-    card.append(h, row, voice, close);
+    const build = el('div', 'fk-build');
+    build.textContent = `نسخة: \u2066${__BUILD__}\u2069`;
+    card.append(h, row, voice, build, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());
     this.root.append(wrap);

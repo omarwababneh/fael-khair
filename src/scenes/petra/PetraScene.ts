@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { fitHeight, fitWidth, hasArt } from '../../core/assets';
 import { dustPuff, glowRing, motes } from '../../core/fx';
+import { addLabel } from '../../core/labels';
 import { music } from '../../core/music';
 import { session } from '../../core/session';
 import { sfx } from '../../core/sfx';
@@ -353,10 +354,8 @@ export class PetraScene extends BaseScene {
     this.tweens.add({ targets: this.boy, x: { from: BOY.x - 10, to: BOY.x }, duration: 420, ease: 'Elastic.easeOut' });
     this.tweens.add({ targets: this.boy, angle: { from: -7, to: 0 }, duration: 520, ease: 'Elastic.easeOut' });
     this.tweens.add({ targets: o.img, angle: { from: 5, to: 0 }, duration: 480, ease: 'Elastic.easeOut' });
-    const t = this.text(this.boy.x + 18, this.boy.y - BOY.h - 14, 'آي!', 36, '#c8623a').setDepth(80).setScale(0.2);
-    t.setStroke('#fbf1dc', 6);
-    this.tweens.add({ targets: t, scale: 1, duration: 260, ease: 'Back.easeOut' });
-    this.tweens.add({ targets: t, y: t.y - 26, alpha: 0, delay: 600, duration: 500, onComplete: () => t.destroy() });
+    const t = addLabel('آي!', this.boy.x + 18, this.boy.y - BOY.h - 14, 'fk-ouch');
+    this.time.delayedCall(1200, () => t.remove());
     if (o.ring) this.tweens.add({ targets: o.ring, scale: o.ring.scale * 1.5, duration: 260, yoyo: true, repeat: 1 });
     if (!o.thornSaid) {
       o.thornSaid = true;

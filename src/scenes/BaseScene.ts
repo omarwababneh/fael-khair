@@ -1,9 +1,8 @@
 import Phaser from 'phaser';
 import { DESIGN_H, DESIGN_W, view, vp } from '../core/viewport';
+import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
-
-export const FONT = '"Baloo Bhaijaan 2", sans-serif';
 
 /** Shared camera fitting, background covering and scene changes. */
 export abstract class BaseScene extends Phaser.Scene {
@@ -14,16 +13,20 @@ export abstract class BaseScene extends Phaser.Scene {
   protected setup(): void {
     this.alive = true;
     this.covers = [];
+    clearLabels();
     this.fit();
     const onResize = () => this.fit();
     this.game.events.on('fk-resize', onResize);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.alive = false;
+      clearLabels();
       this.game.events.off('fk-resize', onResize);
       this.tweens.killAll();
       this.time.removeAllEvents();
     });
     this.cameras.main.fadeIn(350, 243, 223, 180);
+    fadeLabels(0, 0);
+    requestAnimationFrame(() => fadeLabels(1, 350));
   }
 
   /** Fit the 390 x 844 design frame inside the screen. */
@@ -33,6 +36,7 @@ export abstract class BaseScene extends Phaser.Scene {
     cam.setZoom(vp.zoom);
     cam.centerOn(DESIGN_W / 2, DESIGN_H / 2);
     for (const c of this.covers) this.sizeCover(c.img, c.factor);
+    layoutLabels();
     this.onLayout();
   }
 
@@ -57,22 +61,6 @@ export abstract class BaseScene extends Phaser.Scene {
     img.setScale(s);
   }
 
-  /** Text drawn in the world (pin labels, small exclamations). */
-  protected text(x: number, y: number, s: string, size: number, color = '#4a2c17'): Phaser.GameObjects.Text {
-    // Phaser's `rtl` option breaks on iPhone Safari (it ignores the canvas
-    // direction, so only one letter showed). Drawing left-to-right is safe:
-    // Arabic letters still join and run right to left on their own, and the
-    // right-to-left marks (U+200F) keep punctuation such as "!" on the correct side.
-    return this.add.text(x, y, `\u200F${s}\u200F`, {
-      fontFamily: FONT,
-      fontSize: `${size}px`,
-      fontStyle: 'bold',
-      color,
-      resolution: Math.max(1, vp.zoom),
-      padding: { x: 4, y: 6 },
-    }).setOrigin(0.5);
-  }
-
   /** Leave for another scene with a soft fade. */
   goTo(key: string, data?: object): void {
     if (!this.alive) return;
@@ -81,6 +69,7 @@ export abstract class BaseScene extends Phaser.Scene {
     ui.setHome(null);
     this.input.enabled = false;
     this.cameras.main.fadeOut(350, 243, 223, 180);
+    fadeLabels(0, 350);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start(key, data));
   }
 

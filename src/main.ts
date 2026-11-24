@@ -40,8 +40,11 @@ async function boot(): Promise<void> {
     cancelAnimationFrame(pending);
     pending = requestAnimationFrame(() => {
       measure();
-      game.scale.setZoom(1 / vp.dpr);
       game.scale.resize(vp.w, vp.h);
+      game.scale.setZoom(1 / vp.dpr);
+      // Phaser skips the CSS size update when zoom is exactly 1, so set it here.
+      game.canvas.style.width = `${vp.cssW}px`;
+      game.canvas.style.height = `${vp.cssH}px`;
       game.events.emit('fk-resize');
     });
   };

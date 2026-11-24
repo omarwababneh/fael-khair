@@ -1,6 +1,6 @@
 // Voice.say(lineId):
 //  1. If public/assets/audio/vo/<lineId>.m4a exists, play it.
-//  2. Otherwise speak the line's `tts` text with the phone's Arabic voice (rate 0.9).
+//  2. Otherwise speak the line's `tts` text with the phone's best Arabic voice.
 //  3. Always show the text in the speech bubble at the same time.
 // If the phone has no Arabic voice, show the text only (never another language's voice).
 import { audio } from './audio';
@@ -10,6 +10,9 @@ import { music } from './music';
 import { ui } from './ui';
 
 const synth: SpeechSynthesis | null = 'speechSynthesis' in window ? window.speechSynthesis : null;
+
+// The owner found the spec's 0.9 too slow: speak at the phone's natural speed.
+const RATE = 1.0;
 
 function readingTime(text: string): number {
   return Math.max(1800, text.length * 85 + 700);
@@ -24,11 +27,26 @@ class VoiceSystem {
   private timers: number[] = [];
   lastId: string | null = null;
 
-  /** Find the first voice whose language starts with "ar". */
+  /**
+   * Pick the phone's best Arabic voice: a Jordanian one if it exists, then
+   * Premium, then Enhanced, then any voice whose language starts with "ar".
+   * Never a voice in another language.
+   */
   private pick(): void {
-    if (this.voice || !synth) return;
-    const v = synth.getVoices().find((x) => (x.lang || '').toLowerCase().startsWith('ar'));
-    if (v) this.voice = v;
+    if (!synth) return;
+    const score = (v: SpeechSynthesisVoice) => {
+      const name = v.name.toLowerCase();
+      let s = 0;
+      if ((v.lang || '').toLowerCase().replace('_', '-') === 'ar-jo') s += 8;
+      if (name.includes('premium')) s += 4;
+      if (name.includes('enhanced') || name.includes('improved')) s += 2;
+      if (v.localService) s += 1;
+      return s;
+    };
+    const ar = synth.getVoices().filter((x) => (x.lang || '').toLowerCase().startsWith('ar'));
+    if (!ar.length) return;
+    const best = ar.reduce((a, b) => (score(b) > score(a) ? b : a));
+    if (!this.voice || score(best) > score(this.voice)) this.voice = best;
   }
 
   constructor() {
@@ -101,7 +119,7 @@ class VoiceSystem {
         const u = new SpeechSynthesisUtterance(line.tts);
         u.voice = this.voice;
         u.lang = this.voice.lang;
-        u.rate = 0.9;
+        u.rate = RATE;
         u.onend = finish;
         u.onerror = finish;
         this.utter = u; // keep a reference: iOS drops events of collected utterances
