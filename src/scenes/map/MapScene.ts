@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { motes } from '../../core/fx';
+import { addLabel, replay } from '../../core/labels';
 import { music } from '../../core/music';
 import { session, sunStep } from '../../core/session';
 import { sfx } from '../../core/sfx';
@@ -164,28 +165,24 @@ export class MapScene extends BaseScene {
     const r = big ? 22 : 16;
     const ring = this.add.image(0, 0, 'fx_ring').setDisplaySize(r * 3.2, r * 3.2).setAlpha(big ? 0.9 : 0.6);
     const dot = this.add.circle(0, 0, r * 0.55, big ? 0xc8623a : 0xfbf1dc).setStrokeStyle(3, 0x4a2c17);
-    const label = this.text(0, r + 20, p.name, 22);
-    const padX = 12;
-    const lw = label.width + padX * 2;
-    const pill = this.add.graphics();
-    pill.fillStyle(0xfbf1dc, 0.94);
-    pill.lineStyle(2.5, 0x4a2c17, 1);
-    pill.fillRoundedRect(-lw / 2, r + 3, lw, 36, 18);
-    pill.strokeRoundedRect(-lw / 2, r + 3, lw, 36, 18);
-    const c = this.add.container(p.x, p.y, [ring, pill, dot, label]).setDepth(10);
+    // The place name is HTML (see core/labels.ts); the pin itself is drawn here.
+    const label = addLabel(p.name, p.x, p.y + r + 20, 'fk-pin-label');
+    const lw = Math.max(56, label.offsetWidth);
+    const c = this.add.container(p.x, p.y, [ring, dot]).setDepth(10);
     // Generous hit area: covers the pin and its label (at least 56 points).
     const hw = Math.max(34, lw / 2 + 4);
     c.setInteractive(new Phaser.Geom.Rectangle(-hw, -34, hw * 2, r + 3 + 36 + 34 + 4), Phaser.Geom.Rectangle.Contains);
     // Gentle life: every pin breathes a little, out of step with the others.
     this.tweens.add({ targets: ring, scale: ring.scale * 1.15, duration: 1300 + Math.random() * 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: Math.random() * 800 });
-    c.on('pointerdown', () => this.tapPin(p, c));
+    c.on('pointerdown', () => this.tapPin(p, c, label));
   }
 
-  private async tapPin(p: Pin, c: Phaser.GameObjects.Container): Promise<void> {
+  private async tapPin(p: Pin, c: Phaser.GameObjects.Container, label: HTMLElement): Promise<void> {
     if (this.busy) return;
     sfx('pop');
     this.tweens.add({ targets: c, scale: { from: 1.3, to: 1 }, duration: 450, ease: 'Back.easeOut' });
     this.tweens.add({ targets: c, y: { from: p.y - 14, to: p.y }, duration: 450, ease: 'Bounce.easeOut' });
+    replay(label, 'is-bouncing');
     if (!p.scene) {
       void Voice.say(p.line);
       return;

@@ -1,9 +1,21 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { execSync } from 'node:child_process';
+
+// A short version stamp shown in the parents' corner, so we can tell which
+// build a phone is running.
+function buildStamp(): string {
+  let sha = (process.env.GITHUB_SHA || '').slice(0, 7);
+  if (!sha) {
+    try { sha = execSync('git rev-parse --short HEAD').toString().trim(); } catch { sha = 'local'; }
+  }
+  return `${sha} · ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC`;
+}
 
 // Served from https://<owner>.github.io/<repo>/ : every path is relative.
 export default defineConfig({
   base: './',
+  define: { __BUILD__: JSON.stringify(buildStamp()) },
   build: { target: 'es2020', chunkSizeWarningLimit: 2000 },
   plugins: [
     VitePWA({

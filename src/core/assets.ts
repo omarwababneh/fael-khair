@@ -70,8 +70,16 @@ export function makePlaceholders(scene: Phaser.Scene): void {
     ctx.textBaseline = 'middle';
     let size = Math.min(48, Math.floor(w / (name.length * 0.62)));
     size = Math.max(12, size);
-    ctx.font = `bold ${size}px sans-serif`;
-    ctx.fillText(name, w / 2, h / 2);
+    if (name.startsWith('bg_')) {
+      // Backgrounds: a small name near the top, so the placeholder does not
+      // dominate the screen. Still unmistakably a missing image.
+      size = 16;
+      ctx.font = `bold ${size}px sans-serif`;
+      ctx.fillText(`missing art: ${name}`, w / 2, h * 0.183);
+    } else {
+      ctx.font = `bold ${size}px sans-serif`;
+      ctx.fillText(name, w / 2, h / 2);
+    }
     tex.refresh();
   }
 }
