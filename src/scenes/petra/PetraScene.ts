@@ -39,24 +39,27 @@ interface Nook { x: number; y: number; used: boolean; ring: Phaser.GameObjects.I
 // Six obstacles: three rocks, a thorn branch, a rock, a larger branch.
 // Each one is a little heavier or needs a little more care than the one before.
 // Branch art: the smooth end to hold is on the LEFT (see DECISIONS.md).
+// Laid out on the path in bg_petra_siq (visible from about y = 480 down):
+// nearer obstacles lower and bigger, farther ones higher and smaller.
 const OBSTACLES: ObstacleDef[] = [
-  { key: 'rock_a', kind: 'rock', x: 210, y: 505, w: 78, follow: 0.5, weight: 0.15 },
-  { key: 'rock_b', kind: 'rock', x: 165, y: 446, w: 90, follow: 0.33, weight: 0.35 },
-  { key: 'rock_c', kind: 'rock', x: 230, y: 386, w: 98, follow: 0.24, weight: 0.55 },
-  { key: 'thorn_branch', kind: 'branch', x: 192, y: 318, w: 172, follow: 0.3, weight: 0.25, grip: 0.3 },
-  { key: 'rock_d', kind: 'rock', x: 176, y: 250, w: 122, follow: 0.12, weight: 1 },
-  { key: 'big_branch', kind: 'branch', x: 202, y: 180, w: 216, follow: 0.2, weight: 0.6, grip: 0.24 },
+  { key: 'rock_a', kind: 'rock', x: 228, y: 646, w: 58, follow: 0.5, weight: 0.15 },
+  { key: 'rock_b', kind: 'rock', x: 168, y: 608, w: 62, follow: 0.33, weight: 0.35 },
+  { key: 'rock_c', kind: 'rock', x: 236, y: 584, w: 66, follow: 0.24, weight: 0.55 },
+  { key: 'thorn_branch', kind: 'branch', x: 192, y: 556, w: 124, follow: 0.3, weight: 0.25, grip: 0.3 },
+  { key: 'rock_d', kind: 'rock', x: 170, y: 528, w: 74, follow: 0.12, weight: 1 },
+  { key: 'big_branch', kind: 'branch', x: 210, y: 500, w: 140, follow: 0.2, weight: 0.6, grip: 0.24 },
 ];
 
-// Glowing nooks at the canyon sides. Any obstacle fits any free nook.
+// Glowing nooks at the foot of the canyon walls. Any obstacle fits any free nook.
 const NOOKS = [
-  { x: 48, y: 528 }, { x: 342, y: 470 }, { x: 48, y: 402 },
-  { x: 342, y: 336 }, { x: 48, y: 268 }, { x: 342, y: 200 },
+  { x: 52, y: 606 }, { x: 340, y: 566 }, { x: 74, y: 548 },
+  { x: 312, y: 518 }, { x: 98, y: 498 }, { x: 286, y: 482 },
 ];
 
-const BOY = { x: 118, y: 652, h: 150 };
-const CART = { x: 268, y: 712, h: 128 };
-const STEP = 12; // how far the boy and cart move up after each cleared obstacle
+const BOY = { x: 108, y: 706, h: 128 };
+const CART = { x: 292, y: 718, h: 100 };
+const STEP = 10; // how far the boy and cart move up after each cleared obstacle
+const VANISH = { x: 200, y: 482 }; // where the path disappears into the Siq
 const HINT_AFTER = 6000;
 
 export class PetraScene extends BaseScene {
@@ -106,7 +109,7 @@ export class PetraScene extends BaseScene {
     motes(this, { x: 60, y: 120, w: 270, h: 560 }, 40);
 
     for (const n of NOOKS) {
-      this.nooks.push({ ...n, used: false, ring: glowRing(this, n.x, n.y, 40, 5) });
+      this.nooks.push({ ...n, used: false, ring: glowRing(this, n.x, n.y, 32, 5) });
     }
 
     // The cart behind the boy, the boy on the path.
@@ -152,7 +155,8 @@ export class PetraScene extends BaseScene {
   // ---------------------------------------------------------------- obstacles
 
   private makeObstacle(def: ObstacleDef): void {
-    const img = this.add.image(def.x, def.y, def.key).setDepth(20);
+    // Nearer obstacles (lower on screen) are drawn in front.
+    const img = this.add.image(def.x, def.y, def.key).setDepth(20 + def.y / 1000);
     const base = fitWidth(img, def.w);
     const o: Obstacle = { ...def, img, base, placed: false, thornSaid: false };
     // Forgiving hit area: at least 64 points tall and 18 points of extra margin.
@@ -254,7 +258,7 @@ export class PetraScene extends BaseScene {
       duration: 420,
       ease: 'Back.easeOut',
       onComplete: () => {
-        o.img.setDepth(20);
+        o.img.setDepth(20 + o.y / 1000);
         if (o.ring) {
           const g = this.gripPoint(o);
           o.ring.setPosition(g.x, g.y).setVisible(true);
@@ -425,10 +429,10 @@ export class PetraScene extends BaseScene {
 
     // The boy and the cart walk on up the cleared path.
     this.walk(true);
-    this.tweens.add({ targets: this.boy, y: 40, x: 175, scale: 0.75, duration: 4200, ease: 'Sine.easeIn' });
+    this.tweens.add({ targets: this.boy, y: VANISH.y + 10, x: VANISH.x - 12, scale: 0.3, alpha: { from: 1, to: 0 }, duration: 4200, ease: 'Sine.easeIn' });
     this.time.delayedCall(500, () => {
       if (!this.alive) return;
-      this.tweens.add({ targets: this.cart, y: 60, x: 230, scale: 0.75, duration: 4400, ease: 'Sine.easeIn' });
+      this.tweens.add({ targets: this.cart, y: VANISH.y + 14, x: VANISH.x + 14, scale: 0.3, alpha: { from: 1, to: 0 }, duration: 4400, ease: 'Sine.easeIn' });
       this.tweens.add({ targets: this.cartImg, angle: { from: -1.2, to: 1.2 }, duration: 260, yoyo: true, repeat: -1 });
       this.time.addEvent({ delay: 900, repeat: 4, callback: () => sfx('creak', { volume: 0.6 }) });
     });

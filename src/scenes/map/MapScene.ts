@@ -13,23 +13,26 @@ interface Pin {
   id: string;
   name: string; // with full vowel marks
   line: string;
-  x: number; // design-frame position (390 x 844), roughly true geography
+  x: number; // pin: on the landmark drawn in bg_map (design frame, 390 x 844)
   y: number;
+  lx: number; // label centre: beside the landmark, in empty desert
+  ly: number;
   /** Scene to open, if this place has an adventure built. */
   scene?: string;
   adventure?: boolean;
 }
 
-// Positions follow the real map (north at top). Tune them here once bg_map arrives.
+// Pins sit on the landmarks drawn in bg_map (measured from the art, which is
+// shown 390 points wide with its top at y = 129.5); names sit beside them.
 export const PINS: Pin[] = [
-  { id: 'ummqais', name: 'أُمّ قَيْس', line: 'map_ummqais', x: 124, y: 158, adventure: true },
-  { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 262, y: 180, adventure: true },
-  { id: 'jerash', name: 'جَرَش', line: 'map_jerash', x: 214, y: 262 },
-  { id: 'amman', name: 'عَمّان', line: 'map_amman', x: 288, y: 338, adventure: true },
-  { id: 'deadsea', name: 'البَحْر المَيِّت', line: 'map_deadsea', x: 104, y: 390 },
-  { id: 'petra', name: 'البَتْرا', line: 'map_petra', x: 150, y: 498, scene: 'petra', adventure: true },
-  { id: 'wadirum', name: 'وادي رَمّ', line: 'map_wadirum', x: 268, y: 572 },
-  { id: 'aqaba', name: 'العَقَبة', line: 'map_aqaba', x: 86, y: 632 },
+  { id: 'ummqais', name: 'أُمّ قَيْس', line: 'map_ummqais', x: 76, y: 212, lx: 162, ly: 196, adventure: true },
+  { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 135, y: 252, lx: 232, ly: 250, adventure: true },
+  { id: 'jerash', name: 'جَرَش', line: 'map_jerash', x: 118, y: 298, lx: 232, ly: 300 },
+  { id: 'amman', name: 'عَمّان', line: 'map_amman', x: 125, y: 342, lx: 246, ly: 362, adventure: true },
+  { id: 'deadsea', name: 'البَحْر المَيِّت', line: 'map_deadsea', x: 30, y: 412, lx: 116, ly: 432 },
+  { id: 'petra', name: 'البَتْرا', line: 'map_petra', x: 80, y: 470, lx: 212, ly: 470, scene: 'petra', adventure: true },
+  { id: 'wadirum', name: 'وادي رَمّ', line: 'map_wadirum', x: 172, y: 545, lx: 290, ly: 576 },
+  { id: 'aqaba', name: 'العَقَبة', line: 'map_aqaba', x: 62, y: 628, lx: 158, ly: 650 },
 ];
 
 // The sun's path across the top of the map, from morning to sunset (west).
@@ -65,8 +68,8 @@ export class MapScene extends BaseScene {
     ui.clearBubble();
     music.play('map');
 
-    const bg = this.addCover('bg_map');
-    this.tweens.add({ targets: bg, scale: bg.scale * 1.015, duration: 7000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    const bg = this.addMapPicture('bg_map');
+    this.tweens.add({ targets: bg, scale: bg.scale * 1.005, duration: 7000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     const v = view();
     this.tint = this.add.rectangle(v.x, v.y, v.w, v.h, 0xff9a4a, 0).setOrigin(0).setDepth(1).setBlendMode(Phaser.BlendModes.MULTIPLY);
     motes(this, v, 2);
@@ -162,16 +165,20 @@ export class MapScene extends BaseScene {
 
   private makePin(p: Pin): void {
     const big = !!p.adventure;
-    const r = big ? 22 : 16;
+    const r = big ? 17 : 13;
     const ring = this.add.image(0, 0, 'fx_ring').setDisplaySize(r * 3.2, r * 3.2).setAlpha(big ? 0.9 : 0.6);
     const dot = this.add.circle(0, 0, r * 0.55, big ? 0xc8623a : 0xfbf1dc).setStrokeStyle(3, 0x4a2c17);
     // The place name is HTML (see core/labels.ts); the pin itself is drawn here.
-    const label = addLabel(p.name, p.x, p.y + r + 20, 'fk-pin-label');
+    const label = addLabel(p.name, p.lx, p.ly, 'fk-pin-label');
     const lw = Math.max(56, label.offsetWidth);
+    const lh = Math.max(40, label.offsetHeight);
     const c = this.add.container(p.x, p.y, [ring, dot]).setDepth(10);
-    // Generous hit area: covers the pin and its label (at least 56 points).
-    const hw = Math.max(34, lw / 2 + 4);
-    c.setInteractive(new Phaser.Geom.Rectangle(-hw, -34, hw * 2, r + 3 + 36 + 34 + 4), Phaser.Geom.Rectangle.Contains);
+    // Generous hit area: one box covering the pin and its name (at least 56 points).
+    const left = Math.min(-30, p.lx - lw / 2 - p.x - 4);
+    const right = Math.max(30, p.lx + lw / 2 - p.x + 4);
+    const top = Math.min(-30, p.ly - lh / 2 - p.y - 4);
+    const bottom = Math.max(30, p.ly + lh / 2 - p.y + 4);
+    c.setInteractive(new Phaser.Geom.Rectangle(left, top, right - left, bottom - top), Phaser.Geom.Rectangle.Contains);
     // Gentle life: every pin breathes a little, out of step with the others.
     this.tweens.add({ targets: ring, scale: ring.scale * 1.15, duration: 1300 + Math.random() * 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: Math.random() * 800 });
     c.on('pointerdown', () => this.tapPin(p, c, label));

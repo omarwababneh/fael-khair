@@ -20,7 +20,7 @@ export class StartScene extends BaseScene {
     ui.setHome(null);
     ui.clearBubble();
     newDay();
-    const bg = this.addCover('bg_map');
+    const bg = this.addMapPicture('bg_map');
     // Slow drift so nothing is perfectly still.
     this.tweens.add({ targets: bg, scale: bg.scale * 1.04, duration: 9000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     const v = view();

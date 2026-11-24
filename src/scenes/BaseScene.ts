@@ -4,6 +4,9 @@ import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
+/** The cream edge color of the map picture. */
+export const MAP_CREAM = '#fae8ca';
+
 /** Shared camera fitting, background covering and scene changes. */
 export abstract class BaseScene extends Phaser.Scene {
   /** False once the scene is leaving; async steps check it before acting. */
@@ -52,6 +55,18 @@ export abstract class BaseScene extends Phaser.Scene {
     const img = this.add.image(DESIGN_W / 2, DESIGN_H / 2, key).setDepth(depth);
     this.covers.push({ img, factor });
     this.sizeCover(img, factor);
+    return img;
+  }
+
+  /**
+   * The map picture: shown whole, 390 points wide in the design frame (cropping
+   * it would cut off the Dead Sea and Aqaba). The space around it is filled with
+   * the picture's own cream color.
+   */
+  protected addMapPicture(key: string): Phaser.GameObjects.Image {
+    this.cameras.main.setBackgroundColor(MAP_CREAM);
+    const img = this.add.image(DESIGN_W / 2, DESIGN_H / 2, key).setDepth(0);
+    img.setScale(DESIGN_W / img.frame.width);
     return img;
   }
 
