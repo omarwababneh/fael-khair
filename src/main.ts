@@ -1,6 +1,7 @@
 import './style.css';
 import Phaser from 'phaser';
 import { loadIndex } from './core/assets';
+import { setupUpdates } from './core/update';
 import { measure, vp } from './core/viewport';
 import { BootScene } from './scenes/boot/BootScene';
 import { StartScene } from './scenes/start/StartScene';
@@ -53,6 +54,8 @@ async function boot(): Promise<void> {
   };
   window.addEventListener('resize', onResize);
   window.addEventListener('orientationchange', () => setTimeout(onResize, 250));
+
+  setupUpdates(game);
 
   // Harmless debug handle for testing in a desktop browser.
   (window as unknown as { fk: unknown }).fk = { game };
