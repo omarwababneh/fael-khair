@@ -413,6 +413,7 @@ export class IrbidScene extends BaseScene {
 
   private showHint(): void {
     const again = () => this.kickIdle();
+    if (this.dragFood) return again(); // never interrupt a drag in progress
     if (this.state === 'pack') {
       const f = this.foods.find((x) => !x.getData('packed'));
       if (f) this.hint.show('drag', { x: f.x, y: f.y }, BASKET, again);

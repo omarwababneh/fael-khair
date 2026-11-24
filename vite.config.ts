@@ -20,7 +20,7 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'script',
+      injectRegister: false, // registered in src/core/update.ts
       manifest: {
         name: 'فاعل خير',
         short_name: 'فاعل خير',
@@ -44,6 +44,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [],
       },
     }),
