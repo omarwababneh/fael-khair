@@ -88,6 +88,42 @@ class UI {
     return () => wrap.remove();
   }
 
+  /**
+   * Two choice buttons of identical size, color and weight (Amman). Their order
+   * is shuffled each time so that position hints at nothing.
+   */
+  showChoice(labels: [string, string], onPick: (index: 0 | 1) => void): () => void {
+    const wrap = el('div', 'fk-choice');
+    const order: Array<0 | 1> = Math.random() < 0.5 ? [0, 1] : [1, 0];
+    for (const i of order) {
+      const b = el('button', 'fk-choice-btn');
+      b.textContent = labels[i];
+      b.addEventListener('click', (e) => {
+        e.preventDefault();
+        wrap.remove();
+        onPick(i);
+      });
+      wrap.append(b);
+    }
+    this.root.append(wrap);
+    return () => wrap.remove();
+  }
+
+  /** One large button above the speech bubble. */
+  showAction(label: string, onTap: () => void): () => void {
+    const wrap = el('div', 'fk-choice');
+    const b = el('button', 'fk-choice-btn');
+    b.textContent = label;
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      wrap.remove();
+      onTap();
+    });
+    wrap.append(b);
+    this.root.append(wrap);
+    return () => wrap.remove();
+  }
+
   /** Small lock button: hold for 3 seconds (a ring fills) to open the parent area. */
   showLock(onOpen: () => void): () => void {
     const btn = el('button', 'fk-lock');
@@ -122,7 +158,7 @@ class UI {
   }
 
   /** Parent area. Milestone 1 holds the music switch; the rest arrives in Milestone 3. */
-  openParent(opts: { musicOn: boolean; voice: string | null; onMusic: (on: boolean) => void; onClose: () => void }): void {
+  openParent(opts: { musicOn: boolean; voice: string | null; speed: 'slower' | 'normal' | 'faster'; onMusic: (on: boolean) => void; onSpeed: (s: 'slower' | 'normal' | 'faster') => void; onClose: () => void }): void {
     const wrap = el('div', 'fk-parent');
     const card = el('div', 'fk-parent-card');
     const h = el('h2', '');
@@ -143,6 +179,24 @@ class UI {
       opts.onMusic(on);
     });
     row.append(label, toggle);
+    // Voice speed: tap one to hear a sample at that speed.
+    const speedRow = el('div', 'fk-row');
+    const speedLabel = el('span', '');
+    speedLabel.textContent = 'سرعة الصوت';
+    const speeds = el('div', 'fk-speeds');
+    const options: Array<['slower' | 'normal' | 'faster', string]> = [['slower', 'أبطأ'], ['normal', 'عادي'], ['faster', 'أسرع']];
+    const speedBtns = options.map(([key, text]) => {
+      const b = el('button', 'fk-speed');
+      b.textContent = text;
+      b.setAttribute('aria-pressed', String(key === opts.speed));
+      b.addEventListener('click', () => {
+        for (const x of speedBtns) x.setAttribute('aria-pressed', String(x === b));
+        opts.onSpeed(key);
+      });
+      return b;
+    });
+    speeds.append(...speedBtns);
+    speedRow.append(speedLabel, speeds);
     const voice = el('div', 'fk-voice-status');
     voice.textContent = opts.voice
       ? `صوت الجهاز العربي: ${opts.voice}`
@@ -155,7 +209,7 @@ class UI {
     });
     const build = el('div', 'fk-build');
     build.textContent = `نسخة: \u2066${__BUILD__}\u2069`;
-    card.append(h, row, voice, build, close);
+    card.append(h, row, speedRow, voice, build, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());
     this.root.append(wrap);

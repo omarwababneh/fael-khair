@@ -5,7 +5,9 @@ import { hasAudio } from './assets';
 
 export type SfxName =
   | 'thud' | 'dust' | 'grab' | 'step' | 'chime' | 'prick' | 'pop'
-  | 'creak' | 'birds' | 'whoosh' | 'slide';
+  | 'creak' | 'birds' | 'whoosh' | 'slide'
+  | 'splash' | 'pour' | 'lap' | 'bark' | 'bounce' | 'shatter' | 'sweep'
+  | 'wipe' | 'knock' | 'door' | 'rustle' | 'rope';
 
 interface Opts { weight?: number; volume?: number }
 
@@ -101,6 +103,79 @@ const makers: Record<SfxName, (ctx: AudioContext, t: number, o: Required<Opts>) 
     return [g];
   },
   slide: (ctx, t) => [noise(ctx, t, 0.22, 'bandpass', 600, 1.0, 0.18, 0.02)],
+  splash: (ctx, t) => [
+    noise(ctx, t, 0.35, 'bandpass', 1800, 0.7, 0.35, 0.004),
+    noise(ctx, t + 0.05, 0.25, 'highpass', 3000, 0.7, 0.12, 0.004),
+  ],
+  pour: (ctx, t) => {
+    const out: AudioNode[] = [];
+    for (let i = 0; i < 8; i++) out.push(noise(ctx, t + i * 0.11, 0.16, 'bandpass', 900 + Math.random() * 900, 1.4, 0.16, 0.02));
+    return out;
+  },
+  lap: (ctx, t) => {
+    const out: AudioNode[] = [];
+    for (let i = 0; i < 4; i++) out.push(tone(ctx, t + i * 0.22, 'sine', 420, 260, 0.07, 0.12, 0.003), noise(ctx, t + i * 0.22, 0.06, 'bandpass', 1400, 1.5, 0.12, 0.002));
+    return out;
+  },
+  bark: (ctx, t) => {
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(520, t);
+    o.frequency.exponentialRampToValueAtTime(330, t + 0.14);
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 900;
+    f.Q.value = 1.2;
+    const g = ctx.createGain();
+    env(g, t, 0.14, 0.01, 0.16);
+    o.connect(f).connect(g);
+    o.start(t);
+    o.stop(t + 0.25);
+    return [g];
+  },
+  bounce: (ctx, t, o) => [tone(ctx, t, 'sine', 180 + o.weight * 200, 90, 0.16, 0.5, 0.002), noise(ctx, t, 0.05, 'lowpass', 900, 0.7, 0.2, 0.001)],
+  shatter: (ctx, t) => {
+    const out: AudioNode[] = [noise(ctx, t, 0.5, 'highpass', 2200, 0.6, 0.5, 0.002), tone(ctx, t, 'sine', 160, 60, 0.2, 0.5, 0.002)];
+    for (let i = 0; i < 6; i++) out.push(tone(ctx, t + 0.04 + Math.random() * 0.35, 'triangle', 2500 + Math.random() * 2500, 1800, 0.06, 0.08, 0.001));
+    return out;
+  },
+  sweep: (ctx, t) => [noise(ctx, t, 0.28, 'bandpass', 2600, 0.6, 0.16, 0.06)],
+  wipe: (ctx, t) => [noise(ctx, t, 0.22, 'bandpass', 1300, 0.9, 0.12, 0.05)],
+  knock: (ctx, t) => [tone(ctx, t, 'sine', 210, 120, 0.12, 0.7, 0.001), noise(ctx, t, 0.06, 'bandpass', 700, 2, 0.4, 0.001)],
+  door: (ctx, t) => {
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(140, t);
+    o.frequency.linearRampToValueAtTime(260, t + 0.5);
+    o.frequency.linearRampToValueAtTime(180, t + 0.9);
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 1100;
+    f.Q.value = 4;
+    const g = ctx.createGain();
+    env(g, t, 0.07, 0.1, 0.85);
+    o.connect(f).connect(g);
+    o.start(t);
+    o.stop(t + 1.05);
+    return [g];
+  },
+  rustle: (ctx, t) => [noise(ctx, t, 0.5, 'bandpass', 3200, 0.8, 0.08, 0.15)],
+  rope: (ctx, t) => {
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(300, t);
+    o.frequency.linearRampToValueAtTime(240, t + 0.2);
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 1500;
+    f.Q.value = 6;
+    const g = ctx.createGain();
+    env(g, t, 0.05, 0.03, 0.2);
+    o.connect(f).connect(g);
+    o.start(t);
+    o.stop(t + 0.3);
+    return [g, noise(ctx, t, 0.15, 'bandpass', 500, 2, 0.08, 0.02)];
+  },
 };
 
 export function sfx(name: SfxName, opts: Opts = {}): void {

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { makePlaceholders, queueArt } from '../../core/assets';
 import { makeFxTextures } from '../../core/fx';
 
-const SCENES: Record<string, string> = { map: 'map', petra: 'petra' };
+const SCENES: Record<string, string> = { map: 'map', petra: 'petra', ummqais: 'ummqais', amman: 'amman', irbid: 'irbid' };
 
 export class BootScene extends Phaser.Scene {
   constructor() {

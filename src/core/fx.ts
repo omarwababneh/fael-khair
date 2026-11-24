@@ -124,3 +124,112 @@ export function glowRing(scene: Phaser.Scene, x: number, y: number, radius: numb
   img.setData('baseScale', base);
   return img;
 }
+
+/**
+ * The moving hint hand (interface chrome). Shows a drag, a tap or a press-and-hold
+ * gesture, twice, then disappears.
+ */
+export class HintHand {
+  private hand: Phaser.GameObjects.Image | null = null;
+  private tween: Phaser.Tweens.BaseTween | null = null;
+
+  constructor(private scene: Phaser.Scene) {}
+
+  clear(): void {
+    // A chain must be stopped: chain.remove() expects a child tween and throws.
+    const t = this.tween;
+    this.tween = null;
+    t?.stop();
+    this.hand?.destroy();
+    this.hand = null;
+  }
+
+  show(kind: 'drag' | 'tap' | 'hold', from: { x: number; y: number }, to?: { x: number; y: number }, onDone?: () => void): void {
+    this.clear();
+    const hand = this.scene.add.image(from.x, from.y, 'fx_hand').setOrigin(0.37, 0.05).setDepth(950).setAlpha(0);
+    hand.setDisplaySize(58, 72);
+    const s = hand.scale;
+    this.hand = hand;
+    const end = to ?? from;
+    const steps: Phaser.Types.Tweens.TweenBuilderConfig[] =
+      kind === 'drag'
+        ? [
+            { targets: hand, x: from.x, y: from.y, alpha: 1, scale: s, duration: 300 },
+            { targets: hand, scale: s * 0.85, duration: 180 },
+            { targets: hand, x: end.x, y: end.y, duration: 1100, ease: 'Sine.easeInOut' },
+            { targets: hand, scale: s, alpha: 0, duration: 300 },
+          ]
+        : kind === 'tap'
+          ? [
+              { targets: hand, alpha: 1, duration: 250 },
+              { targets: hand, scale: s * 0.82, duration: 160, yoyo: true, repeat: 2 },
+              { targets: hand, alpha: 0, duration: 300 },
+            ]
+          : [
+              { targets: hand, alpha: 1, duration: 250 },
+              { targets: hand, scale: s * 0.82, duration: 200 },
+              { targets: hand, x: end.x, y: end.y, duration: 1300, ease: 'Linear' },
+              { targets: hand, scale: s, alpha: 0, duration: 300 },
+            ];
+    const chain = this.scene.tweens.chain({
+      targets: hand,
+      loop: 1,
+      tweens: steps.map((st) => {
+        const { targets: _t, ...rest } = st as Phaser.Types.Tweens.TweenBuilderConfig & { targets?: unknown };
+        return rest;
+      }),
+      onComplete: () => {
+        this.clear();
+        onDone?.();
+      },
+    });
+    this.tween = chain;
+  }
+}
+
+/** Water droplets bursting from a point (particles). */
+export function droplets(scene: Phaser.Scene, x: number, y: number, amount = 12, depth = 60, spread = { min: 200, max: 340 }): void {
+  const e = scene.add.particles(x, y, 'fx_dot', {
+    speed: { min: 60, max: 180 },
+    angle: spread,
+    scale: { start: 0.35, end: 0.1 },
+    alpha: { start: 0.9, end: 0 },
+    lifespan: { min: 400, max: 800 },
+    gravityY: 520,
+    tint: [0x8fd3f0, 0xbfe7f7, 0x5fb8e0],
+    emitting: false,
+  });
+  e.setDepth(depth);
+  e.explode(amount);
+  scene.time.delayedCall(1000, () => e.destroy());
+}
+
+/** A stream of water (particles), for pouring. Returns a stop function. */
+export function waterStream(scene: Phaser.Scene, x: number, y: number, depth = 60): Phaser.GameObjects.Particles.ParticleEmitter {
+  const e = scene.add.particles(x, y, 'fx_dot', {
+    speedX: { min: -20, max: 20 },
+    speedY: { min: 40, max: 90 },
+    scale: { start: 0.3, end: 0.15 },
+    alpha: { start: 0.9, end: 0.2 },
+    lifespan: 520,
+    gravityY: 700,
+    frequency: 18,
+    tint: [0x8fd3f0, 0x5fb8e0],
+  });
+  e.setDepth(depth);
+  return e;
+}
+
+/** The small gray cloud of an uneasy heart (Amman). Drawn in code, as the spec allows. */
+export function grayCloud(scene: Phaser.Scene, x: number, y: number, depth = 70): Phaser.GameObjects.Container {
+  const g = scene.add.graphics();
+  g.fillStyle(0x8e8e96, 0.95);
+  g.lineStyle(3, 0x5a5a62, 1);
+  const puffs: Array<[number, number, number]> = [[-26, 4, 18], [-8, -8, 22], [14, -4, 20], [30, 6, 15], [2, 10, 18]];
+  for (const [px, py, r] of puffs) g.strokeCircle(px, py, r);
+  for (const [px, py, r] of puffs) g.fillCircle(px, py, r);
+  const c = scene.add.container(x, y, [g]).setDepth(depth).setAlpha(0).setScale(0.4);
+  scene.tweens.add({ targets: c, alpha: 1, scale: 1, duration: 700, ease: 'Back.easeOut' });
+  scene.tweens.add({ targets: g, y: -5, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+  return c;
+}

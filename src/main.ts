@@ -6,6 +6,9 @@ import { BootScene } from './scenes/boot/BootScene';
 import { StartScene } from './scenes/start/StartScene';
 import { MapScene } from './scenes/map/MapScene';
 import { PetraScene } from './scenes/petra/PetraScene';
+import { UmmQaisScene } from './scenes/ummqais/UmmQaisScene';
+import { AmmanScene } from './scenes/amman/AmmanScene';
+import { IrbidScene } from './scenes/irbid/IrbidScene';
 
 // No page zoom, no pinch, no double-tap zoom, no long-press callouts, no pull-to-refresh.
 const block = (e: Event) => e.preventDefault();
@@ -32,7 +35,7 @@ async function boot(): Promise<void> {
     render: { antialias: true, powerPreference: 'high-performance' },
     input: { activePointers: 2 },
     fps: { target: 60 },
-    scene: [BootScene, StartScene, MapScene, PetraScene],
+    scene: [BootScene, StartScene, MapScene, PetraScene, UmmQaisScene, AmmanScene, IrbidScene],
   });
 
   let pending = 0;

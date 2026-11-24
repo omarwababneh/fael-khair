@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { DESIGN_H, DESIGN_W, view, vp } from '../core/viewport';
 import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
+import { session, type Adventure } from '../core/session';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
@@ -14,10 +15,15 @@ export abstract class BaseScene extends Phaser.Scene {
   /** False once the scene is leaving; async steps check it before acting. */
   alive = false;
   private covers: Array<{ img: Phaser.GameObjects.Image; factor: number }> = [];
+  private baseIdleTimer?: Phaser.Time.TimerEvent;
+  private idleAction: (() => void) | null = null;
 
   protected setup(): void {
     this.alive = true;
     this.covers = [];
+    this.baseIdleTimer = undefined;
+    this.idleAction = null;
+    this.input.on('pointerdown', () => this.kickIdle());
     clearLabels();
     this.fit();
     const onResize = () => this.fit();
@@ -83,10 +89,44 @@ export abstract class BaseScene extends Phaser.Scene {
     img.setScale(s);
   }
 
+  /**
+   * What to show if he does nothing for 6 seconds (the hint hand).
+   * Any touch restarts the wait; null switches hints off.
+   */
+  protected setIdle(action: (() => void) | null, ms = 6000): void {
+    this.idleAction = action;
+    this.kickIdle(ms);
+  }
+
+  protected kickIdle(ms = 6000): void {
+    this.baseIdleTimer?.remove();
+    this.baseIdleTimer = undefined;
+    if (!this.idleAction || !this.alive) return;
+    this.baseIdleTimer = this.time.delayedCall(ms, () => {
+      if (this.alive && this.idleAction) this.idleAction();
+    });
+  }
+
+  /**
+   * Every adventure ends the same way: the father's hadith line over a calm
+   * final frame, then back to the map. Nothing about the player changes.
+   */
+  protected async finishAdventure(id: Adventure, hadithLine: string): Promise<void> {
+    this.setIdle(null);
+    // The story's consequence is done: the place counts even if he taps home now.
+    session.done.add(id);
+    await Voice.say(hadithLine);
+    if (!this.alive) return;
+    await this.wait(2600);
+    if (!this.alive) return;
+    this.goTo('map');
+  }
+
   /** Leave for another scene with a soft fade. */
   goTo(key: string, data?: object): void {
     if (!this.alive) return;
     this.alive = false;
+    this.events.emit('leave');
     Voice.stop(false);
     ui.setHome(null);
     this.input.enabled = false;

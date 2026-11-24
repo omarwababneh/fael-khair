@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { motes } from '../../core/fx';
 import { addLabel, replay } from '../../core/labels';
 import { music } from '../../core/music';
+import { getVoiceSpeed, setVoiceSpeed } from '../../core/settings';
 import { session, sunStep } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
@@ -25,10 +26,10 @@ interface Pin {
 // Pins sit on the landmarks drawn in bg_map (measured from the art, which is
 // shown 390 points wide with its top at y = 129.5); names sit beside them.
 export const PINS: Pin[] = [
-  { id: 'ummqais', name: 'أُمّ قَيْس', line: 'map_ummqais', x: 76, y: 212, lx: 162, ly: 196, adventure: true },
-  { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 135, y: 252, lx: 232, ly: 250, adventure: true },
+  { id: 'ummqais', name: 'أُمّ قَيْس', line: 'map_ummqais', x: 76, y: 212, lx: 162, ly: 196, scene: 'ummqais', adventure: true },
+  { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 135, y: 252, lx: 232, ly: 250, scene: 'irbid', adventure: true },
   { id: 'jerash', name: 'جَرَش', line: 'map_jerash', x: 118, y: 298, lx: 232, ly: 300 },
-  { id: 'amman', name: 'عَمّان', line: 'map_amman', x: 125, y: 342, lx: 246, ly: 362, adventure: true },
+  { id: 'amman', name: 'عَمّان', line: 'map_amman', x: 125, y: 342, lx: 246, ly: 362, scene: 'amman', adventure: true },
   { id: 'deadsea', name: 'البَحْر المَيِّت', line: 'map_deadsea', x: 30, y: 412, lx: 118, ly: 424 },
   { id: 'petra', name: 'البَتْرا', line: 'map_petra', x: 138, y: 482, lx: 222, ly: 482, scene: 'petra', adventure: true },
   { id: 'wadirum', name: 'وادي رَمّ', line: 'map_wadirum', x: 172, y: 545, lx: 290, ly: 576 },
@@ -230,6 +231,11 @@ export class MapScene extends BaseScene {
     ui.openParent({
       musicOn: music.isOn,
       voice: Voice.voiceLabel,
+      speed: getVoiceSpeed(),
+      onSpeed: (sp) => {
+        setVoiceSpeed(sp);
+        void Voice.say('map_next'); // a sample at the new speed
+      },
       onMusic: (on) => music.setOn(on),
       onClose: () => {
         this.busy = false;
