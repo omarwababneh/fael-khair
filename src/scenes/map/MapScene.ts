@@ -203,6 +203,7 @@ export class MapScene extends BaseScene {
     Voice.stop(false);
     ui.openParent({
       musicOn: music.isOn,
+      voice: Voice.voiceLabel,
       onMusic: (on) => music.setOn(on),
       onClose: () => {
         this.busy = false;

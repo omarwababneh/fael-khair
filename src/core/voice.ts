@@ -24,13 +24,16 @@ class VoiceSystem {
   private timers: number[] = [];
   lastId: string | null = null;
 
+  /** Find the first voice whose language starts with "ar". */
+  private pick(): void {
+    if (this.voice || !synth) return;
+    const v = synth.getVoices().find((x) => (x.lang || '').toLowerCase().startsWith('ar'));
+    if (v) this.voice = v;
+  }
+
   constructor() {
     if (synth) {
-      const pick = () => {
-        if (this.voice) return;
-        const v = synth.getVoices().find((x) => (x.lang || '').toLowerCase().startsWith('ar'));
-        if (v) this.voice = v;
-      };
+      const pick = () => this.pick();
       pick();
       // iOS loads voices late: listen for the event and also poll for 3 seconds.
       synth.addEventListener?.('voiceschanged', pick);
@@ -45,8 +48,10 @@ class VoiceSystem {
     });
   }
 
-  get hasArabicVoice(): boolean {
-    return !!this.voice;
+  /** For the parents' corner: which Arabic voice the phone offers, if any. */
+  get voiceLabel(): string | null {
+    this.pick();
+    return this.voice ? `${this.voice.name} (${this.voice.lang})` : null;
   }
 
   /** Speak one silent utterance inside the first tap, which unlocks speech on iOS. */
@@ -65,6 +70,7 @@ class VoiceSystem {
   /** Resolves when the line has finished (or was replaced or stopped). */
   say(id: string): Promise<void> {
     this.stop(false);
+    this.pick(); // voices can arrive late on iOS; look again before every line
     const token = ++this.token;
     this.lastId = id;
     const line = getLine(id);

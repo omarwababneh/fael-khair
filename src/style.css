@@ -259,6 +259,7 @@ button {
 }
 .fk-toggle[aria-pressed='true'] { background: var(--olive); color: var(--cream); }
 .fk-toggle[aria-pressed='false'] { background: var(--sand); color: var(--ink); }
+.fk-voice-status { font-size: 16px; line-height: 1.4; direction: rtl; }
 .fk-close {
   align-self: center;
   min-width: 140px;
@@ -271,3 +272,47 @@ button {
   font-weight: 700;
   padding: 4px 16px 0;
 }
+
+/* Wide screens (a computer, a tablet): keep the interface in a phone-shaped
+   column over the game instead of stretching it across the whole width. */
+@media (min-aspect-ratio: 3/4) {
+  #ui {
+    left: 50%;
+    right: auto;
+    width: min(100vw, calc(100vh * 390 / 844));
+    transform: translateX(-50%);
+  }
+}
+
+/* The game is portrait only. iPhone home-screen apps ignore the manifest's
+   orientation, so a phone held sideways shows this instead of a squashed game. */
+#rotate {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--sand);
+}
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 600px) {
+  #rotate { display: flex; }
+  .fk-on-computer { display: none; }
+}
+/* A computer window too short for a portrait game. */
+@media (orientation: landscape) and (pointer: fine) and (max-height: 500px) {
+  #rotate { display: flex; }
+  .fk-on-phone, .fk-rotate-icon { display: none; }
+}
+.fk-rotate-icon { width: 120px; height: 120px; }
+.fk-rotate-phone, .fk-rotate-dot {
+  transform-origin: 60px 66px;
+  animation: fk-turn 2.4s ease-in-out infinite;
+}
+@keyframes fk-turn {
+  0%, 25% { transform: rotate(-90deg); }
+  55%, 100% { transform: rotate(0deg); }
+}
+.fk-rotate-text { font-size: 28px; font-weight: 700; }

@@ -52,3 +52,9 @@ Choices made where `GAME_SPEC.md` is silent. In each case the simpler, more cons
 33. **`content/lines.json`:** each line has `tts` and `script`; religious lines hold only `{"registry": "<source_id>"}` and take their text from the registry.
 34. **`content/registry.json`:** the hadith entries have empty `original_arabic` and `translation` with a `todo_owner` note. For `quran_3_190`, `child_paraphrase_tts` and `child_paraphrase_script` are `null` (not the words "not spoken synthetically"), with `"tts": false`, so code can never speak them; its translation is left empty for the owner.
 35. **The registry warning** is already printed by `npm run build` (section 8), since the Petra hadith line depends on the registry.
+
+## After Milestone 1
+
+36. **Phone held sideways:** the game is portrait only, but iPhone home-screen apps ignore the manifest's orientation. A phone held sideways shows a full-screen "امسك التلفون واقف" picture instead of a squashed game. It returns to the game when the phone is upright again.
+37. **On a computer:** the interface stays in a phone-shaped column over the game. A window shorter than 500 pixels shows a note asking for a taller window. The iPhone remains the only target.
+38. **The phone's Arabic voice is looked up again before every line,** because iOS can load its voices late. The parents' corner now shows which Arabic voice the phone offers, or says that there is none. This is shown on screen only and never stored or sent.

@@ -122,7 +122,7 @@ class UI {
   }
 
   /** Parent area. Milestone 1 holds the music switch; the rest arrives in Milestone 3. */
-  openParent(opts: { musicOn: boolean; onMusic: (on: boolean) => void; onClose: () => void }): void {
+  openParent(opts: { musicOn: boolean; voice: string | null; onMusic: (on: boolean) => void; onClose: () => void }): void {
     const wrap = el('div', 'fk-parent');
     const card = el('div', 'fk-parent-card');
     const h = el('h2', '');
@@ -143,13 +143,17 @@ class UI {
       opts.onMusic(on);
     });
     row.append(label, toggle);
+    const voice = el('div', 'fk-voice-status');
+    voice.textContent = opts.voice
+      ? `صوت الجهاز العربي: ${opts.voice}`
+      : 'ما في صوت عربي على الجهاز. الكلام بيظهر مكتوب بس.';
     const close = el('button', 'fk-close');
     close.textContent = 'رجوع';
     close.addEventListener('click', () => {
       wrap.remove();
       opts.onClose();
     });
-    card.append(h, row, close);
+    card.append(h, row, voice, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());
     this.root.append(wrap);
