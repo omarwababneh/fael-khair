@@ -376,8 +376,11 @@ export class PetraScene extends BaseScene {
   }
 
   private clearHint(): void {
-    for (const t of this.hintTweens) t.remove();
+    // A tween chain must be stopped, not removed: chain.remove() expects a child
+    // tween and threw, which blocked every touch once the hint had appeared.
+    const ts = this.hintTweens;
     this.hintTweens = [];
+    for (const t of ts) t.stop();
     this.hint?.destroy();
     this.hint = null;
   }
@@ -495,11 +498,12 @@ export class PetraScene extends BaseScene {
 
     // The father's hadith line over the calm final frame.
     m.frequency = 400;
+    // The story's consequence is done: the place counts even if he taps home now.
+    session.done.add('petra');
     await Voice.say('petra_hadith');
     if (!this.alive) return;
     await this.wait(2600);
     if (!this.alive) return;
-    session.done.add('petra');
     this.goTo('map');
   }
 
