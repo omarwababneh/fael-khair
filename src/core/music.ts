@@ -203,8 +203,9 @@ class Music {
     this.applyVolume(1);
   }
 
-  /** Fade the music out completely. */
+  /** Fade the music out completely (the track and the music level itself). */
   stop(fade = 1.2): void {
+    audio.ramp('music', 0, fade);
     this.track?.stop(fade);
     this.track = null;
     this.place = null;
