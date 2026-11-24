@@ -1,0 +1,59 @@
+[
+  {
+    "source_id": "bukhari_2472",
+    "reference": "Sahih al-Bukhari 2472",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 2472 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أخبرنا نبيّنا محمد صلى الله عليه وسلم عن رجل وجد غصن شوك في الطريق فأبعده، فشكر الله له وغفر له.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم حكالنا عن رجل لقى غصن شوك بالطريق فشاله، فشكر الله له وغفر له.",
+    "fictional_adaptation": "A boy clears rocks and branches in the Siq for a man with a cart. Invented.",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "bukhari_2363",
+    "reference": "Sahih al-Bukhari 2363",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 2363 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أخبرنا نبيّنا محمد صلى الله عليه وسلم عن رجل رأى كلباً عطشان جداً، فسقاه ماءً، فغفر الله له.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم حكالنا عن رجل شاف كلب عطشان كثير، فسقاه ميّ، فغفر الله له.",
+    "fictional_adaptation": "A boy draws water with a rope and bucket for a stray dog. Invented.",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "muslim_2607c",
+    "reference": "Sahih Muslim 2607c",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih Muslim 2607c from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن الصدق يهدي إلى البرّ، وأن البرّ يهدي إلى الجنة.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنّه الصدق بيوصّل للخير، والخير بيوصّل للجنة.",
+    "fictional_adaptation": "A boy breaks a jar and tells his mother. Invented.",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "bukhari_660",
+    "reference": "Sahih al-Bukhari 660",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 660 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أخبرنا نبيّنا محمد صلى الله عليه وسلم أن من الذين يُظلّهم الله في ظلّه يوم القيامة رجلاً تصدّق بصدقة فأخفاها.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم حكالنا إنّه من الناس اللي الله بيظلّهم بظلّه يوم القيامة واحد تصدّق وخبّى صدقته.",
+    "fictional_adaptation": "A boy leaves a food basket at a neighbor's door unseen. Invented.",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_3_190",
+    "reference": "Quran, Al 'Imran 3:190",
+    "original_arabic": "إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ لَآيَاتٍ لِأُولِي الْأَلْبَابِ",
+    "translation": "",
+    "todo_owner": "TODO owner: add the translation you want to use, if any. Do not fill from memory.",
+    "child_paraphrase_tts": null,
+    "child_paraphrase_script": null,
+    "tts": false,
+    "note": "Not spoken synthetically. Not paraphrased. Shown only as still text in the night-sky ending.",
+    "fictional_adaptation": "The night-sky ending.",
+    "approval_status": "pending"
+  }
+]

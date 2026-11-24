@@ -1,0 +1,24 @@
+{
+  "name": "fael-khair",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "art": "node scripts/prepare-art.mjs",
+    "check:art": "node scripts/check-art.mjs",
+    "check:registry": "node scripts/check-registry.mjs",
+    "predev": "node scripts/prepare-art.mjs --quiet",
+    "dev": "vite",
+    "build": "node scripts/prepare-art.mjs --quiet && node scripts/check-art.mjs --build && node scripts/check-registry.mjs && tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "sharp": "0.35.5",
+    "typescript": "5.9.3",
+    "vite": "7.3.8",
+    "vite-plugin-pwa": "1.3.0"
+  }
+}
