@@ -4,6 +4,11 @@ import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
+/** The cream edge colors of the map picture (top and bottom rows, measured). */
+export const MAP_CREAM = '#f9e8ce';
+const MAP_TOP = 0xfbe7c9;
+const MAP_BOTTOM = 0xf8e8d3;
+
 /** Shared camera fitting, background covering and scene changes. */
 export abstract class BaseScene extends Phaser.Scene {
   /** False once the scene is leaving; async steps check it before acting. */
@@ -52,6 +57,23 @@ export abstract class BaseScene extends Phaser.Scene {
     const img = this.add.image(DESIGN_W / 2, DESIGN_H / 2, key).setDepth(depth);
     this.covers.push({ img, factor });
     this.sizeCover(img, factor);
+    return img;
+  }
+
+  /**
+   * The map picture: shown whole, 390 points wide in the design frame (cropping
+   * it would cut off the Dead Sea and Aqaba). The space around it is filled with
+   * the picture's own cream color.
+   */
+  protected addMapPicture(key: string): Phaser.GameObjects.Image {
+    this.cameras.main.setBackgroundColor(MAP_CREAM);
+    const img = this.add.image(DESIGN_W / 2, DESIGN_H / 2, key).setDepth(0);
+    img.setScale(DESIGN_W / img.frame.width);
+    // Bands above and below in the picture's own edge colors, so no seam shows.
+    const h = img.frame.height * img.scale;
+    const top = DESIGN_H / 2 - h / 2, bottom = DESIGN_H / 2 + h / 2;
+    this.add.rectangle(DESIGN_W / 2, top - 600, 3000, 1200 + 1, MAP_TOP).setDepth(-1);
+    this.add.rectangle(DESIGN_W / 2, bottom + 600, 3000, 1200 + 1, MAP_BOTTOM).setDepth(-1);
     return img;
   }
 
