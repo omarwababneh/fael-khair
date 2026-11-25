@@ -12,7 +12,11 @@ import type Phaser from 'phaser';
 
 export function setupUpdates(game: Phaser.Game): void {
   if (!('serviceWorker' in navigator)) return;
-  const hadController = !!navigator.serviceWorker.controller;
+  // A takeover counts as a new version only if this page was already controlled
+  // or an update arrived while another version was active. The very first
+  // install is not an update; a newer version published later in that same
+  // session is.
+  let updateSeen = !!navigator.serviceWorker.controller;
   let waitingToReload = false;
   let reloading = false;
   const onStartScreen = () => game.scene.getScenes(true).some((s) => s.scene.key === 'start' || s.scene.key === 'boot');
@@ -24,7 +28,7 @@ export function setupUpdates(game: Phaser.Game): void {
 
   /** A new version has taken over: switch now if the start screen shows, otherwise at the next start screen. */
   const ready = () => {
-    if (!hadController) return; // the very first install: already the newest version
+    if (!updateSeen) return;
     waitingToReload = true;
     if (onStartScreen()) reload();
   };
@@ -37,11 +41,13 @@ export function setupUpdates(game: Phaser.Game): void {
     // The start screen asks too, so a version published while the app stays
     // open is found at the moment it can switch.
     game.events.on('fk-start-screen', check);
-    // Belt and braces: a new version that has finished installing and taken over
-    // counts as ready even if the browser's takeover event is missed.
     reg.addEventListener('updatefound', () => {
       const w = reg.installing;
-      w?.addEventListener('statechange', () => {
+      if (!w || !reg.active) return; // nothing active yet: the first install, not an update
+      updateSeen = true;
+      // Belt and braces: once it has finished installing and taken over, it is
+      // ready even if the browser's takeover event is missed.
+      w.addEventListener('statechange', () => {
         if (w.state === 'activated') ready();
       });
     });

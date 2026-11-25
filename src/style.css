@@ -76,6 +76,8 @@ body { position: fixed; inset: 0; }
 
 #game { position: fixed; inset: 0; }
 #game canvas { display: block; touch-action: none; }
+/* Plain bars around the portrait frame on a wide (or very tall) screen. */
+#bars > div { position: fixed; z-index: 3; background: var(--sand); touch-action: none; }
 
 #ui {
   position: fixed;
@@ -289,7 +291,7 @@ button {
 .fk-secret-intro { font-size: 15px !important; opacity: 0.8; margin-bottom: 0 !important; }
 .fk-secret { font-weight: 700; }
 .fk-voice-status { font-size: 16px; line-height: 1.4; direction: rtl; }
-.fk-parent-card { max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 32px); }
+.fk-parent-card { max-height: calc(var(--frame-height, 100dvh) - var(--safe-top) - var(--safe-bottom) - 32px); }
 .fk-parent-scroll {
   overflow-y: auto;
   padding-bottom: 4px;

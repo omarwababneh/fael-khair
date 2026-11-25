@@ -257,7 +257,7 @@ export class IrbidScene extends BaseScene {
   private passerbyWatch(warn: number): void {
     // A man walks along the street, stops, and turns his head toward the street.
     // He enters from just past the right edge of the frame (wider on some screens).
-    const p = this.add.image(view().right + 40, STREET_Y, 'passerby_walk').setOrigin(0.5, 1).setDepth(24);
+    const p = this.add.image(view().right + 70, STREET_Y, 'passerby_walk').setOrigin(0.5, 1).setDepth(24);
     fitHeight(p, PASSERBY_H);
     this.passerby = p;
     const stopX = 210;

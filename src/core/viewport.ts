@@ -58,8 +58,9 @@ export function measure(): void {
   // The whole design frame always fits.
   vp.zoom = Math.min(vp.w / DESIGN_W, vp.h / DESIGN_H);
   // Show more of the picture where the screen allows, but never past its edges.
-  const fw = Math.round(Math.min(vp.w / vp.zoom, PIC.w) * vp.zoom);
-  const fh = Math.round(Math.min(vp.h / vp.zoom, PIC.h) * vp.zoom);
+  // Rounded down, so the frame never shows past the picture's edge.
+  const fw = Math.floor(Math.min(vp.w / vp.zoom, PIC.w) * vp.zoom);
+  const fh = Math.floor(Math.min(vp.h / vp.zoom, PIC.h) * vp.zoom);
   vp.frame = { x: Math.round((vp.w - fw) / 2), y: Math.round((vp.h - fh) / 2), w: fw, h: fh };
   // The HTML interface (place name, home button, speech bubble) follows the frame.
   const css = document.documentElement.style;
@@ -70,9 +71,20 @@ export function measure(): void {
   // A short frame (a 16:9 phone, a laptop window) gets a smaller speech-bubble
   // text, so a line that wraps does not push the bubble over things he must touch.
   document.documentElement.toggleAttribute('data-short-frame', fh / vp.dpr < 760);
+  // The plain bars around the frame: they cover anything drawn past the picture
+  // and swallow touches, so a hand resting on a bar never reaches the game.
+  const bars = document.getElementById('bars');
+  if (bars) {
+    const [l, r, t, b] = Array.from(bars.children) as HTMLElement[];
+    const fx = vp.frame.x / vp.dpr, fy = vp.frame.y / vp.dpr, cw = fw / vp.dpr, chh = fh / vp.dpr;
+    Object.assign(l.style, { left: '0px', top: '0px', width: `${fx}px`, height: '100%' });
+    Object.assign(r.style, { left: `${fx + cw}px`, top: '0px', right: '0px', height: '100%' });
+    Object.assign(t.style, { left: `${fx}px`, top: '0px', width: `${cw}px`, height: `${fy}px` });
+    Object.assign(b.style, { left: `${fx}px`, top: `${fy + chh}px`, width: `${cw}px`, bottom: '0px' });
+  }
 }
 
-/** The world rectangle the camera currently shows (the portrait frame). */
+/** The world rectangle of the portrait frame (what the player sees). */
 export function view(): { x: number; y: number; w: number; h: number; bottom: number; right: number } {
   const w = vp.frame.w / vp.zoom;
   const h = vp.frame.h / vp.zoom;

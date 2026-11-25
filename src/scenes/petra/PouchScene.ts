@@ -5,7 +5,7 @@ import { music } from '../../core/music';
 import { completeMission } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
-import { view } from '../../core/viewport';
+import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
@@ -246,7 +246,7 @@ export class PouchScene extends BaseScene {
   /** A large view of the pouch: he looks at its tie-string and its patch. He does not open it. */
   private openCloseUp(): void {
     const v = view();
-    const dim = this.add.rectangle(v.x, v.y, v.w, v.h, 0x2a1a0e, 0).setOrigin(0);
+    const dim = this.add.rectangle(PIC.x, PIC.y, PIC.w, PIC.h, 0x2a1a0e, 0).setOrigin(0);
     const big = this.add.image(195, 400, 'pouch_red');
     fitHeight(big, 230);
     const w = big.frame.width * big.scale, h = big.frame.height * big.scale;

@@ -40,10 +40,14 @@ export abstract class BaseScene extends Phaser.Scene {
     requestAnimationFrame(() => fadeLabels(1, 350));
   }
 
-  /** Draw into the portrait frame, with the 390 x 844 design frame always inside it. */
+  /**
+   * The camera covers the whole canvas (so a touch always maps to the right
+   * world point), zoomed so the 390 x 844 design frame fits and centred on it.
+   * Anything past the portrait frame is covered by the HTML bars (main.ts).
+   */
   protected fit(): void {
     const cam = this.cameras.main;
-    cam.setViewport(vp.frame.x, vp.frame.y, vp.frame.w, vp.frame.h);
+    cam.setViewport(0, 0, vp.w, vp.h);
     cam.setZoom(vp.zoom);
     cam.centerOn(DESIGN_W / 2, DESIGN_H / 2);
     for (const c of this.covers) this.sizeCover(c.img, c.factor);

@@ -6,7 +6,7 @@ import { music } from '../../core/music';
 import { completeMission } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
-import { DESIGN_H, view } from '../../core/viewport';
+import { DESIGN_H, PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
@@ -125,7 +125,7 @@ export class PetraScene extends BaseScene {
     if (this.quiet) {
       // Before sunrise: a cool, dim light over the canyon (code may tint delivered art).
       const v = view();
-      this.dawn = this.add.rectangle(v.x - 20, v.y - 20, v.w + 40, v.h + 40, DAWN_TINT, 0.4)
+      this.dawn = this.add.rectangle(PIC.x - 20, PIC.y - 20, PIC.w + 40, PIC.h + 40, DAWN_TINT, 0.4)
         .setOrigin(0).setDepth(80);
     }
 
@@ -518,15 +518,16 @@ export class PetraScene extends BaseScene {
     const bgH = bg.frame.height * s;
 
     const ground = v.bottom - 150;
-    const boy = this.add.image(v.x + 70, ground + 8, 'boy_happy').setOrigin(0.5, 1);
+    // Fixed spots on the plaza (the picture is centred on x = 195), never from the screen edge.
+    const boy = this.add.image(70, ground + 8, 'boy_happy').setOrigin(0.5, 1);
     fitHeight(boy, 138);
     const elder = this.add.image(v.x - 140, ground, 'elder_cart').setOrigin(0.5, 1);
-    fitHeight(elder, 132);
+    fitWidth(elder, 138 * 1.6); // the old man's cart: 1.6 times the boy wide (art checklist)
     plaza.add([bg, boy, elder]);
     this.tweens.add({ targets: boy, scaleY: boy.scaleY * 1.02, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     // Warm light over the plaza.
-    const warm = this.add.rectangle(v.x, v.y, v.w, v.h, 0xffa84a, 0).setOrigin(0).setDepth(101).setBlendMode(Phaser.BlendModes.ADD);
+    const warm = this.add.rectangle(PIC.x, PIC.y, PIC.w, PIC.h, 0xffa84a, 0).setOrigin(0).setDepth(101).setBlendMode(Phaser.BlendModes.ADD);
     const m = motes(this, v, 102, 0xffd27a);
 
     sfx('whoosh');
@@ -590,9 +591,9 @@ export class PetraScene extends BaseScene {
     // A father and his daughter walk up the path, chatting, without stopping.
     const v = view();
     const dad = this.add.image(v.x - 50, v.bottom + 20, 'traveler_happy').setOrigin(0.5, 1).setDepth(31);
-    fitHeight(dad, 150);
+    fitHeight(dad, BOY.h * 1.35); // art checklist: adults 1.35, the girl 0.7
     const girl = this.add.image(v.x - 100, v.bottom + 26, 'girl_happy').setOrigin(0.5, 1).setDepth(32);
-    fitHeight(girl, 82);
+    fitHeight(girl, BOY.h * 0.7);
     const steps = this.time.addEvent({ delay: 420, loop: true, callback: () => sfx('step', { volume: 0.35 }) });
     for (const [img, dx, delay] of [[dad, 6, 0], [girl, -18, 500]] as const) {
       this.tweens.add({ targets: img, angle: { from: -2, to: 2 }, duration: 300, yoyo: true, repeat: -1 });
