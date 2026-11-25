@@ -12,10 +12,15 @@ import { BaseScene } from '../BaseScene';
 // Wadi Rum: the night sky (value: reflection on creation and gratitude;
 // source quran_3_190). Slow and quiet: no goal, no count.
 //
-// The ayah rules (GAME_SPEC.md sections 2 and 4E): it is shown only here, as
+// The ayah rules (GAME_SPEC.md sections 2 and 4.4): it is shown only here, as
 // still text; never animated as a prize, never draggable or collectible; never
-// read by a synthetic voice. All game input and all sound effects stop while it
-// is on screen, and the music fades out fully before it appears.
+// read by a synthetic voice. All game input and all sound effects stop before it
+// appears. There is no music at all in Wadi Rum (MISSIONS_V2.md section 7):
+// wind and a few crickets only, and only a soft wind stays under the ayah.
+//
+// Order: stars for about 30 seconds (or until he stops) -> input and sound
+// effects off -> the father's closing line (quran_2_215) -> silence -> the ayah
+// -> "تصبح على خير يا حبيبي." and the button "خلصنا لليوم". No summary of the day.
 
 const BOY = { x: 195, y: 712, h: 150 };
 const SKY_BOTTOM = 560; // the sky fills the upper two thirds of bg_wadirum_night
@@ -28,7 +33,7 @@ export class WadiRumScene extends BaseScene {
   private touchedOnce = false;
   private lastTouch = 0;
   private startedAt = 0;
-  private stopAmbience: (() => void) | null = null;
+  private night: ReturnType<typeof nightAmbience> | null = null;
   private removeDone: (() => void) | null = null;
   private lastSpark = 0;
 
@@ -40,15 +45,15 @@ export class WadiRumScene extends BaseScene {
     this.setup();
     this.playing = false;
     this.touchedOnce = false;
-    this.stopAmbience = null;
+    this.night = null;
     this.removeDone = null;
 
     ui.setPill('وادي رَمّ');
     ui.setHome(() => this.goTo('map'));
     ui.clearBubble();
-    music.play('wadirum');
+    music.stop(1.5); // no music at all in Wadi Rum
     setSfxMuted(false, 0.3);
-    this.stopAmbience = nightAmbience();
+    this.night = nightAmbience();
     this.events.once('leave', () => this.cleanUp());
     this.events.once('shutdown', () => this.cleanUp());
 
@@ -81,8 +86,8 @@ export class WadiRumScene extends BaseScene {
   }
 
   private cleanUp(): void {
-    this.stopAmbience?.();
-    this.stopAmbience = null;
+    this.night?.stop();
+    this.night = null;
     this.removeDone?.();
     this.removeDone = null;
     setSfxMuted(false, 0.3);
@@ -143,19 +148,22 @@ export class WadiRumScene extends BaseScene {
   private async ayah(): Promise<void> {
     if (!this.alive) return;
     this.playing = false;
-    await Voice.say('wr_subhan');
-    if (!this.alive) return;
-
-    // Everything else stops: input, sound effects, and the music fades out fully.
+    // Input off, sound effects off. The crickets stop; a soft wind stays.
     this.input.enabled = false;
     ui.setHome(null);
     ui.setPill(null);
-    ui.clearBubble();
     setSfxMuted(true, 1.2);
-    this.stopAmbience?.();
-    this.stopAmbience = null;
-    music.stop(2.4);
-    await this.wait(2800);
+    this.night?.quiet();
+    music.stop(1);
+    await this.wait(1400);
+    if (!this.alive) return;
+
+    // The father's closing line comes before the ayah.
+    await Voice.say('wr_close');
+    if (!this.alive) return;
+    ui.clearBubble();
+    // Then silence.
+    await this.wait(2600);
     if (!this.alive) return;
 
     const entry = registry.find((r) => r.source_id === 'quran_3_190') as { original_arabic?: string } | undefined;

@@ -14,8 +14,10 @@ import { BaseScene } from '../BaseScene';
 // frame; tune them once the art arrives.
 
 const FOODS = ['food_bread', 'food_olives', 'food_labneh', 'food_tomatoes', 'food_apples'];
-const SHELF_Y = 470;
-const BASKET = { x: 196, y: 640, w: 118 };
+// Measured on the delivered bg_irbid_dusk: the food waits in a row on the paving in
+// front (it used to float over the wall), and the basket is about half the boy's height.
+const FOOD_ROW = { y: 722, xs: [44, 166, 234, 300, 358] };
+const BASKET = { x: 205, y: 660, w: 86 };
 const TREE = { x: 64, y: 694 };
 const DOOR = { x: 300, y: 560, w: 96, h: 160, step: 652 };
 const STOP_X = 244; // where he stands at the door
@@ -83,7 +85,7 @@ export class IrbidScene extends BaseScene {
     fitWidth(this.basket, BASKET.w);
 
     FOODS.forEach((key, i) => {
-      const img = this.add.image(52 + i * 72, SHELF_Y, key).setDepth(25);
+      const img = this.add.image(FOOD_ROW.xs[i], FOOD_ROW.y, key).setDepth(25);
       fitWidth(img, 58);
       img.setData('home', { x: img.x, y: img.y });
       img.setData('base', img.scale);

@@ -11,7 +11,7 @@ npm run build        # production build (fails if required art is missing)
 ALLOW_PLACEHOLDERS=1 npm run build   # build with magenta placeholders
 ```
 
-Debug: add `?scene=petra` or `?scene=map` to the address to jump straight to a scene.
+Debug: add `?scene=petra` (or `map`, `p2`, `p3`, `petra-dawn`, `ummqais`, `amman`, `irbid`, `wadirum`) to the address to jump straight to a scene.
 
 ## Music credits
 
@@ -30,4 +30,4 @@ The background music in `public/assets/audio/music/` is by Kevin MacLeod (incomp
 
 The last three are ready for places that are not built yet. They play once those places exist under the keys `jerash`, `deadsea` and `aqaba`.
 
-The license requires this credit to stay wherever the game is shared. It must also be shown inside the game, in the parents' corner.
+The license requires this credit to stay wherever the game is shared. It is also shown inside the game, at the bottom of the parents' corner.

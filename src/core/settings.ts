@@ -1,40 +1,91 @@
-// Stored on the device: the music on/off setting and the voice speed the parent
-// chose (see DECISIONS.md). Nothing about the child.
-const KEY = 'fk.music';
+// Stored on the device only (GAME_SPEC.md section 2): the parents' sound settings
+// (sound choice, music volume, voice speed) and one number per place, which
+// mission comes next. Nothing about what he chose or how he played.
+// Every read and write is wrapped: without storage, settings last until the app closes.
 
-export function getMusicOn(): boolean {
+function read(key: string): string | null {
   try {
-    return localStorage.getItem(KEY) !== 'off';
+    return localStorage.getItem(key);
   } catch {
-    return true;
+    return null;
   }
 }
 
-export function setMusicOn(on: boolean): void {
+function write(key: string, value: string): void {
   try {
-    localStorage.setItem(KEY, on ? 'on' : 'off');
+    localStorage.setItem(key, value);
   } catch {
     /* storage unavailable: the setting lasts until the app closes */
   }
 }
+
+function remove(key: string): void {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
+// ---------------------------------------------------------------- sound choice
+
+/** "موسيقى مرحة" (default), "أصوات الطبيعة فقط", "بدون". */
+export type SoundMode = 'music' | 'nature' | 'off';
+export type MusicVolume = 'quiet' | 'medium';
+
+const SOUND_KEY = 'fk.sound';
+const OLD_MUSIC_KEY = 'fk.music'; // before version 2: music on or off
+
+export function getSoundMode(): SoundMode {
+  const v = read(SOUND_KEY);
+  if (v === 'music' || v === 'nature' || v === 'off') return v;
+  // A parent who switched the music off before version 2 keeps it off.
+  return read(OLD_MUSIC_KEY) === 'off' ? 'off' : 'music';
+}
+
+export function setSoundMode(mode: SoundMode): void {
+  write(SOUND_KEY, mode);
+  remove(OLD_MUSIC_KEY);
+}
+
+const VOLUME_KEY = 'fk.musicVolume';
+
+export function getMusicVolume(): MusicVolume {
+  return read(VOLUME_KEY) === 'quiet' ? 'quiet' : 'medium';
+}
+
+export function setMusicVolume(v: MusicVolume): void {
+  write(VOLUME_KEY, v);
+}
+
+// ---------------------------------------------------------------- voice speed
 
 const RATE_KEY = 'fk.voiceRate';
 export const VOICE_RATES = { slower: 0.85, normal: 1.0, faster: 1.15 } as const;
 export type VoiceSpeed = keyof typeof VOICE_RATES;
 
 export function getVoiceSpeed(): VoiceSpeed {
-  try {
-    const v = localStorage.getItem(RATE_KEY);
-    return v === 'slower' || v === 'faster' ? v : 'normal';
-  } catch {
-    return 'normal';
-  }
+  const v = read(RATE_KEY);
+  return v === 'slower' || v === 'faster' ? v : 'normal';
 }
 
 export function setVoiceSpeed(speed: VoiceSpeed): void {
-  try {
-    localStorage.setItem(RATE_KEY, speed);
-  } catch {
-    /* storage unavailable: the setting lasts until the app closes */
-  }
+  write(RATE_KEY, speed);
+}
+
+// ---------------------------------------------------------------- rotation
+
+/**
+ * One small number per place: which of its three missions comes next (0, 1 or 2).
+ * Never shown, never counted, never sent anywhere.
+ */
+const ROT_PREFIX = 'fk.next.';
+
+export function getNextIndex(place: string): number {
+  const n = Number(read(ROT_PREFIX + place));
+  return Number.isInteger(n) && n >= 0 && n <= 2 ? n : 0;
+}
+
+export function setNextIndex(place: string, n: number): void {
+  write(ROT_PREFIX + place, String(((n % 3) + 3) % 3));
 }

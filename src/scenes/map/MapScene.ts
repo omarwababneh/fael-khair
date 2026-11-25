@@ -3,7 +3,7 @@ import { motes } from '../../core/fx';
 import { addLabel, replay } from '../../core/labels';
 import { music } from '../../core/music';
 import { getVoiceSpeed, setVoiceSpeed } from '../../core/settings';
-import { session, sunStep } from '../../core/session';
+import { dayComplete, MISSIONS_PER_DAY, missionFor, session, sunStep, type Place } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
@@ -18,22 +18,21 @@ interface Pin {
   y: number;
   lx: number; // label centre: beside the landmark, in empty desert
   ly: number;
-  /** Scene to open, if this place has an adventure built. */
-  scene?: string;
-  adventure?: boolean;
+  /** A place with missions (all seven are open from the first second). Wadi Rum is the night ending. */
+  place?: Place;
 }
 
 // Pins sit on the landmarks drawn in bg_map (measured from the art, which is
 // shown 390 points wide with its top at y = 129.5); names sit beside them.
 export const PINS: Pin[] = [
-  { id: 'ummqais', name: 'أُمّ قَيْس', line: 'map_ummqais', x: 76, y: 212, lx: 162, ly: 196, scene: 'ummqais', adventure: true },
-  { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 135, y: 252, lx: 232, ly: 250, scene: 'irbid', adventure: true },
-  { id: 'jerash', name: 'جَرَش', line: 'map_jerash', x: 118, y: 298, lx: 232, ly: 300 },
-  { id: 'amman', name: 'عَمّان', line: 'map_amman', x: 125, y: 342, lx: 246, ly: 362, scene: 'amman', adventure: true },
-  { id: 'deadsea', name: 'البَحْر المَيِّت', line: 'map_deadsea', x: 30, y: 412, lx: 118, ly: 424 },
-  { id: 'petra', name: 'البَتْرا', line: 'map_petra', x: 138, y: 482, lx: 222, ly: 482, scene: 'petra', adventure: true },
+  { id: 'ummqais', name: 'أُمّ قَيْس', line: 'map_ummqais', x: 76, y: 212, lx: 162, ly: 196, place: 'ummqais' },
+  { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 135, y: 252, lx: 232, ly: 250, place: 'irbid' },
+  { id: 'jerash', name: 'جَرَش', line: 'map_jerash', x: 118, y: 298, lx: 232, ly: 300, place: 'jerash' },
+  { id: 'amman', name: 'عَمّان', line: 'map_amman', x: 125, y: 342, lx: 246, ly: 362, place: 'amman' },
+  { id: 'deadsea', name: 'البَحْر المَيِّت', line: 'map_deadsea', x: 30, y: 412, lx: 118, ly: 424, place: 'deadsea' },
+  { id: 'petra', name: 'البَتْرا', line: 'map_petra', x: 138, y: 482, lx: 222, ly: 482, place: 'petra' },
   { id: 'wadirum', name: 'وادي رَمّ', line: 'map_wadirum', x: 172, y: 545, lx: 290, ly: 576 },
-  { id: 'aqaba', name: 'العَقَبة', line: 'map_aqaba', x: 62, y: 628, lx: 158, ly: 650 },
+  { id: 'aqaba', name: 'العَقَبة', line: 'map_aqaba', x: 62, y: 628, lx: 158, ly: 650, place: 'aqaba' },
 ];
 
 // The sun's path across the top of the map, from morning to sunset (west).
@@ -47,7 +46,7 @@ const SUN_PATH = [
 const WARMTH = [0, 0.05, 0.1, 0.15, 0.3];
 const DAY_TINT = 0xff9a4a;
 const DUSK_TINT = 0xa48ac8; // after all four places, the sky turns to dusk
-const tintFor = (step: number) => (step >= 4 ? DUSK_TINT : DAY_TINT);
+const tintFor = (step: number) => (step >= MISSIONS_PER_DAY ? DUSK_TINT : DAY_TINT);
 
 export class MapScene extends BaseScene {
   private busy = false;
@@ -158,11 +157,11 @@ export class MapScene extends BaseScene {
       this.sun.setPosition(s.x, s.y);
       this.sunDisc.setFillStyle(s.color);
       this.tint?.setFillStyle(tintFor(step), warmth);
-      if (step >= 4) this.wadiRumGlows();
+      if (step >= MISSIONS_PER_DAY) this.wadiRumGlows();
       return;
     }
     sfx('chime', { volume: 0.5 });
-    if (step >= 4) this.time.delayedCall(1500, () => this.alive && this.wadiRumGlows());
+    if (step >= MISSIONS_PER_DAY) this.time.delayedCall(1500, () => this.alive && this.wadiRumGlows());
     this.tweens.add({ targets: this.sun, x: s.x, y: s.y, duration: 1500, ease: 'Sine.easeInOut' });
     this.tweens.addCounter({
       from: 0, to: 1, duration: 1500,
@@ -176,7 +175,7 @@ export class MapScene extends BaseScene {
     });
   }
 
-  /** After all four places, the Wadi Rum pin glows softly: the night is ready. */
+  /** After four missions, the Wadi Rum pin glows softly: the night is ready. */
   private wadiRumGlows(): void {
     if (this.duskGlow) return;
     const p = PINS.find((x) => x.id === 'wadirum');
@@ -187,7 +186,8 @@ export class MapScene extends BaseScene {
   }
 
   private makePin(p: Pin): void {
-    const big = !!p.adventure;
+    // Every place looks the same: nothing marks what is built, locked or played.
+    const big = !!p.place;
     const r = big ? 17 : 13;
     const ring = this.add.image(0, 0, 'fx_ring').setDisplaySize(r * 3.2, r * 3.2).setAlpha(big ? 0.9 : 0.6);
     const dot = this.add.circle(0, 0, r * 0.55, big ? 0xc8623a : 0xfbf1dc).setStrokeStyle(3, 0x4a2c17);
@@ -230,13 +230,17 @@ export class MapScene extends BaseScene {
     this.tweens.add({ targets: c, scale: { from: 1.3, to: 1 }, duration: 450, ease: 'Back.easeOut' });
     this.tweens.add({ targets: c, y: { from: p.y - 14, to: p.y }, duration: 450, ease: 'Bounce.easeOut' });
     replay(label, 'is-bouncing');
-    // Wadi Rum is scenery until all four places are done; then it opens the night ending.
-    const scene = p.id === 'wadirum' ? (sunStep() >= 4 ? 'wadirum' : undefined) : p.scene;
+    // Wadi Rum is scenery until the day's four missions are done; then it opens
+    // the night ending. A place played today, or one with nothing built yet, is
+    // scenery with a voice: it bounces and says its name.
+    const run = p.place ? missionFor(p.place) : null;
+    const scene = p.id === 'wadirum' ? (dayComplete() ? 'wadirum' : undefined) : run?.scene;
     if (!scene) {
       void Voice.say(p.line);
       return;
     }
     this.busy = true;
+    session.current = run;
     sfx('whoosh');
     const said = Voice.say(p.line);
     await Promise.race([said, this.wait(3500)]);
@@ -248,14 +252,16 @@ export class MapScene extends BaseScene {
     this.busy = true;
     Voice.stop(false);
     ui.openParent({
-      musicOn: music.isOn,
+      sound: music.soundMode,
+      volume: music.musicVolume,
       voice: Voice.voiceLabel,
       speed: getVoiceSpeed(),
       onSpeed: (sp) => {
         setVoiceSpeed(sp);
         void Voice.say('map_next'); // a sample at the new speed
       },
-      onMusic: (on) => music.setOn(on),
+      onSound: (m) => music.setSoundMode(m),
+      onVolume: (v) => music.setVolume(v),
       onClose: () => {
         this.busy = false;
         this.resetIdle();

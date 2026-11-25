@@ -4,7 +4,16 @@ import parentsJson from '../../content/parents.json';
 import linesContent from '../../content/lines.json';
 import { getLine, registry } from './content';
 
-const parentsContent = parentsJson as { starters: Record<string, string[]>; invitation: string };
+const parentsContent = parentsJson as {
+  starters: Record<string, string[]>;
+  invitation: string;
+  secret_note: { place: string; intro: string; text: string };
+  music_credit: { text: string; tracks: string[] };
+};
+
+type SoundMode = 'music' | 'nature' | 'off';
+type MusicVolume = 'quiet' | 'medium';
+type VoiceSpeed = 'slower' | 'normal' | 'faster';
 
 const ICONS = {
   home: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15.5 16 5l12 10.5" fill="none" stroke="#4a2c17" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13.5V27h6v-7h4v7h6V13.5" fill="#c8623a" stroke="#4a2c17" stroke-width="2.6" stroke-linejoin="round"/></svg>`,
@@ -12,7 +21,7 @@ const ICONS = {
   lock: `<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="9" rx="2" fill="#4a2c17"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9" fill="none" stroke="#4a2c17" stroke-width="2"/></svg>`,
 };
 
-const PLACE_NAMES: Record<string, string> = { petra: 'البَتْرا', ummqais: 'أُمّ قَيْس', amman: 'عَمّان', irbid: 'إِرْبِد' };
+const PLACE_NAMES: Record<string, string> = { petra: 'البَتْرا', ummqais: 'أُمّ قَيْس', amman: 'عَمّان', irbid: 'إِرْبِد', jerash: 'جَرَش', deadsea: 'البَحْر المَيِّت', aqaba: 'العَقَبة' };
 
 function section(title: string, ...children: HTMLElement[]): HTMLDetailsElement {
   const d = el('details', 'fk-section');
@@ -39,6 +48,14 @@ function parentSections(): HTMLElement[] {
       ul.append(li);
     }
     talk.push(h, ul);
+    // Under Irbid: good and bad secrets, for the parent to say in his own words.
+    if (id === parentsContent.secret_note.place) {
+      const intro = el('p', 'fk-secret-intro');
+      intro.textContent = parentsContent.secret_note.intro;
+      const text = el('p', 'fk-secret');
+      text.textContent = parentsContent.secret_note.text;
+      talk.push(intro, text);
+    }
   }
   // An optional invitation: never tracked, confirmed or tied to the game.
   const inv = el('p', 'fk-invite');
@@ -265,45 +282,54 @@ class UI {
     return () => { reset(); btn.remove(); };
   }
 
-  /** Parent area. Milestone 1 holds the music switch; the rest arrives in Milestone 3. */
-  openParent(opts: { musicOn: boolean; voice: string | null; speed: 'slower' | 'normal' | 'faster'; onMusic: (on: boolean) => void; onSpeed: (s: 'slower' | 'normal' | 'faster') => void; onClose: () => void }): void {
+  /** A row of options: the chosen one is pressed. Tapping one calls onPick. */
+  private options<T extends string>(items: Array<[T, string]>, current: T, onPick: (v: T) => void): HTMLDivElement {
+    const wrap = el('div', 'fk-options');
+    const btns = items.map(([key, text]) => {
+      const b = el('button', 'fk-speed');
+      b.textContent = text;
+      b.setAttribute('aria-pressed', String(key === current));
+      b.addEventListener('click', () => {
+        for (const x of btns) x.setAttribute('aria-pressed', String(x === b));
+        onPick(key);
+      });
+      return b;
+    });
+    wrap.append(...btns);
+    return wrap;
+  }
+
+  /** Parents' corner (GAME_SPEC.md section 10). */
+  openParent(opts: {
+    sound: SoundMode; volume: MusicVolume; voice: string | null; speed: VoiceSpeed;
+    onSound: (m: SoundMode) => void; onVolume: (v: MusicVolume) => void; onSpeed: (s: VoiceSpeed) => void; onClose: () => void;
+  }): void {
     const wrap = el('div', 'fk-parent');
     const card = el('div', 'fk-parent-card');
     const h = el('h2', '');
     h.textContent = 'للأهل';
-    const row = el('div', 'fk-row');
-    const label = el('span', '');
-    label.textContent = 'الموسيقى';
-    const toggle = el('button', 'fk-toggle');
-    const render = (on: boolean) => {
-      toggle.setAttribute('aria-pressed', String(on));
-      toggle.textContent = on ? 'شغّالة' : 'مطفيّة';
-    };
-    let on = opts.musicOn;
-    render(on);
-    toggle.addEventListener('click', () => {
-      on = !on;
-      render(on);
-      opts.onMusic(on);
-    });
-    row.append(label, toggle);
+    // Sound choice: cheerful music (default), nature sounds only, or off. Plus the music volume.
+    const soundGroup = el('div', 'fk-group');
+    const soundLabel = el('span', '');
+    soundLabel.textContent = 'الصوت بالخلفية';
+    const volumeRow = el('div', 'fk-row');
+    const volumeLabel = el('span', '');
+    volumeLabel.textContent = 'علوّ الموسيقى';
+    const volume = this.options<MusicVolume>([['quiet', 'واطي'], ['medium', 'متوسط']], opts.volume, opts.onVolume);
+    volumeRow.append(volumeLabel, volume);
+    const showVolume = (m: SoundMode) => { volumeRow.hidden = m === 'off'; };
+    showVolume(opts.sound);
+    const sound = this.options<SoundMode>(
+      [['music', 'موسيقى مرحة'], ['nature', 'أصوات الطبيعة فقط'], ['off', 'بدون']],
+      opts.sound,
+      (m) => { showVolume(m); opts.onSound(m); },
+    );
+    soundGroup.append(soundLabel, sound);
     // Voice speed: tap one to hear a sample at that speed.
     const speedRow = el('div', 'fk-row');
     const speedLabel = el('span', '');
     speedLabel.textContent = 'سرعة الصوت';
-    const speeds = el('div', 'fk-speeds');
-    const options: Array<['slower' | 'normal' | 'faster', string]> = [['slower', 'أبطأ'], ['normal', 'عادي'], ['faster', 'أسرع']];
-    const speedBtns = options.map(([key, text]) => {
-      const b = el('button', 'fk-speed');
-      b.textContent = text;
-      b.setAttribute('aria-pressed', String(key === opts.speed));
-      b.addEventListener('click', () => {
-        for (const x of speedBtns) x.setAttribute('aria-pressed', String(x === b));
-        opts.onSpeed(key);
-      });
-      return b;
-    });
-    speeds.append(...speedBtns);
+    const speeds = this.options<VoiceSpeed>([['slower', 'أبطأ'], ['normal', 'عادي'], ['faster', 'أسرع']], opts.speed, opts.onSpeed);
     speedRow.append(speedLabel, speeds);
     const voice = el('div', 'fk-voice-status');
     voice.textContent = opts.voice
@@ -317,10 +343,13 @@ class UI {
     });
     const build = el('div', 'fk-build');
     build.textContent = `نسخة: \u2066${__BUILD__}\u2069`;
+    // The music license requires this credit (MISSIONS_V2.md section 9).
+    const credit = el('div', 'fk-credit');
+    credit.textContent = `${parentsContent.music_credit.text} Tracks: ${parentsContent.music_credit.tracks.join(', ')}.`;
     // The longer sections fold away so the card stays short.
     const scroll = el('div', 'fk-parent-scroll');
     scroll.append(voice, ...parentSections());
-    card.append(h, row, speedRow, scroll, build, close);
+    card.append(h, soundGroup, volumeRow, speedRow, scroll, credit, build, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());
     this.root.append(wrap);

@@ -15,7 +15,8 @@ import { BaseScene } from '../BaseScene';
 const FLOOR = 700;
 const BOY = { x: 150, h: 150 };
 const BALL = { x: 238, d: 46 };
-const JAR = { x: 326, y: 336, h: 74 };
+// The jar stands on the shelf of the delivered bg_amman_home (its top plank is at y = 316).
+const JAR = { x: 334, y: 280, h: 74 };
 const SHARDS = [{ x: 290, y: 692 }, { x: 322, y: 704 }, { x: 350, y: 690 }];
 const SHARD_KEYS = ['shard_a', 'shard_b', 'shard_c'];
 const PUDDLE = { x: 318, y: 704, rx: 58, ry: 14 };

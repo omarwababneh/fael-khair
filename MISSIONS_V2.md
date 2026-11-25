@@ -239,6 +239,8 @@ Rules, the same as Irbid today:
 - No chime, no sparkle on him, no hadith line, no closing praise. The father says at most one plain line about what changed in the world, then the map.
 - The world shows the result after he has gone: someone arrives and simply enjoys it.
 
+**One exception:** Irbid's quiet deed (I1) keeps its closing hadith line (`bukhari_660`). It is the one quiet deed whose hadith is about giving in secret. Every other quiet deed ends without a hadith line.
+
 One quiet deed per place. Keep them short (about 60 seconds) and reuse art.
 
 | Place | Quiet deed | Reuses |
