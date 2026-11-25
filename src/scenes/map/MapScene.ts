@@ -160,7 +160,8 @@ export class MapScene extends BaseScene {
       if (step >= MISSIONS_PER_DAY) this.wadiRumGlows();
       return;
     }
-    sfx('chime', { volume: 0.5 });
+    // The fourth step follows the quiet deed, which has no chime at all.
+    if (step < MISSIONS_PER_DAY) sfx('chime', { volume: 0.5 });
     if (step >= MISSIONS_PER_DAY) this.time.delayedCall(1500, () => this.alive && this.wadiRumGlows());
     this.tweens.add({ targets: this.sun, x: s.x, y: s.y, duration: 1500, ease: 'Sine.easeInOut' });
     this.tweens.addCounter({

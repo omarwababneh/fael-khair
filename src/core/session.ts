@@ -109,13 +109,13 @@ export function completeMission(place: Place): void {
   }
 }
 
-/** For ?scene= debugging: the run a scene key would be opened with. */
+/** For ?scene= debugging: the run a scene key would be opened with. It never moves a rotation. */
 export function debugRun(scene: string): MissionRun | null {
   for (const place of PLACES) {
     const q = QUIET[place];
     if (q && q.scene === scene && q.id !== 'I1') return { ...q, place, quiet: true };
     const i = ROTATION[place].findIndex((d) => d?.scene === scene);
-    if (i >= 0) return { ...(ROTATION[place][i] as MissionDef), place, quiet: false, index: i };
+    if (i >= 0) return { ...(ROTATION[place][i] as MissionDef), place, quiet: false };
   }
   if (scene === 'irbid') return { ...(QUIET.irbid as MissionDef), place: 'irbid', quiet: false };
   return null;

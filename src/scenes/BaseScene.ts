@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { DESIGN_H, DESIGN_W, view, vp } from '../core/viewport';
 import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
-import { completeMission, session, type MissionRun, type Place } from '../core/session';
+import { completeMission, type Place } from '../core/session';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
@@ -105,12 +105,6 @@ export abstract class BaseScene extends Phaser.Scene {
     this.baseIdleTimer = this.time.delayedCall(ms, () => {
       if (this.alive && this.idleAction) this.idleAction();
     });
-  }
-
-  /** The mission the map opened (or the debug default for this scene). */
-  protected run(fallback: MissionRun): MissionRun {
-    const r = session.current;
-    return r && r.scene === fallback.scene ? r : fallback;
   }
 
   /**

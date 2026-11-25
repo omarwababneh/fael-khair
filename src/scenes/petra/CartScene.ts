@@ -27,7 +27,7 @@ const CART_S = CART_W / 768;
 const GROUND = AXLE.y + (CART_ART.wheelBottom - CART_ART.hubY) * CART_S; // under the wheel
 const DONKEY = { x: AXLE.x + 146, h: 118 };
 const ELDER = { x: 62, h: 140 };
-const BOY = { x: 262, y: 748, h: 124 };
+const BOY = { x: 262, y: 736, h: 124 };
 const SMALL_H = 38; // a small sack on the ground
 const BED_SMALL_H = 44;
 const BED_BIG_H = 60;
@@ -36,9 +36,10 @@ const BED_BOTTOM = -(CART_ART.hubY - 75) * CART_S;
 const SLOTS = { left: [-26, -44, -10], right: [34, 52, 18] };
 const BED_CENTER = 4;
 const TILT_PER_SACK = 4; // degrees
+// Kept above y = 734, so the speech bubble never covers them on shorter phones.
 const GROUND_SPOTS = [
-  { x: 36, y: 744 }, { x: 96, y: 752 }, { x: 150, y: 742 }, { x: 206, y: 752 },
-  { x: 322, y: 752 }, { x: 368, y: 742 }, { x: 128, y: 724 },
+  { x: 36, y: 724 }, { x: 96, y: 732 }, { x: 150, y: 722 }, { x: 206, y: 732 },
+  { x: 322, y: 732 }, { x: 368, y: 722 }, { x: 124, y: 706 },
 ];
 const WALL_SPOT = { x: 28, y: 640 }; // where the extra sack waits for the next trip
 const BUCKET_SPOT = { x: 112, y: 708 };
@@ -72,6 +73,9 @@ export class CartScene extends BaseScene {
   private loaded = { left: 0, right: 0 };
   private tipSaid = false;
   private bucketScale = 1;
+  /** A sack is on its way into the bed: no new grab until it has landed and been judged. */
+  private landing = false;
+  private introDone = false;
 
   constructor() {
     super('p3');
@@ -87,6 +91,8 @@ export class CartScene extends BaseScene {
     this.dragId = -1;
     this.loaded = { left: 0, right: 0 };
     this.tipSaid = false;
+    this.landing = false;
+    this.introDone = false;
     this.hint = new HintHand(this);
     // Small variation on replay: four or six sacks to balance, lying in different places.
     this.toLoad = Math.random() < 0.5 ? 4 : 6;
@@ -124,7 +130,7 @@ export class CartScene extends BaseScene {
       const base = fitHeight(img, SMALL_H);
       this.sacks.push({ img, home: spot, side: null, base });
     }
-    const big = this.add.image(ELDER.x + 46, GROUND + 26, 'sack_big').setOrigin(0.5, 1).setDepth(34.7).setAngle(-6);
+    const big = this.add.image(ELDER.x + 46, GROUND + 22, 'sack_big').setOrigin(0.5, 1).setDepth(34.7).setAngle(-6);
     fitHeight(big, 56);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
@@ -134,6 +140,9 @@ export class CartScene extends BaseScene {
     this.events.once('shutdown', () => this.hint.clear());
     this.time.addEvent({ delay: 7500, loop: true, callback: () => Math.random() < 0.6 && sfx('birds', { volume: 0.45 }) });
 
+    // He may start loading at once (an easy first win inside 10 seconds),
+    // while the old man lifts the big sack.
+    this.state = 'load';
     void this.intro(big);
   }
 
@@ -160,15 +169,16 @@ export class CartScene extends BaseScene {
     this.tweens.add({ targets: this.cart, y: AXLE.y + 2, duration: 120, yoyo: true });
     await said;
     if (!this.alive) return;
-    this.state = 'load';
+    this.introDone = true;
+    if (this.state !== 'load') return;
     this.setIdle(() => this.showHint());
-    void Voice.say('p3_hint');
+    if (this.loaded.left + this.loaded.right === 0) void Voice.say('p3_hint');
   }
 
   // ---------------------------------------------------------------- input
 
   private down(p: Phaser.Input.Pointer): void {
-    if (!this.alive || this.dragging || this.draggingBucket) return;
+    if (!this.alive || this.dragging || this.draggingBucket || this.landing) return;
     this.hint.clear();
     const x = p.worldX, y = p.worldY;
     if (this.state === 'load') {
@@ -246,7 +256,7 @@ export class CartScene extends BaseScene {
 
   /** Put a sack into the bed on one side. */
   private loadSack(s: Sack, side: Side): void {
-    const done = this.loaded.left + this.loaded.right;
+    this.landing = true;
     const slot = SLOTS[side][this.loaded[side] % SLOTS[side].length];
     s.side = side;
     this.loaded[side]++;
@@ -258,7 +268,7 @@ export class CartScene extends BaseScene {
     this.tweens.add({
       targets: s.img, x: slot + Phaser.Math.Between(-3, 3), y: BED_BOTTOM - (this.loaded[side] > 1 ? 4 : 0), scaleX: scale, scaleY: scale, angle: Phaser.Math.Between(-5, 5),
       duration: 260, ease: 'Quad.easeIn',
-      onComplete: () => this.landed(s, done + 1),
+      onComplete: () => this.landed(s),
     });
   }
 
@@ -268,18 +278,21 @@ export class CartScene extends BaseScene {
     return { x: dx * Math.cos(a) - dy * Math.sin(a), y: dx * Math.sin(a) + dy * Math.cos(a) };
   }
 
-  private landed(s: Sack, count: number): void {
+  private landed(s: Sack): void {
     sfx('thud', { weight: 0.3, volume: 0.8 });
     sfx('creak', { volume: 0.6 });
+    // Judged with the count and the balance read together, after the sack is in.
+    const count = this.loaded.left + this.loaded.right;
     const diff = this.loaded.left - this.loaded.right;
-    if (count > this.toLoad) {
-      void this.tooMuch(s);
-      return;
-    }
     if (Math.abs(diff) >= 2) {
       void this.tipOver(s);
       return;
     }
+    if (count > this.toLoad) {
+      void this.tooMuch(s);
+      return;
+    }
+    this.landing = false;
     this.settle();
     // A finished step chimes (a mechanical step, not a moral choice).
     this.time.delayedCall(240, () => sfx('chime', { volume: 0.4 }));
@@ -300,6 +313,7 @@ export class CartScene extends BaseScene {
     // The sack slides off and goes back to where it lay.
     this.unload(s);
     this.settle();
+    this.landing = false;
     if (!this.tipSaid) {
       this.tipSaid = true;
       void Voice.say('p3_balance');
@@ -342,6 +356,7 @@ export class CartScene extends BaseScene {
     this.tweens.add({ targets: this.bucket, scale: this.bucketScale, duration: 400, ease: 'Back.easeOut' });
     this.bucketRing = glowRing(this, BUCKET_SPOT.x, BUCKET_SPOT.y - 22, 30, 34);
     this.state = 'water';
+    this.landing = false;
     this.setIdle(() => this.showHint());
     await Voice.say('p3_water');
   }

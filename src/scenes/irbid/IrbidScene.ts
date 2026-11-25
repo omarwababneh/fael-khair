@@ -16,7 +16,7 @@ import { BaseScene } from '../BaseScene';
 const FOODS = ['food_bread', 'food_olives', 'food_labneh', 'food_tomatoes', 'food_apples'];
 // Measured on the delivered bg_irbid_dusk: the food waits in a row on the paving in
 // front (it used to float over the wall), and the basket is about half the boy's height.
-const FOOD_ROW = { y: 722, xs: [44, 166, 234, 300, 358] };
+const FOOD_ROW = { y: 708, xs: [44, 166, 234, 300, 358] };
 const BASKET = { x: 205, y: 660, w: 86 };
 const TREE = { x: 64, y: 694 };
 const DOOR = { x: 300, y: 560, w: 96, h: 160, step: 652 };

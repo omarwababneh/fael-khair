@@ -60,6 +60,8 @@ export class PouchScene extends BaseScene {
   private seen = { knot: false, patch: false };
   private closeUp: Phaser.GameObjects.Container | null = null;
   private variant: Variant = 'color';
+  private detailSay = 0;
+  private hintSaid = false;
 
   constructor() {
     super('p2');
@@ -74,6 +76,8 @@ export class PouchScene extends BaseScene {
     this.dragging = false;
     this.dragId = -1;
     this.seen = { knot: false, patch: false };
+    this.detailSay = 0;
+    this.hintSaid = false;
     this.walkTimer = undefined;
     this.hint = new HintHand(this);
     this.variant = playsSinceOpen === 0 ? 'color' : Math.random() < 0.5 ? 'string' : 'patch';
@@ -100,9 +104,9 @@ export class PouchScene extends BaseScene {
     this.breathe(this.boy);
 
     const px = boyRight ? Phaser.Math.Between(70, 120) : Phaser.Math.Between(250, 320);
-    this.pouch = this.add.image(px, GROUND + 22, 'pouch_red').setOrigin(0.5, 1).setDepth(31).setAngle(-12);
+    this.pouch = this.add.image(px, GROUND + 14, 'pouch_red').setOrigin(0.5, 1).setDepth(31).setAngle(-12);
     fitHeight(this.pouch, POUCH_H);
-    this.pouchRing = glowRing(this, px, GROUND + 10, 24, 29);
+    this.pouchRing = glowRing(this, px, GROUND + 2, 24, 29);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.move(p));
@@ -272,15 +276,17 @@ export class PouchScene extends BaseScene {
       this.seen[kind] = true;
       sfx('pop');
       this.tweens.add({ targets: r, scale: r.scale * 1.5, alpha: 0, duration: 500, onComplete: () => r.setVisible(false) });
+      // Close the view only after the last detail's line has finished.
+      const n = ++this.detailSay;
       void Voice.say(kind === 'knot' ? 'p2_string' : 'p2_patch').then(() => {
-        if (this.alive && this.seen.knot && this.seen.patch && this.state === 'look') void this.closeCloseUp();
+        if (this.alive && n === this.detailSay && this.seen.knot && this.seen.patch && this.state === 'look') void this.closeCloseUp();
       });
       return;
     }
   }
 
   private async closeCloseUp(): Promise<void> {
-    this.state = 'toGuard';
+    this.state = 'wait'; // nothing to tap while the view closes
     this.setIdle(null);
     const c = this.closeUp;
     this.closeUp = null;
@@ -293,6 +299,8 @@ export class PouchScene extends BaseScene {
     const h = this.handPoint();
     this.pouch.setVisible(true).setAngle(0).setPosition(h.x, h.y).setDepth(34);
     fitHeight(this.pouch, POUCH_H);
+    // Only now may he tap the guard (a tap during the pose change froze the walk).
+    this.state = 'toGuard';
     await Voice.say('p2_guard');
     if (!this.alive || this.state !== 'toGuard') return;
     this.guardRing = glowRing(this, this.guard.x, GROUND - GUARD.h * 0.45, 46, 29);
@@ -462,7 +470,10 @@ export class PouchScene extends BaseScene {
     if (!this.alive) return;
     if (this.state === 'find') {
       this.hint.show('tap', { x: this.pouch.x, y: this.pouch.y - 10 }, undefined, () => this.kickIdle());
-      void Voice.say('p2_hint');
+      if (!this.hintSaid) {
+        this.hintSaid = true;
+        void Voice.say('p2_hint');
+      }
     }
   }
 }
