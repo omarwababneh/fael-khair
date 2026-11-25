@@ -17,10 +17,11 @@ import { BaseScene } from '../BaseScene';
 const FOODS = ['food_bread', 'food_olives', 'food_labneh', 'food_tomatoes', 'food_apples'];
 // Measured on the delivered bg_irbid_dusk: the food waits in a row on the paving in
 // front (it used to float over the wall), and the basket is about half the boy's height.
-const FOOD_ROW = { y: 708, xs: [44, 166, 234, 300, 358] };
+const FOOD_ROW = { y: 696, xs: [44, 166, 234, 300, 358] };
 // Heights follow the art checklist (boy = 1.0): basket 0.5 empty, 0.55 full.
 const BASKET = { x: 205, y: 660, h: 73, hFull: 80 };
-const TREE = { x: 64, y: 694 };
+// Where he hides: on the paving just past the end of the low basalt wall (not on it).
+const TREE = { x: 94, y: 694 };
 const DOOR = { x: 300, y: 560, w: 96, h: 160, step: 652 };
 const STOP_X = 244; // where he stands at the door
 const WINDOW = { x: 196, y: 318 };

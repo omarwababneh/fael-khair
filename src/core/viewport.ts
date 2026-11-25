@@ -67,6 +67,9 @@ export function measure(): void {
   css.setProperty('--frame-top', `${vp.frame.y / vp.dpr}px`);
   css.setProperty('--frame-width', `${fw / vp.dpr}px`);
   css.setProperty('--frame-height', `${fh / vp.dpr}px`);
+  // A short frame (a 16:9 phone, a laptop window) gets a smaller speech-bubble
+  // text, so a line that wraps does not push the bubble over things he must touch.
+  document.documentElement.toggleAttribute('data-short-frame', fh / vp.dpr < 760);
 }
 
 /** The world rectangle the camera currently shows (the portrait frame). */

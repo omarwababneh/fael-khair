@@ -30,7 +30,7 @@ const GROUND = AXLE.y + (CART_ART.wheelBottom - CART_ART.hubY) * CART_S; // unde
 // The donkey stands at the shaft tips (hub to tip: 550 px of the cart art).
 const DONKEY = { x: AXLE.x + Math.round(550 * CART_S) + 12, h: 124, tiredH: 112 };
 const ELDER = { x: 68, h: 161 };
-const BOY = { x: 262, y: 736, h: 124 };
+const BOY = { x: 262, y: 726, h: 124 };
 const SMALL_H = 38; // a small sack on the ground
 const BED_SMALL_H = 40;
 const BED_BIG_H = 56;
@@ -39,10 +39,11 @@ const BED_BOTTOM = -(CART_ART.hubY - 75) * CART_S;
 const SLOTS = { left: [-22, -35, -9], right: [26, 39, 13] };
 const BED_CENTER = 4;
 const TILT_PER_SACK = 4; // degrees
-// Kept above y = 734, so the speech bubble never covers them on shorter phones.
+// Their bottoms stay above y = 716: on a 375 x 667 phone the speech bubble's top
+// edge is at about y = 731 (DECISIONS.md 92).
 const GROUND_SPOTS = [
-  { x: 36, y: 724 }, { x: 96, y: 732 }, { x: 150, y: 722 }, { x: 206, y: 732 },
-  { x: 322, y: 732 }, { x: 368, y: 722 }, { x: 124, y: 706 },
+  { x: 36, y: 708 }, { x: 96, y: 716 }, { x: 150, y: 706 }, { x: 206, y: 716 },
+  { x: 322, y: 716 }, { x: 368, y: 706 }, { x: 124, y: 692 },
 ];
 const WALL_SPOT = { x: 28, y: 640 }; // where the extra sack waits for the next trip
 const BUCKET_SPOT = { x: 112, y: 708 };

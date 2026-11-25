@@ -105,9 +105,9 @@ export class PouchScene extends BaseScene {
     this.breathe(this.boy);
 
     const px = boyRight ? Phaser.Math.Between(70, 120) : Phaser.Math.Between(250, 320);
-    this.pouch = this.add.image(px, GROUND + 14, 'pouch_red').setOrigin(0.5, 1).setDepth(31).setAngle(-12);
+    this.pouch = this.add.image(px, GROUND + 4, 'pouch_red').setOrigin(0.5, 1).setDepth(31).setAngle(-12);
     fitHeight(this.pouch, POUCH_H);
-    this.pouchRing = glowRing(this, px, GROUND + 2, 24, 29);
+    this.pouchRing = glowRing(this, px, GROUND - 8, 24, 29);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.move(p));
