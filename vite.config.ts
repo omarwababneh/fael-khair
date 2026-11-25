@@ -42,6 +42,11 @@ export default defineConfig({
         // Precache every file so the game runs with no connection after the first load.
         globPatterns: ['**/*.{js,css,html,json,webp,png,jpg,svg,woff2,m4a,txt}'],
         maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
+        // Only Vite's own hashed bundles (assets/index-<hash>.js and .css) may skip
+        // revision checks. Art, audio and assets/index.json keep their names when
+        // they change, so they need a revision, or installed phones never fetch the
+        // new versions (new art showed as magenta boxes, new music never played).
+        dontCacheBustURLsMatching: /^assets\/index-[\w-]+\.(js|css)$/,
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
         skipWaiting: true,
