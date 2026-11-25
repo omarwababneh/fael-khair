@@ -9,7 +9,7 @@ Read this whole file before writing any code. It is the single source of truth f
 A private game for one Arabic-speaking boy in Jordan, aged 6 to 7, who is starting to read. He plays on his mother's iPhone.
 
 - **Form:** an installable, offline Progressive Web App (PWA) hosted on GitHub Pages. His mother opens a link in Safari, taps Share, then "Add to Home Screen". No App Store.
-- **Session:** about 10 minutes. Four short adventures in four real places in Jordan, then a calm night-sky ending.
+- **Session:** 8 to 10 minutes. Four short missions, chosen by him from seven real places in Jordan, then a calm night-sky ending in Wadi Rum. The fourth mission of every day is a quiet good deed that nobody sees (section 4.3). `MISSIONS_V2.md` holds the full mission designs.
 - **Purpose:** to help him grow an inner disposition toward goodness, so that he does good when there is no screen, no reward and nobody watching. The game is a tool inside his father's upbringing of him. It does not replace the father.
 - **Governing principle:** نجاح اللعبة أن يبقى أثرها بعد إغلاقها. The game succeeds if its benefit remains after it is turned off.
 
@@ -36,38 +36,84 @@ Never trade test 2 or 3 for test 1.
 - Language of love, hope and gratitude toward Allah. Never "Allah is angry with you", never shame.
 
 ### Ethical design
-- Forbidden: coins, points, stars, levels-as-rank, inventories, unlockable rewards, loot boxes, random prizes, streaks, daily login pressure, countdown timers, leaderboards, social features, notifications, ads, purchases, analytics, tracking, any network request after the app is installed.
+- Forbidden: coins as rewards (a coin as a story object, like the change in I2, is fine), points, stars, levels-as-rank, inventories, unlockable rewards, loot boxes, random prizes, streaks, daily login pressure, countdown timers, leaderboards, social features, notifications, ads, purchases, analytics, tracking, any network request after the app is installed.
 - No fail screens, no "wrong" buzzer, no lives. A slip is followed by a gentle retry.
 - Consequences of a good act land on other characters and on the world, never on the player's status. Example: the dog drinks; the road is clear.
-- The secret good deed gets no acknowledgment of any kind (section 4D).
+- The secret good deed and every quiet deed get no acknowledgment of any kind (sections 4.2 I1 and 4.3).
 - Never punish him for stopping or for missing a day. Nothing is lost by closing the app.
 - Never teach an action that is dangerous to copy. He never climbs into the well.
 
 ### Privacy
-- The repository is public. Never commit names, photos or personal details of the family. Nothing about the child is stored except a local music on/off setting.
+- The repository is public. Never commit names, photos or personal details of the family.
+- **Storage.** The game may store, on the device only, the parents' sound settings (sound choice, music volume, voice speed) and one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere.
+
+### Rules added by MISSIONS_V2
+Every rule above still holds. `MISSIONS_V2.md` section 4 adds rules that apply to every mission, old and new: mercy with wisdom (a trusted adult whenever a stranger, an animal in trouble, broken glass, a leak or a lost child is involved; never alone with a stranger; never touching a wild or unfamiliar animal; light loads only; food shared only after asking, never a shared cup; good and bad secrets), no shame, the father describes and does not grade, everyday remembrance (only بسم الله، الحمد لله، إن شاء الله، ما شاء الله، سبحان الله are used freely; any other religious sentence comes from the registry), Quran in missions only as the short paraphrase, no jingle or musical sting for a moral choice or a good deed, and short two-form voice lines.
 
 ---
 
 ## 3. Player flow
 
 1. **Start screen.** The app title "فاعل خير" over the map art, and one large button "يَلّا" (Let's go). The first tap unlocks audio (required on iOS).
-2. **Map of Jordan (the hub).** An illustrated map with landmark pins. Four pins have adventures: Petra, Umm Qais, Amman, Irbid. He may play them in any order.
-3. **Other landmarks** on the map (Jerash, the Dead Sea, Aqaba, Wadi Rum before the ending) are tappable too. A tap makes the landmark bounce and plays one voice line naming the place. They are scenery with a voice, not locked content. Show no locks and no "coming soon".
-4. **Each adventure** lasts 60 to 120 seconds and ends by returning to the map.
-5. **The sun** on the map moves one step toward sunset after each adventure. This is the only sign of progress. No checkmarks, no counters.
-6. **After all four,** the sky on the map turns to dusk and the Wadi Rum pin glows softly. Tapping it opens the night ending.
-7. **Night ending,** then a button "خلصنا لليوم" (Done for today) returns to the start screen.
-8. **Replay any time.** Starting again begins a fresh day. There is no daily lock.
 
-A home button on every adventure returns to the map at once, with no confirmation and no penalty.
+From the map on, a day works as follows (copied from `MISSIONS_V2.md` section 3; section numbers inside refer to that file, where the quiet deed is section 6, here 4.3):
+
+1. **Map.** All seven places are open from the first second. No locks, no "coming soon", no marks showing what was played.
+2. **One mission per place per day.** When he taps a place, it plays that place's next mission in its rotation (mission 1, then 2, then 3, then 1 again). A place he has played today becomes scenery with a voice for the rest of the day, the way Jerash behaves now: it bounces and says its name.
+3. **The sun** moves one step after each mission, as now.
+4. **The fourth mission of the day is always the quiet deed** of whichever place he opens fourth (section 6). It does not advance that place's rotation.
+5. **After four missions** the map turns to dusk, the Wadi Rum pin glows, and the other places become scenery with a voice. Wadi Rum opens the night ending.
+6. **"خلصنا لليوم"** returns to the start screen. Starting again begins a fresh day at once. There is no waiting, no daily lock and nothing lost by stopping halfway.
+7. **Rotation moves by play, not by the calendar.** A place's rotation advances only when its mission is finished. Missing a day changes nothing.
+8. **Small variation on replay.** Each mission has two or three light variations chosen at random: where objects lie, how many there are, which side a character stands on. The story and the value never change.
+
+**Storage.** The game may now store, on the device only, one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. (Section 2, Privacy.)
+
+A full day should take 8 to 10 minutes. Each mission lasts 60 to 120 seconds.
+
+A home button on every mission returns to the map at once, with no confirmation and no penalty.
+
+**While the missions are being built** (`MISSIONS_V2.md` section 12): until a place's missions are built, that place stays scenery with a voice. Until a place's quiet deed is built, its next ordinary mission plays in the fourth slot. Until I2 and I3 exist, I1 plays in any slot.
 
 ---
 
-## 4. The adventures
+## 4. The missions
 
-Shared rules: every adventure opens with one father voice line that sets the situation, shows a moving hand hint if he does nothing for 6 seconds, and closes with the father's hadith line (from the registry) over a calm final frame.
+Seven places have missions: Petra, Umm Qais, Amman, Irbid, Jerash, the Dead Sea and Aqaba, three each. Wadi Rum is the night ending. The full play, outcome, safeguards and suggested art of every mission are in `MISSIONS_V2.md` section 5; this section lists them and keeps the original descriptions of the four built missions.
 
-### A. Petra: clearing the road
+Shared rules: every mission opens with one father voice line that sets the situation (his work starts with "بسم الله"), shows a moving hand hint if he does nothing for 6 seconds, and closes with the father's line from the registry over a calm final frame. Quiet deeds close differently (section 4.3). Each mission lasts 60 to 120 seconds, gives an easy first win inside 10 seconds and gets a little harder.
+
+### 4.1 All missions
+
+| Id | Mission | Place | Value | Source | Status |
+|---|---|---|---|---|---|
+| P1 | Clearing the road | Petra | removing harm from the path | `bukhari_2472` | built |
+| P2 | The lost pouch | Petra | trust (amanah), returning what is lost | `bukhari_2427` | wave 1 |
+| P3 | Loading the cart | Petra | helping someone with his load | `bukhari_2989` (mount) | wave 1 |
+| U1 | The thirsty dog | Umm Qais | mercy to animals | `bukhari_2363` | built |
+| U2 | The olive saplings | Umm Qais | planting good others enjoy later; patience; trust in Allah | `muslim_1553a` | wave 2 |
+| U3 | Sharing the harvest | Umm Qais | fairness between two | `bukhari_2989` (justice) | wave 2 |
+| A1 | The broken jar | Amman | truthfulness | `muslim_2607c` | built |
+| A2 | The block tower | Amman | self-control when angry | `bukhari_6114` | wave 2 |
+| A3 | Mama's shopping | Amman | kindness to parents | `quran_17_23` | wave 2 |
+| I1 | The secret helper | Irbid | giving in secret | `bukhari_660` | built (Irbid's quiet deed) |
+| I2 | Too much change | Irbid | trust, giving people what is theirs | `quran_4_58` | wave 2 |
+| I3 | The new boy | Irbid | a kind word; including the one left out | `bukhari_2989` (good word) | wave 2 |
+| J1 | After the festival | Jerash | removing harm from where people walk | `bukhari_2989` (harm) | wave 3 |
+| J2 | The lost little girl | Jerash | helping someone in distress | `muslim_2699a` | wave 3 |
+| J3 | The forgotten lunch | Jerash | feeding others | `bukhari_12` | wave 3 |
+| D1 | The dripping taps | Dead Sea | not wasting water | `quran_7_31` | wave 3 |
+| D2 | Seeing the blessings | Dead Sea | gratitude | `quran_14_7` | wave 3 |
+| D3 | Walking with Grandfather | Dead Sea | honoring the elderly | `tirmidhi_1920` | wave 3 |
+| Q1 | The turtle and the plastic | Aqaba | mercy to animals; keeping harm out of their home | `bukhari_2363` | wave 4 |
+| Q2 | The honest scale | Aqaba | honest weight | `quran_55_9` | wave 4 |
+| Q3 | The sandcastle promise | Aqaba | keeping a promise | `quran_17_34` | wave 4 |
+
+### 4.2 The four built missions
+They stay as they are and become the first mission of their place, with the safeguards `MISSIONS_V2.md` adds.
+
+#### P1. Petra: clearing the road
+
 - **Value:** removing harm from people's path. **Source:** `bukhari_2472`.
 - **Place:** the Siq, the narrow rose-red canyon that leads into Petra. Portrait suits it: tall walls, a sandy path running up the screen.
 - **Situation:** an old man with a small donkey cart cannot get through. Rocks and thorn branches block the path.
@@ -77,8 +123,10 @@ Shared rules: every adventure opens with one father voice line that sets the sit
   - Six obstacles in total: three rocks, a thorn branch, a rock, a larger branch.
 - **Consequence:** as the path clears, the cart rolls forward behind him. When the last obstacle is gone, the boy and the cart walk on, the screen cross-fades to the Treasury plaza, and the camera rises slowly over the facade in warm light while birds cross the sky. The old man says his one line and goes on his way.
 - **Ending line:** the father's hadith line.
+- **Added (MISSIONS_V2):** Safeguard to add: the obstacles are loose stones and fallen branches only. He never moves, climbs or touches the ancient carved rock. Add one father line saying we look after the old place.
 
-### B. Umm Qais: the thirsty dog
+#### U1. Umm Qais: the thirsty dog
+
 - **Value:** mercy to animals. **Source:** `bukhari_2363`.
 - **Place:** the old hilltop village of Umm Qais: black basalt columns, a stone well, a wide view over the valley and the lake far below.
 - **Situation:** a stray dog pants beside an empty stone trough.
@@ -89,8 +137,10 @@ Shared rules: every adventure opens with one father voice line that sets the sit
   - Two buckets fill the trough.
 - **Consequence:** the dog drinks, its tail wags, it stretches, then it trots away toward the hills. It does not follow him and does not become a pet. He is not given the dog.
 - **Ending line:** the father's hadith line.
+- **Added (MISSIONS_V2):** Safeguard to add: he pours the water into the trough and steps back. He does not pet or approach the dog. The well stays covered by its frame, as now.
 
-### C. Amman: the broken jar
+#### A1. Amman: the broken jar
+
 - **Value:** truthfulness, then repair without shame. **Source:** `muslim_2607c`.
 - **Place:** the family home in Amman. An arched window looks over the city's hills of pale stone houses, with the Citadel columns on the skyline.
 - **Opening play:** he bounces a ball. Each tap bounces it higher; this part should be pure fun for 10 seconds. On the fourth bounce the ball knocks a clay jar off the shelf. It breaks and water spreads on the floor. The accident happens inside play, not through a bad choice.
@@ -99,8 +149,10 @@ Shared rules: every adventure opens with one father voice line that sets the sit
 - **If he hides:** he drags the shards under the rug. Mama comes in and asks where the jar is. A small gray cloud appears above his head and water creeps out from under the rug. The father's voice says gently that the truth rests the heart, and one button appears: "بَحكي الحَقيقة" (I tell the truth). When he taps it, the cloud dissolves and the same clean-up and hug follow. There is no scolding and no sad ending. The door back to honesty is always open; that is the lesson.
 - Mama is never angry in either branch. Do not show punishment.
 - **Ending line:** the father's hadith line.
+- **Added (MISSIONS_V2):** Safeguards to add: he does not touch the shards with his hands. He tells Mama, and she handles the sharp pieces while he sweeps with the long broom. Check that no line suggests the accident itself was a wrong.
 
-### D. Irbid: the secret helper
+#### I1. Irbid: the secret helper
+
 - **Value:** sincerity, doing good without being seen. **Source:** `bukhari_660`.
 - **Place:** a street in old Irbid at dusk: dark basalt and pale limestone houses, an arched green door, an old olive tree.
 - **Situation:** an elderly neighbor is unwell and cannot go to the market.
@@ -111,13 +163,51 @@ Shared rules: every adventure opens with one father voice line that sets the sit
 - **Consequence:** the neighbor opens the door, looks left and right, finds the basket, smiles and takes it inside. She never learns who left it.
 - **Hard rule:** no thanks to the boy, no sparkle around him, no cheer, no special sound, no badge, nothing unlocked. The only reward is watching her smile from behind the tree. The return to the map looks exactly like the return from any other adventure.
 - **Ending line:** the father's line that nobody knew, but Allah knows; then the hadith line.
+- **Added (MISSIONS_V2):** No change to the scene. The sentence about good and bad secrets goes in the parents' corner, not in the scene.
+- **Open question for the owner:** I1 is Irbid's quiet deed, and quiet deeds end with "no hadith line, no closing praise" (section 4.3), but I1 as built ends with `ir_secret` and the hadith line `ir_hadith`. Until the owner decides, I1 stays as built.
 
-### E. Wadi Rum: the night sky (ending)
+### 4.3 The quiet deed (fourth mission of every day)
+Copied from `MISSIONS_V2.md` section 6 (section numbers inside refer to that file).
+
+The governing idea of this game is that he does good when there is no screen, no reward and nobody watching. So every day ends its missions with a good deed that nobody sees.
+
+Rules, the same as Irbid today:
+- Nobody in the story learns who did it. Nobody thanks him. He is not shown being noticed.
+- No chime, no sparkle on him, no hadith line, no closing praise. The father says at most one plain line about what changed in the world, then the map.
+- The world shows the result after he has gone: someone arrives and simply enjoys it.
+
+One quiet deed per place. Keep them short (about 60 seconds) and reuse art.
+
+| Place | Quiet deed | Reuses |
+|---|---|---|
+| Petra | Before sunrise the Siq is empty. He clears the fallen stones and leaves. Later a family walks through without knowing. | P1 scene, cooler dawn tint |
+| Umm Qais | A neighbor's young trees are wilting. He waters them with the can while nobody is there. In the evening they stand up straight. | U2 art |
+| Amman | Before Mama wakes he waters her mint pots on the windowsill and folds the blanket. She smells the mint and smiles at the window, not at him. | `bg_amman_home`, `plant_dry`, `plant_fresh`, `watering_can` |
+| Irbid | The secret basket (I1 as built). On days when Irbid is opened first, second or third, it plays I2 or I3; I1 is kept for the fourth slot. | built |
+| Jerash | Early morning, the plaza is empty. He bins the safe litter and goes. The first visitors walk in on clean stone. | J1 art, no guard, no glass |
+| Dead Sea | One tap drips with nobody around. He turns it off and walks on. | D1 art |
+| Aqaba | At sunrise he clears plastic from the empty beach. Later a turtle crosses the clean sand to the water. | Q1 art |
+
+Because I1 is Irbid's quiet deed, Irbid's rotation for the first three slots is I2, I3 only. Every other place rotates through its three missions.
+
+### 4.4 Wadi Rum: the night sky (ending)
 - **Value:** reflection on creation (tafakkur) and gratitude. **Source:** `quran_3_190`.
 - **Place:** Wadi Rum at night: red sandstone mountains, a sky full of stars. The boy sits on a rock, seen from behind.
 - **Play:** slow and quiet. He drags a finger across the sky and stars brighten where he touches. Now and then a shooting star crosses. No goal, no count.
-- **Then:** after about 30 seconds, or when he stops, input is disabled, sound effects stop and the music fades out. The ayah fades in as still text with its reference "آل عمران ١٩٠". If the file `audio/quran/3_190.m4a` exists, play it; otherwise show the text in silence for 10 seconds. Never use a synthetic voice here.
-- **Close:** the father's goodnight line, then the button "خلصنا لليوم".
+- **Ayah:** still text with its reference "آل عمران ١٩٠". If the file `audio/quran/3_190.m4a` exists, play it; otherwise show the text in silence for 10 seconds. Never use a synthetic voice here. All input and sound effects are stopped while it shows.
+
+Changes from `MISSIONS_V2.md` section 7, copied (section numbers inside refer to that file):
+
+Build it as described above, with these changes:
+
+- **No music at all in Wadi Rum.** Wind and a few crickets only. Remove the generated Wadi Rum melody.
+- After he has brightened the stars for about 30 seconds, or when he stops: input off, sound effects off.
+- The father's closing line comes **before** the ayah, in his own voice or the phone's voice. `script`, exactly:
+  "يا حبيبي، شوف قديش خلق الله جميل. اليوم ساعدنا ناس وحيوانات باللعبة، وبكرا إن شاء الله بنقدر نعمل خير بحياتنا. مش لازم حدا يشوفنا أو يشكرنا، الله بعرف الخير اللي بنعمله."
+  This line rests on `quran_2_215` and is pending approval like every religious line. Write a simple Standard Arabic `tts` form of it.
+- Then silence. The ayah `quran_3_190` fades in as still text, as specified. Recitation only if the file exists. Stars and wind.
+- Then "تصبح على خير يا حبيبي." and the button "خلصنا لليوم".
+- No summary of the day, no list of deeds, no completion screen, no preview of tomorrow.
 
 ---
 
@@ -164,9 +254,22 @@ Each background must be recognizable as the real place. Cues to include:
 | Amman | hills covered in pale stone box-shaped houses; the Citadel's tall standing columns on the skyline |
 | Irbid | old town houses mixing dark basalt and pale limestone, arched doorways |
 | Wadi Rum | towering red sandstone mountains rising from flat desert sand; clear starry sky |
-| Jerash (map only) | a curved row of tall stone columns around an oval plaza |
-| Dead Sea (map only) | still turquoise water with white salt crust at the shore |
-| Aqaba (map only) | deep blue sea, palm trees, coral and fish near the shore |
+| Jerash (map) | a curved row of tall stone columns around an oval plaza |
+| Dead Sea (map) | still turquoise water with white salt crust at the shore |
+| Aqaba (map) | deep blue sea, palm trees, coral and fish near the shore |
+| `bg_petra_tombs` | the Royal Tombs: a tall rose-red cliff face with large rock-cut facades in a row, plain stone with no carved figures; wide sandy path in front |
+| `bg_ummqais_grove` | terraced olive trees among black basalt blocks and a few standing basalt columns; the valley and the distant lake |
+| `bg_amman_stairs` | a long outdoor stone stairway climbing between pale limestone houses, flower pots, a landing halfway, the hills of houses beyond |
+| `bg_irbid_bakery` | an old Irbid shopfront in dark basalt and pale limestone with an arched opening, a counter, round flatbread on a shelf |
+| `bg_irbid_alley` | a narrow old-town lane by day, basalt and limestone walls, a goal chalked on one wall |
+| `bg_jerash_plaza` | the Oval Plaza: a wide stone-paved oval ringed by a curve of tall columns |
+| `bg_jerash_cardo` | the long straight colonnaded street paved with large worn stones, columns on both sides |
+| `bg_deadsea_restarea` | a shaded stone rest stop with a row of taps on a low wall; still turquoise water, white salt edge and hazy mountains behind |
+| `bg_deadsea_shore` | a viewpoint path above the shore, white salt crust at the waterline, still turquoise water, mountains across the water, room for a bench |
+| `bg_aqaba_beach` | golden sand, deep blue sea, palm trees, dry mountains across the gulf, a small rescue hut at one side |
+| `bg_aqaba_harbor` | a fish stall beside small wooden boats on blue water, palms, a tall flagpole far away |
+
+Backgrounds have no people. Leave calm space at the top and bottom.
 
 ### 6.4 Characters
 - **The boy:** about 6 to 7 years old, short dark brown hair, big friendly eyes, sky-blue t-shirt, tan shorts, red sneakers. He has no name in the game, so the player sees himself in him.
@@ -176,44 +279,199 @@ Each background must be recognizable as the real place. Cues to include:
 - **Passerby (Irbid):** a man in everyday clothes carrying a bag.
 - **Dog:** a slim tan stray with upright ears, friendly.
 
+Added by `MISSIONS_V2.md` (all with full, friendly cartoon faces):
+- **Baba:** in his thirties, short dark hair, short trimmed beard, plain shirt and trousers.
+- **Grandfather:** white hair and beard, white thobe, walking stick.
+- **Little sister:** about four, two short pigtails, yellow dress.
+- **Friends (two):** boys his age in different colored t-shirts, different hair.
+- **New boy:** his age, green striped shirt.
+- **Site guard / guide:** khaki shirt, cap, lanyard with a plain card (no writing).
+- **Baker:** apron, flour on his hands, white cap.
+- **Travelers, visitors, customer, mother:** ordinary modest everyday clothes, each with one clear color so a six-year-old can tell them apart.
+- **Fisherman:** sun-browned, rolled sleeves, straw hat.
+- **Marine ranger:** light blue shirt, shorts, cap.
+- **Turtle, cat, donkey, birds:** friendly, simple, same outline style.
+
+The exact descriptions used for the art (clothes and colors chosen so a six-year-old can tell people apart) are in the checklist's prompts.
+
 ### 6.5 Asset manifest
-Backgrounds are portrait, at least 1024 x 1536 pixels, with the important content in the middle 70 percent and calm space at the top and bottom for interface. Sprites are at least 1024 pixels on the long side, full figure, no cast shadow, on a transparent or plain pure-white background. Art arrives in `art/incoming/` under these names (`.png`, `.jpg` or `.webp`).
+Backgrounds are portrait, at least 1024 x 1536 pixels, with the important content in the middle 70 percent and calm space at the top and bottom for interface. Sprites are at least 1024 pixels on the long side (384 for an object on a sheet), full figure, no cast shadow, on a transparent or plain pure-white background. Art arrives in `art/incoming/` under these names (`.png`, `.jpg` or `.webp`).
+
+**The full reference is `art/Fael_Khair_Art_Checklist.xlsx`:** one row per image with its wave, the missions it is used in, a ready-to-paste prompt, the references to attach, and in its notes which way it faces, where the boy holds it, its height on screen compared with the boy standing (boy = 1.0), and which objects may share a sheet. `scripts/art-lib.mjs` holds the same names. The list below is generated from the same data (156 images: 52 from the first version, 104 added by `MISSIONS_V2.md`). "Wave" is the build wave an image is first needed in; "existing" means it was in the first version.
 
 **Backgrounds**
 
-| File | Contents |
-|---|---|
-| `bg_map` | illustrated map of Jordan, north at top, with small landmark drawings in their true positions: Umm Qais and Irbid in the north, Jerash and Amman below them, the Dead Sea on the west edge, Petra and Wadi Rum in the south, Aqaba at the southern tip by the sea. No text. |
-| `bg_petra_siq` | the Siq, empty path, no people |
-| `bg_petra_treasury` | the Treasury plaza, warm light, no people |
-| `bg_ummqais_well` | stone well with wooden frame in the foreground, basalt columns, valley view; no bucket, no rope, empty stone trough at left |
-| `bg_amman_home` | home interior, arched window with the Amman view, a wooden shelf at right, tiled floor, a rug |
-| `bg_irbid_dusk` | old Irbid street at dusk, closed arched green door at center-right, olive tree at left, a window with a curtain |
-| `bg_wadirum_night` | Wadi Rum at night, big empty starry sky in the upper two thirds |
+| File | Contents | Wave |
+|---|---|---|
+| `bg_map` | an illustrated map of Jordan, north at top, with small landmark drawings in their true positions: Umm Qais and Irbid in the north, Jerash and Amman below them, the Dead Sea on the west edge, Petra and Wadi Rum in the south, Aqaba at the southern tip by the sea. No text. | existing |
+| `bg_petra_siq` | the Siq, the narrow canyon leading into Petra: tall, narrow, rose-red sandstone walls with swirling bands, a sandy path running up the picture. Empty path. | existing |
+| `bg_petra_treasury` | the Treasury plaza in Petra: the rock-cut facade with columns and pediment, seen from the plaza, in warm light. No carved figures (simplify any to plain stone). | existing |
+| `bg_ummqais_well` | the old hilltop village of Umm Qais: a stone well with a wooden frame in the foreground, black basalt columns and stones, a view down to a wide valley and a distant lake. No bucket, no rope. An empty stone trough at left. | existing |
+| `bg_amman_home` | a family home interior in Amman: an arched window looking over hills covered in pale stone box-shaped houses, with the Citadel's tall standing columns on the skyline; a wooden shelf at right, a tiled floor, a rug, a wide windowsill. | existing |
+| `bg_irbid_dusk` | an old Irbid street at dusk: old town houses mixing dark basalt and pale limestone, arched doorways, a closed arched green door at center-right, an old olive tree at left, a window with a curtain. | existing |
+| `bg_wadirum_night` | Wadi Rum at night: towering red sandstone mountains rising from flat desert sand; a big, empty, clear starry sky in the upper two thirds. | existing |
+| `bg_petra_tombs` | the Royal Tombs in Petra: a tall rose-red cliff face with large rock-cut facades in a row, plain stone with no carved figures; a wide sandy path in front. | 1 |
+| `bg_ummqais_grove` | terraced olive trees among black basalt blocks and a few standing basalt columns at Umm Qais; the valley and the distant lake below. A strip of open, bare, planting soil across the lower third. | 2 |
+| `bg_amman_stairs` | a long outdoor stone stairway in Amman climbing between pale limestone houses, flower pots, a landing halfway, the hills of houses beyond. The steps rise from bottom left to top right. No animals. | 2 |
+| `bg_irbid_alley` | a narrow old-town lane in Irbid by day, basalt and limestone walls, a simple goal chalked on one wall (two posts and a bar only, no letters or numbers). | 2 |
+| `bg_irbid_bakery` | an old Irbid bakery shopfront by day in dark basalt and pale limestone with an arched opening, a counter at the front with an empty flat metal tray on it, round flatbread on a shelf behind. No signs or writing. | 2 |
+| `bg_jerash_cardo` | the long straight colonnaded street in Jerash paved with large worn stones, columns on both sides receding into the distance. | 3 |
+| `bg_jerash_plaza` | the Oval Plaza in Jerash: a wide stone-paved oval ringed by a curve of tall columns, low stone steps along the lower edge. | 3 |
+| `bg_deadsea_restarea` | a shaded stone rest stop by the Dead Sea: a plain low stone wall across the front where taps will be placed (draw no taps and no plants), a shade roof, still turquoise water, a white salt edge and hazy mountains behind. | 3 |
+| `bg_deadsea_shore` | a viewpoint path above the Dead Sea shore: white salt crust at the waterline, still turquoise water, mountains across the water, a flat paved path along the lower third with room for a bench (draw no bench). The sun fairly low at upper left. | 3 |
+| `bg_aqaba_beach` | a beach at Aqaba: golden sand, deep blue sea, palm trees, dry mountains across the gulf, a small rescue hut with a hanging bell at the right side. No writing. | 4 |
+| `bg_aqaba_harbor` | a fish stall beside small wooden boats on blue water at Aqaba, palms, a tall flagpole far away with no flag detail. The stall counter is empty (fish and the scale are separate pictures). No writing. | 4 |
 
 **Characters** (one image per pose)
 
-| File | Pose |
-|---|---|
-| `boy_idle`, `boy_walk_a`, `boy_walk_b` | standing; two walking frames |
-| `boy_lift` | bending to lift something heavy |
-| `boy_pull` | pulling a rope downward with both hands |
-| `boy_carry` | carrying a basket in both arms |
-| `boy_peek` | crouching and peeking sideways, smiling |
-| `boy_worried`, `boy_happy` | worried face; relieved, happy face |
-| `boy_sweep` | sweeping with a small broom |
-| `boy_sit_back` | sitting, seen from behind, head tilted up |
-| `dog_thirsty`, `dog_drinking`, `dog_happy` | panting; head down drinking; standing, tail up |
-| `elder_cart` | the old man beside his donkey cart, side view |
-| `mama_stand`, `mama_kneel` | standing; kneeling with open arms |
-| `neighbor_basket` | at her door, holding the basket, smiling, looking around |
-| `passerby_walk`, `passerby_look` | walking; head turned toward the viewer |
+| File | Pose | Wave |
+|---|---|---|
+| `boy_happy` | The boy. Standing, relieved, happy face. | existing |
+| `boy_idle` | The boy. Standing, relaxed, friendly smile. | existing |
+| `boy_lift` | The boy. Bending to lift something heavy with both hands. | existing |
+| `boy_walk_a` | The boy. Walking, first step (left foot forward). | existing |
+| `boy_walk_b` | The boy. Walking, second step (right foot forward), same direction as the first walking frame. | existing |
+| `boy_worried` | The boy. Standing, worried face. | existing |
+| `elder_cart` | An old man in a white thobe, red-and-white shemagh with black agal, beside a small donkey cart loaded with sacks. Side view. | existing |
+| `boy_pull` | The boy. Pulling a rope downward with both hands (the rope drawn in his hands, going up out of the picture). | existing |
+| `dog_drinking` | A slim tan stray dog with upright ears, friendly. Head down, drinking. | existing |
+| `dog_happy` | A slim tan stray dog with upright ears, friendly. Standing, tail up, happy. | existing |
+| `dog_thirsty` | A slim tan stray dog with upright ears, friendly. Panting, thirsty. | existing |
+| `boy_sweep` | The boy. Sweeping with a long-handled broom, both hands on the handle. | existing |
+| `mama_kneel` | Mama: warm expression, long modest dress, hijab. Kneeling with open arms. | existing |
+| `mama_stand` | Mama: warm expression, long modest dress, hijab. Standing. | existing |
+| `boy_carry` | The boy. Carrying a basket in both arms. | existing |
+| `boy_peek` | The boy. Crouching and peeking sideways, smiling. | existing |
+| `neighbor_basket` | An elderly woman in a traditional embroidered Jordanian dress and a white headscarf. At her door, holding a basket, smiling, looking around. | existing |
+| `passerby_look` | A man in everyday clothes carrying a bag. Head turned toward the viewer. | existing |
+| `passerby_walk` | A man in everyday clothes carrying a bag. Walking, side view. | existing |
+| `boy_sit_back` | The boy. Sitting on a rock, seen from behind, head tilted up toward the sky. | existing |
+| `boy_kneel` | The boy. Kneeling on both knees, leaning forward, both hands flat on the ground in front of him. | 1 |
+| `boy_offer` | The boy. Holding something out in front with both hands, arms forward, palms up, friendly smile. Hands empty (the game places the object in them). | 1 |
+| `donkey_stand` | The same small grey donkey as in elder_cart, alone, harness on, ears up, standing. | 1 |
+| `donkey_tired` | The same small grey donkey, ears drooping, head low, tired. | 1 |
+| `elder_stand` | An old man in a white thobe, red-and-white shemagh with black agal, the same old man as in elder_cart, standing alone without the cart, friendly, hands ready to lift. | 1 |
+| `girl_happy` | A little girl about 4 years old, short dark hair with a red hair clip, a pink dress. Happy, running with arms out. | 1 |
+| `guard_stand` | A friendly site guard: a man in a khaki shirt and trousers, a cap, and a lanyard with a plain card (no writing on it). Standing, friendly, one hand slightly raised. | 1 |
+| `traveler_b` | A second traveler: a man in modest everyday clothes, a bright orange shirt, a cap. Looking around, a little worried. | 1 |
+| `traveler_happy` | A traveler: a man in modest everyday clothes, a blue shirt, a small backpack. Relieved and happy, walking, hands together at his chest. | 1 |
+| `traveler_worried` | A traveler: a man in modest everyday clothes, a blue shirt, a small backpack. Looking at the ground, worried, hands open. | 1 |
+| `birds_eating` | Three small brown birds perched close together, pecking at olives, as one group. | 2 |
+| `boy_water` | The boy. Standing, tilting a small green watering can forward with both hands (no water drawn). | 2 |
+| `friend_a` | A boy about 7 years old, curly black hair, an orange t-shirt, blue shorts, white sneakers. Standing, ready to play, smiling. | 2 |
+| `friend_b` | A boy about 7 years old, short light-brown hair, a yellow t-shirt, grey shorts, green sneakers. Standing, ready to play, smiling. | 2 |
+| `grandpa_sit` | Grandfather: white hair and beard, white thobe, a walking stick, full friendly face. Sitting on a bench facing the viewer, his stick leaning beside him, one hand held out to his side at child-head height (as if resting on a child's head), gentle smile. | 2 |
+| `boy_angry` | The boy. Standing, fists clenched, cheeks red, frowning, upset but not frightening. | 2 |
+| `boy_breathe` | The boy. Standing calmly, eyes closed, one hand on his chest, breathing in. | 2 |
+| `boy_carry_bags` | The boy. Climbing a step, one small light shopping bag in each hand. | 2 |
+| `cat_sleeping` | A small ginger cat curled up asleep. | 2 |
+| `mama_bags` | Mama: warm expression, long modest dress, hijab. Standing at the foot of the stairs holding one heavy shopping bag with both hands, a little tired, kind smile. | 2 |
+| `sister_happy` | The little sister: about four years old, two short pigtails, yellow dress, full friendly face. Standing, laughing, clapping her hands. | 2 |
+| `sister_play` | The little sister: about four years old, two short pigtails, yellow dress, full friendly face. Toddling forward with her arms out, playful. | 2 |
+| `sister_sorry` | The little sister: about four years old, two short pigtails, yellow dress, full friendly face. Standing, small and sorry, hands together, looking up, a little sad. | 2 |
+| `baker_busy` | A baker: a man in an apron with flour on his hands and a white cap. Busy, looking to the side, one hand held out to give something. | 2 |
+| `baker_smile` | A baker: a man in an apron with flour on his hands and a white cap. Surprised and smiling warmly, one hand on his heart. | 2 |
+| `boy_kick` | The boy. Kicking a ball (no ball drawn), right leg swinging forward, arms out for balance. | 2 |
+| `boy_wave` | The boy. Standing, waving one hand high above his head, smiling, calling someone. | 2 |
+| `newboy_alone` | A boy about 7 years old, short black hair, a green striped shirt, brown trousers. Standing alone by a wall, hands behind his back, shy and a little sad. | 2 |
+| `newboy_happy` | A boy about 7 years old, short black hair, a green striped shirt, brown trousers. Running with arms up, a big happy smile. | 2 |
+| `boy_sit_front` | The boy. Sitting on a low step, facing the viewer, legs hanging, hands on his knees, happy. | 3 |
+| `classmate_happy` | A boy about 7 years old, short curly brown hair, a red t-shirt, dark shorts. Sitting on a stone step, eating half a sandwich, happy, legs swinging. | 3 |
+| `classmate_hungry` | A boy about 7 years old, short curly brown hair, a red t-shirt, dark shorts. Sitting on a stone step facing the viewer, empty hands in his lap, a little sad. | 3 |
+| `girl_crying` | A little girl about 4 years old, short dark hair with a red hair clip, a pink dress. Standing alone, crying, hands at her eyes. | 3 |
+| `mother_search` | A mother in modest everyday clothes: a green headscarf, a long blue dress and a yellow handbag. Looking around, worried, searching. | 3 |
+| `visitor_a` | A woman visitor in modest everyday clothes: a red headscarf, a long brown dress, no bag. Walking. | 3 |
+| `visitor_b` | A man visitor in modest everyday clothes: a white shirt, grey trousers, a black backpack. Walking. | 3 |
+| `baba_sit` | Baba: a man in his thirties, short dark hair, short trimmed beard, plain shirt and trousers, full friendly face. Sitting on a bench, turned slightly to his right as if talking with his son beside him, one hand open. | 3 |
+| `grandpa_baba_walk` | Baba: a man in his thirties, short dark hair, short trimmed beard, plain shirt and trousers, full friendly face. Grandfather: white hair and beard, white thobe, a walking stick, full friendly face. Baba walks beside Grandfather and supports his arm; Grandfather walks slowly with his stick. Both in one picture. | 3 |
+| `customer_basket` | A woman customer in modest everyday clothes, a purple headscarf, holding an empty basket, smiling. | 4 |
+| `fisherman_stand` | A fisherman: sun-browned, sleeves rolled up, a straw hat. Standing, friendly, pointing to one side. | 4 |
+| `ranger_kneel` | A marine ranger: a man in a light blue shirt, shorts and a cap. Kneeling, gently freeing something on the ground with both hands. | 4 |
+| `ranger_stand` | A marine ranger: a man in a light blue shirt, shorts and a cap. Standing, friendly, empty hands. | 4 |
+| `sister_bucket_wait` | The little sister: about four years old, two short pigtails, yellow dress, full friendly face. Standing on sand, holding a small red bucket with both hands, waiting, looking hopeful. | 4 |
+| `turtle_free` | The same green sea turtle, free and happy, crawling. | 4 |
+| `turtle_tangled` | A green sea turtle on the sand at the water's edge, a white plastic bag tangled around one front flipper, looking sad. | 4 |
 
 **Objects**
 
-`rock_a`, `rock_b`, `rock_c`, `rock_d`, `thorn_branch`, `big_branch`, `bucket_empty`, `bucket_full`, `trough_water` (the water surface only), `jar_whole`, `shard_a`, `shard_b`, `shard_c`, `ball`, `dustpan`, `cloth`, `basket_empty`, `basket_full`, `food_bread`, `food_olives`, `food_labneh`, `food_tomatoes`, `food_apples`, `icon_app` (1024 x 1024: the boy's smiling face on a warm sand background, no text).
+| File | Object | Wave |
+|---|---|---|
+| `big_branch` | a larger dry thorny branch lying horizontally. The LEFT end is smooth bare wood with no thorns; thorns cover the rest. | existing |
+| `bird` | a small bird in flight, wings spread. | existing |
+| `rock_a` | a small rounded rose-red sandstone rock. | existing |
+| `rock_b` | a medium rounded rose-red sandstone rock. | existing |
+| `rock_c` | a larger rounded rose-red sandstone rock. | existing |
+| `rock_d` | a big, heavy rounded rose-red sandstone rock. | existing |
+| `thorn_branch` | a dry thorn branch lying horizontally. The LEFT end is smooth bare wood with no thorns (where a child would hold it); thorns cover the rest. | existing |
+| `bucket_empty` | an empty wooden well bucket with a rope handle. | existing |
+| `bucket_full` | the same wooden well bucket, full of water. | existing |
+| `trough_water` | the surface of water only, as it would fill a long stone trough, seen from slightly above. | existing |
+| `ball` | a child's colorful ball. | existing |
+| `cloth` | a cleaning cloth. | existing |
+| `dustpan` | a small dustpan. | existing |
+| `jar_whole` | a clay water jar (terracotta). | existing |
+| `shard_a` | one broken shard of a terracotta clay jar. | existing |
+| `shard_b` | another broken shard of a terracotta clay jar, different shape. | existing |
+| `shard_c` | a third broken shard of a terracotta clay jar, different shape. | existing |
+| `basket_empty` | an empty woven basket with a handle. | existing |
+| `basket_full` | the same woven basket, full of bread, olives, labneh, tomatoes and apples. | existing |
+| `food_apples` | a few red apples. | existing |
+| `food_bread` | round Arabic flatbread. | existing |
+| `food_labneh` | a small bowl of labneh. | existing |
+| `food_olives` | a small bowl of olives. | existing |
+| `food_tomatoes` | a few red tomatoes. | existing |
+| `cart_empty` | the same small wooden two-wheeled cart as in elder_cart, empty, without the donkey. Side view. | 1 |
+| `pouch_blue` | the same small cloth pouch in blue, with a blue tie-string and a yellow star patch. | 1 |
+| `pouch_red` | a small cloth pouch, red, tied at the top with a red tie-string, a small yellow star patch sewn on the front. | 1 |
+| `pouch_red_moon` | the same red cloth pouch with a red tie-string, but a small white moon patch instead of the star. | 1 |
+| `sack_big` | a big, heavy, bulging burlap sack tied at the top. | 1 |
+| `sack_small` | a small, light burlap sack tied at the top. | 1 |
+| `basket_olives` | the woven basket (same as basket_empty) full of green and black olives. | 2 |
+| `olive_tree_fruit` | a grown olive tree heavy with olives, with a wide shady crown. | 2 |
+| `olive_young` | a young olive tree, healthy and upright. | 2 |
+| `olive_young_wilt` | the same young olive tree, wilting, leaves drooping. | 2 |
+| `olives_pile` | a heap of green and black olives. | 2 |
+| `sapling_small` | a small olive sapling with a few leaves and a small root ball. | 2 |
+| `scale_base` | the stand of an old-fashioned balance scale: a wooden base and an upright post with a pivot at the top (no beam, no pans). | 2 |
+| `scale_beam` | the horizontal metal beam of the balance scale, a hook at each end and a hole at the centre. | 2 |
+| `scale_pan` | one hanging pan of the balance scale with its three chains joined at the top. | 2 |
+| `soil_mound` | a small mound of freshly dug brown soil. | 2 |
+| `watering_can` | a small green metal watering can. | 2 |
+| `bag_heavy` | a big full cloth shopping bag with handles, heavy. | 2 |
+| `bag_light` | a small light cloth shopping bag with handles, a few vegetables peeking out. | 2 |
+| `blanket_folded` | the same striped wool blanket, neatly folded. | 2 |
+| `blanket_messy` | a crumpled striped wool blanket lying on a sofa cushion. | 2 |
+| `block` | a plain wooden toy building block (a cube), no letters, no numbers. | 2 |
+| `bread_bag` | a paper bag with round flatbread showing at the top, no writing. | 2 |
+| `coin` | a plain round gold-coloured coin with a simple rim, no face, no writing, no numbers. | 2 |
+| `bin` | a plain grey recycling bin with an open top and a blank round label area on the front (left empty). | 3 |
+| `cup_empty` | a simple clear plastic cup, empty. | 3 |
+| `cup_full` | the same clear cup, full of water. | 3 |
+| `glass_broken` | a few pieces of broken green glass lying close together on the ground, glinting. | 3 |
+| `litter_bottle` | an empty plastic water bottle lying on its side. | 3 |
+| `litter_paper` | a crumpled paper wrapper. | 3 |
+| `litter_peel` | a banana peel. | 3 |
+| `sandwich_half` | half of the same sandwich. | 3 |
+| `sandwich_whole` | a round flatbread sandwich with white cheese, whole. | 3 |
+| `water_bottle` | a reusable blue water bottle with a cap. | 3 |
+| `bag_small` | Grandfather's small cloth shoulder bag. | 3 |
+| `bench` | a simple wooden bench, three-quarter view. | 3 |
+| `pipe_leak` | a short metal pipe with a joint, leaking a few drops of water. | 3 |
+| `plant_dry` | a clay pot with a mint plant, wilted and dry. | 3 |
+| `plant_fresh` | the same clay pot with the mint plant fresh and green. | 3 |
+| `tap_body` | an old brass water tap without its handle, spout pointing down, side view, on a short pipe stub. | 3 |
+| `tap_handle` | the separate round cross-shaped handle of that brass tap, seen from the front. | 3 |
+| `fish_big` | a large silver fish. | 4 |
+| `fish_small` | a small silver fish. | 4 |
+| `plastic_bag` | a crumpled white plastic bag. | 4 |
+| `sand_bucket` | a small red plastic beach bucket, empty. | 4 |
+| `sand_tower` | a sandcastle tower shaped by a bucket, golden sand. | 4 |
+| `shell` | a small pinkish scallop shell. | 4 |
+| `weight_iron` | an old black iron weight with a ring handle on top, no numbers. | 4 |
 
-Objects may arrive as sheets (several objects on one white image). Support an optional `art/incoming/sheets.json` that maps a sheet file to the ordered list of object names, read left to right, top to bottom.
+**Icon:** `icon_app` (1024 x 1024: the boy's smiling face on a warm sand background, no text).
+
+Objects may arrive as sheets (several objects on one white image). Support an optional `art/incoming/sheets.json` that maps a sheet file to the ordered list of object names, read left to right, top to bottom. The checklist lists the agreed sheets and their order.
 
 ### 6.6 Art preparation script
 Write `scripts/prepare-art.mjs` (run by `npm run art`):
@@ -300,12 +558,24 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `wr_night` | close | تصبح على خير يا حبيبي. | تصبح على خير يا حبيبي. |
 
 ### 7.3 Music
-Light background music is wanted, with a switch in the parent area to turn it off (the setting is remembered).
+Copied from `MISSIONS_V2.md` section 9 (section numbers inside refer to that file: section 4 = its added rules, here section 2; section 7 = Wadi Rum, here 4.4):
 
-- No music files can be downloaded during the build, so generate the music in code with the Web Audio API: a slow, soft plucked-string melody over a quiet sustained note, in a calm scale, looping without an audible seam. One gentle variation per place (brighter for the map, slower for Wadi Rum).
-- Keep it quiet, well under the voice. Lower it further whenever the voice speaks.
-- Fade it out fully before the ayah appears. Never play music under Quran text or recitation.
-- Structure the audio code so a real music file dropped at `public/assets/audio/music/<place>.m4a` replaces the generated music for that place.
+The slow plucked melody is retired. Recorded tracks are already in the repository, one per place, at `public/assets/audio/music/<place>.m4a`: `map`, `petra`, `ummqais`, `amman`, `irbid`, `jerash`, `deadsea`, `aqaba`. Credits are in `README.md`.
+
+1. Add `jerash`, `deadsea` and `aqaba` to the music places. Wadi Rum has no music (section 7).
+2. Keep the generated melody only as a fallback for a file that fails to load. No place should use it by design.
+3. The tracks end with a short fade. Loop them with a pause of about one second between the fade-out and the restart, so the join sounds intended.
+4. **Parents' corner sound choice,** remembered on the device, three options:
+   - "موسيقى مرحة" cheerful music (default)
+   - "أصوات الطبيعة فقط" nature sounds only: birds, wind, water, the place's own sounds; no music
+   - "بدون" off
+   Plus a music volume choice: quiet, medium (default), with medium no louder than today's level.
+5. Music keeps lowering under the voice, as now.
+6. Music is silent in Wadi Rum and never plays under Quran text or recitation.
+7. No jingle, fanfare or musical sting for a moral choice, a finished good deed or a quiet deed (section 4).
+8. **Credit.** The license requires it. Show this at the bottom of the parents' corner, in small text: "Music: Kevin MacLeod (incompetech.com), licensed under Creative Commons: By Attribution 4.0." with the track titles from `README.md`.
+
+**Status note (25 November 2026):** the eight tracks and their credits are on the branch `music/kids-tracks`, not yet merged into `main`. Merging them (without losing the Milestone 3 code, which that branch predates) is the first step of wave 1.
 
 ### 7.4 Sound effects
 Generate with Web Audio as well: rock thud, dust puff, rope creak, water splash and pour, dog lapping and a soft happy bark, ball bounce, jar breaking, sweeping, footsteps, knock on wood, door creak, birds by day, crickets and soft wind at night, a gentle chime for a finished step. A file at `public/assets/audio/sfx/<name>.m4a` overrides the generated sound.
@@ -316,7 +586,7 @@ Generate with Web Audio as well: rock thud, dust puff, rope creak, water splash 
 
 Create `content/registry.json` exactly from this table. Every entry starts with `"approval_status": "pending"`. The owner changes it to `"approved"` after review. `npm run build` prints a clear warning listing every pending entry; it does not block the build.
 
-Fields: `source_id`, `reference`, `original_arabic`, `translation`, `child_paraphrase_tts`, `child_paraphrase_script`, `fictional_adaptation`, `approval_status`.
+Fields: `source_id`, `reference`, `original_arabic`, `translation`, `child_paraphrase_tts`, `child_paraphrase_script`, `fictional_adaptation`, `approval_status`, and (since MISSIONS_V2) `used_in` and `kind` (section 8.1).
 
 | source_id | Reference | `child_paraphrase_tts` | `child_paraphrase_script` | Fictional adaptation |
 |---|---|---|---|---|
@@ -333,6 +603,42 @@ For `quran_3_190`, `original_arabic` is:
 Leave `original_arabic` and `translation` empty for the four hadith entries, with a `TODO owner` note. Do not fill them from memory. The owner will paste the exact text from the collection.
 
 Display the ayah in the Amiri typeface, bundled locally.
+
+### 8.1 Sources added by MISSIONS_V2
+Copied from `MISSIONS_V2.md` section 8 (section numbers inside refer to that file):
+
+`MISSIONS_V2.md` section 8 adds these to `content/registry.json` (done in wave 1). Every entry starts `"approval_status": "pending"`. Leave `original_arabic` and `translation` empty with the same `TODO owner` note; do not fill them from memory. Copy the paraphrases below exactly; write the Jordanian `child_paraphrase_script` in the pattern of the existing entries.
+
+Add two fields to every entry, old and new: `used_in` (list of mission ids) and `kind`, which is `direct` when the text teaches this very act, or `application` when the mission applies a broader teaching. One source may be used by several missions. `bukhari_2989` has four parts; store one paraphrase per part.
+
+| source_id | Reference | Used in | Kind | `child_paraphrase_tts` |
+|---|---|---|---|---|
+| `bukhari_2472` | Sahih al-Bukhari 2472 | P1 | direct | (existing) |
+| `bukhari_2427` | Sahih al-Bukhari 2427 | P2 | direct | علّمنا نبيّنا محمد صلى الله عليه وسلم أن من وجد شيئاً ضائعاً يعرف وعاءه ورباطه، ويسأل عن صاحبه، فإذا جاء صاحبه أعطاه إياه. |
+| `bukhari_2989` part `mount` | Sahih al-Bukhari 2989 | P3 | direct | علّمنا نبيّنا محمد صلى الله عليه وسلم أن من يساعد رجلاً فيرفع له متاعه على دابّته، فذلك صدقة. |
+| `bukhari_2989` part `justice` | Sahih al-Bukhari 2989 | U3 | direct | علّمنا نبيّنا محمد صلى الله عليه وسلم أن العدل بين اثنين صدقة. |
+| `bukhari_2989` part `good_word` | Sahih al-Bukhari 2989 | I3 | application | علّمنا نبيّنا محمد صلى الله عليه وسلم أن الكلمة الطيبة صدقة. |
+| `bukhari_2989` part `harm` | Sahih al-Bukhari 2989 | J1 | direct | علّمنا نبيّنا محمد صلى الله عليه وسلم أن إبعاد الأذى عن الطريق صدقة. |
+| `bukhari_2363` | Sahih al-Bukhari 2363 | U1, Q1 | direct for U1, application for Q1 | (existing) |
+| `muslim_1553a` | Sahih Muslim 1553a | U2 | direct | أخبرنا نبيّنا محمد صلى الله عليه وسلم أن المسلم إذا زرع شجرة فأكل منها إنسان أو طير أو حيوان، كان ذلك له صدقة. |
+| `muslim_2607c` | Sahih Muslim 2607c | A1 | direct | (existing) |
+| `bukhari_6114` | Sahih al-Bukhari 6114 | A2 | direct | علّمنا نبيّنا محمد صلى الله عليه وسلم أن القويّ ليس من يغلب الناس، بل القويّ من يملك نفسه عند الغضب. |
+| `quran_17_23` | Quran, Al-Isra 17:23 | A3 | application | أمرنا الله أن نُحسن إلى الوالدين. |
+| `bukhari_660` | Sahih al-Bukhari 660 | I1 | direct | (existing) |
+| `quran_4_58` | Quran, An-Nisa 4:58 | I2 | application | أمرنا الله أن نردّ الأمانات إلى أصحابها. |
+| `muslim_2699a` | Sahih Muslim 2699a | J2 | application | علّمنا نبيّنا محمد صلى الله عليه وسلم أن الله في عون العبد ما دام العبد في عون أخيه. |
+| `bukhari_12` | Sahih al-Bukhari 12 | J3 | direct | سُئل نبيّنا محمد صلى الله عليه وسلم: أيّ الإسلام خير؟ فقال: أن تُطعم الطعام، وتسلّم على من عرفت ومن لم تعرف. |
+| `quran_7_31` | Quran, Al-A'raf 7:31 | D1 | application | علّمنا الله أن نأكل ونشرب دون إسراف. |
+| `quran_14_7` | Quran, Ibrahim 14:7 | D2 | direct | علّمنا الله أن نشكره على نعمه. |
+| `tirmidhi_1920` | Jami' at-Tirmidhi 1920 (graded hasan) | D3 | direct | علّمنا نبيّنا محمد صلى الله عليه وسلم أن نرحم الصغير ونعرف قدر الكبير. |
+| `quran_55_9` | Quran, Ar-Rahman 55:9 | Q2 | direct | أمرنا الله أن نزن بالعدل ولا ننقص الميزان. |
+| `quran_17_34` | Quran, Al-Isra 17:34 | Q3 | direct | أمرنا الله أن نوفي بالعهد. |
+| `quran_2_215` | Quran, Al-Baqarah 2:215 | Wadi Rum closing line | direct | (the closing line in section 7) |
+| `quran_3_190` | Quran, Al 'Imran 3:190 | Wadi Rum ayah | direct | not spoken synthetically |
+
+`quran_14_7`: the paraphrase speaks only of thanking. It leaves out the promise of increase on purpose, so a child does not hear gratitude as a way to get more things. The owner may change this at review.
+
+Keep the Sunnah and the story apart, as now: the closing hadith line of a mission says only what the paraphrase says. No game details in it.
 
 ---
 
@@ -351,7 +657,7 @@ He is starting to read, so short words help him; long text does not.
 
 Opened by holding the small lock button on the map for 3 seconds (a ring fills while holding). Contents:
 
-- **Music:** on or off.
+- **Sound:** the sound choice and music volume (section 7.3), and the voice speed.
 - **Conversation starters:** after each adventure, three questions for father and son to talk through (text below).
 - **An optional invitation:** one small real-life act of kindness. It is never tracked, confirmed, reported or tied to anything in the game.
 - **Recording guide:** the list of `script` lines, with a note that recordings named `<lineId>.m4a` go in the `vo` folder.
@@ -367,6 +673,15 @@ Conversation starters:
 - **Irbid:** ليش ما حكينا للجارة مين جاب السلّة؟ / كيف حسّيت لمّا ما حدا عرف؟ / مين بنقدر نفرّحه بالسرّ هالأسبوع؟
 
 Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما تحكوا لحدا.
+
+**Added by MISSIONS_V2** (copied from its section 10; section numbers inside refer to that file):
+
+- The sound choice and the music credit (section 9).
+- Conversation starters for every new mission: three short questions each, in Jordanian Arabic, in the style of the existing ones. One of the three should point to real life ("شو بنقدر نعمل بكرا؟").
+- Under Irbid, add this sentence for the parent to say in his own words: "السرّ الحلو هو اللي بيفرّح الناس. وأي سرّ بيخوّفك أو بيزعّلك، بتحكيه لماما وبابا دايماً."
+- The recording guide lists every new `script` line.
+- Review status counts pending registry entries, as now.
+- Still no statistics, no history, no record of his choices.
 
 ---
 
@@ -411,7 +726,7 @@ public/assets/          prepared art, audio, fonts
 
 ## 12. Milestones
 
-Stop at the end of each milestone, open the pull request, and wait.
+Stop at the end of each milestone (and each wave of version 2), open the pull request, and wait.
 
 ### Milestone 1: playable on the phone
 - Project setup, PWA, offline cache, deploy workflow, art pipeline with placeholders, voice system with the built-in Arabic voice, generated music with its switch.
@@ -428,6 +743,30 @@ Stop at the end of each milestone, open the pull request, and wait.
 - Acceptance: a full session runs about 10 minutes; replay starts a fresh day; no network request after install (verify and state how it was verified).
 
 For each milestone, list in the pull request what was tested and how, and what could not be tested in this environment and needs checking on the real phone.
+
+Milestones 1 to 3 are done.
+
+### Version 2: missions (MISSIONS_V2)
+Copied from `MISSIONS_V2.md` section 12 (section numbers inside refer to that file):
+
+Work in waves. Each wave is one pull request. At the end of each, list what you tested and how, and what needs checking on the real phone. Then stop and wait.
+
+- **Step 0:** the art checklist (section 2). Stop.
+- **Wave 1:** the new day (section 3), the quiet-deed slot (section 6) with Petra's and Irbid's quiet deeds, the sound choice and credit (section 9), the Wadi Rum ending (section 7), and Petra P2 and P3. Petra's art exists, so Petra is where the new framework is proven.
+- **Wave 2:** U2, U3, A2, A3, I2, I3, the quiet deeds for Umm Qais and Amman, and the safeguard changes to P1, U1 and A1.
+- **Wave 3:** Jerash (J1, J2, J3) and the Dead Sea (D1, D2, D3) with their quiet deeds.
+- **Wave 4:** Aqaba (Q1, Q2, Q3) with its quiet deed, all conversation starters, a full pass on motion, sound and pacing.
+
+Until a place's missions are built, that place stays scenery with a voice, as Jerash is now. Until a place's quiet deed is built, its next ordinary mission plays in the fourth slot. Until I2 and I3 exist, I1 plays in any slot.
+
+Acceptance for every wave:
+- Each new mission has an easy first win inside 10 seconds, gets a little harder, and ends inside two minutes.
+- The good act visibly changes something for someone else. Nothing changes for the player's status.
+- Every safeguard listed for the mission is in the scene.
+- The fourth mission of a day is always a quiet deed, with no acknowledgment of any kind.
+- A day of four missions plus Wadi Rum runs 8 to 10 minutes.
+- No network request after install. No new stored data beyond section 3.
+- `npm run build` passes with placeholders; `npm run check:art` lists what is still missing.
 
 ---
 

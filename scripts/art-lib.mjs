@@ -1,5 +1,6 @@
 // Shared art helpers for prepare-art.mjs and check-art.mjs.
-// The asset list mirrors GAME_SPEC.md section 6.5.
+// The asset list mirrors GAME_SPEC.md section 6.5 and art/Fael_Khair_Art_Checklist.xlsx
+// (MISSIONS_V2.md added the names marked by wave).
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -12,6 +13,15 @@ export const OUT_ICONS = path.join(ROOT, 'public', 'icons');
 export const BACKGROUNDS = [
   'bg_map', 'bg_petra_siq', 'bg_petra_treasury', 'bg_ummqais_well',
   'bg_amman_home', 'bg_irbid_dusk', 'bg_wadirum_night',
+  // MISSIONS_V2, wave 1
+  'bg_petra_tombs',
+  // MISSIONS_V2, wave 2
+  'bg_ummqais_grove', 'bg_amman_stairs', 'bg_irbid_bakery', 'bg_irbid_alley',
+  // MISSIONS_V2, wave 3
+  'bg_jerash_plaza', 'bg_jerash_cardo', 'bg_deadsea_restarea',
+  'bg_deadsea_shore',
+  // MISSIONS_V2, wave 4
+  'bg_aqaba_beach', 'bg_aqaba_harbor',
 ];
 
 export const CHARACTERS = [
@@ -19,6 +29,21 @@ export const CHARACTERS = [
   'boy_peek', 'boy_worried', 'boy_happy', 'boy_sweep', 'boy_sit_back',
   'dog_thirsty', 'dog_drinking', 'dog_happy', 'elder_cart', 'mama_stand',
   'mama_kneel', 'neighbor_basket', 'passerby_walk', 'passerby_look',
+  // MISSIONS_V2, wave 1
+  'boy_offer', 'boy_kneel', 'guard_stand', 'traveler_worried',
+  'traveler_happy', 'traveler_b', 'elder_stand', 'donkey_stand',
+  'donkey_tired', 'girl_happy',
+  // MISSIONS_V2, wave 2
+  'boy_water', 'boy_angry', 'boy_breathe', 'boy_carry_bags', 'boy_kick',
+  'boy_wave', 'grandpa_sit', 'birds_eating', 'friend_a', 'friend_b',
+  'sister_play', 'sister_sorry', 'sister_happy', 'mama_bags', 'cat_sleeping',
+  'baker_busy', 'baker_smile', 'newboy_alone', 'newboy_happy',
+  // MISSIONS_V2, wave 3
+  'boy_sit_front', 'girl_crying', 'mother_search', 'visitor_a', 'visitor_b',
+  'classmate_hungry', 'classmate_happy', 'baba_sit', 'grandpa_baba_walk',
+  // MISSIONS_V2, wave 4
+  'turtle_tangled', 'turtle_free', 'ranger_stand', 'ranger_kneel',
+  'fisherman_stand', 'customer_basket', 'sister_bucket_wait',
 ];
 
 export const OBJECTS = [
@@ -27,6 +52,22 @@ export const OBJECTS = [
   'shard_b', 'shard_c', 'ball', 'dustpan', 'cloth', 'basket_empty',
   'basket_full', 'food_bread', 'food_olives', 'food_labneh',
   'food_tomatoes', 'food_apples',
+  // MISSIONS_V2, wave 1
+  'pouch_red', 'pouch_blue', 'pouch_red_moon', 'sack_small', 'sack_big',
+  'cart_empty',
+  // MISSIONS_V2, wave 2
+  'sapling_small', 'soil_mound', 'watering_can', 'olives_pile',
+  'basket_olives', 'olive_young', 'olive_young_wilt', 'olive_tree_fruit',
+  'scale_base', 'scale_beam', 'scale_pan', 'block', 'bag_light', 'bag_heavy',
+  'blanket_messy', 'blanket_folded', 'coin', 'bread_bag',
+  // MISSIONS_V2, wave 3
+  'litter_bottle', 'litter_paper', 'litter_peel', 'glass_broken', 'bin',
+  'sandwich_whole', 'sandwich_half', 'cup_empty', 'cup_full', 'water_bottle',
+  'tap_body', 'tap_handle', 'pipe_leak', 'plant_dry', 'plant_fresh', 'bench',
+  'bag_small',
+  // MISSIONS_V2, wave 4
+  'plastic_bag', 'fish_big', 'fish_small', 'weight_iron', 'sand_bucket',
+  'sand_tower', 'shell',
 ];
 
 export const ICON = 'icon_app';
