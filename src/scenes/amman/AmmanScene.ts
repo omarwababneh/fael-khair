@@ -4,6 +4,7 @@ import { droplets, dustPuff, grayCloud, HintHand, motes } from '../../core/fx';
 import { music } from '../../core/music';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
+import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
@@ -22,7 +23,8 @@ const SHARD_KEYS = ['shard_a', 'shard_b', 'shard_c'];
 const PUDDLE = { x: 318, y: 704, rx: 58, ry: 14 };
 const RUG = { x: 92, y: 676 };
 const DUSTPAN = { x: 214, y: 706, w: 74 };
-const MAMA = { x: 74, h: 176, kneelH: 140 };
+// Heights follow the art checklist (boy = 1.0): Mama standing 1.3, kneeling 0.95.
+const MAMA = { x: 74, h: 195, kneelH: 142 };
 const GRAVITY = 1500;
 const FUN_MS = 8000; // the ball is pure fun for about 10 seconds before the jar falls
 
@@ -342,7 +344,7 @@ export class AmmanScene extends BaseScene {
 
   private mamaEnters(): void {
     if (this.mama) return;
-    this.mama = this.add.image(-90, FLOOR, 'mama_stand').setOrigin(0.5, 1).setDepth(28);
+    this.mama = this.add.image(view().x - 70, FLOOR, 'mama_stand').setOrigin(0.5, 1).setDepth(28);
     fitHeight(this.mama, MAMA.h);
     sfx('door', { volume: 0.5 });
     this.tweens.add({ targets: this.mama, x: MAMA.x, duration: 1200, ease: 'Sine.easeOut' });

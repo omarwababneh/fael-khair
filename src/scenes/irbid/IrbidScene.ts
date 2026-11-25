@@ -4,6 +4,7 @@ import { HintHand, motes } from '../../core/fx';
 import { music } from '../../core/music';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
+import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
@@ -17,12 +18,16 @@ const FOODS = ['food_bread', 'food_olives', 'food_labneh', 'food_tomatoes', 'foo
 // Measured on the delivered bg_irbid_dusk: the food waits in a row on the paving in
 // front (it used to float over the wall), and the basket is about half the boy's height.
 const FOOD_ROW = { y: 708, xs: [44, 166, 234, 300, 358] };
-const BASKET = { x: 205, y: 660, w: 86 };
+// Heights follow the art checklist (boy = 1.0): basket 0.5 empty, 0.55 full.
+const BASKET = { x: 205, y: 660, h: 73, hFull: 80 };
 const TREE = { x: 64, y: 694 };
 const DOOR = { x: 300, y: 560, w: 96, h: 160, step: 652 };
 const STOP_X = 244; // where he stands at the door
 const WINDOW = { x: 196, y: 318 };
 const BOY_H = 146;
+// The passerby walks along the street, farther back than the boy, so he is drawn
+// smaller than the checklist's 1.35 (perspective).
+const PASSERBY_H = 172;
 const WALK_SPEED = 36; // points per second while tiptoeing
 const STREET_Y = 612;
 
@@ -82,7 +87,7 @@ export class IrbidScene extends BaseScene {
     this.windowGlow = this.add.image(WINDOW.x, WINDOW.y, 'fx_glow').setDisplaySize(150, 150).setDepth(5).setAlpha(0).setBlendMode(Phaser.BlendModes.ADD);
 
     this.basket = this.add.image(BASKET.x, BASKET.y, 'basket_empty').setDepth(20);
-    fitWidth(this.basket, BASKET.w);
+    fitHeight(this.basket, BASKET.h);
 
     FOODS.forEach((key, i) => {
       const img = this.add.image(FOOD_ROW.xs[i], FOOD_ROW.y, key).setDepth(25);
@@ -198,7 +203,7 @@ export class IrbidScene extends BaseScene {
     this.time.delayedCall(450, () => {
       if (!this.alive) return;
       this.basket.setTexture('basket_full');
-      fitWidth(this.basket, BASKET.w);
+      fitHeight(this.basket, BASKET.hFull);
       void this.startSneak();
     });
   }
@@ -250,8 +255,9 @@ export class IrbidScene extends BaseScene {
 
   private passerbyWatch(warn: number): void {
     // A man walks along the street, stops, and turns his head toward the street.
-    const p = this.add.image(430, STREET_Y, 'passerby_walk').setOrigin(0.5, 1).setDepth(24);
-    fitHeight(p, 136);
+    // He enters from just past the right edge of the frame (wider on some screens).
+    const p = this.add.image(view().right + 40, STREET_Y, 'passerby_walk').setOrigin(0.5, 1).setDepth(24);
+    fitHeight(p, PASSERBY_H);
     this.passerby = p;
     const stopX = 210;
     const walk = this.tweens.add({ targets: p, y: { from: STREET_Y, to: STREET_Y - 3 }, duration: 220, yoyo: true, repeat: -1 });
@@ -266,11 +272,11 @@ export class IrbidScene extends BaseScene {
           if (!this.alive || this.state !== 'sneak') return;
           this.watch = 'looking';
           p.setTexture('passerby_look');
-          fitHeight(p, 136);
+          fitHeight(p, PASSERBY_H);
           this.events_.push(this.time.delayedCall(1700, () => {
             if (!this.alive) return;
             p.setTexture('passerby_walk');
-            fitHeight(p, 136);
+            fitHeight(p, PASSERBY_H);
             walk.resume();
             this.passerbyLeaves(p);
             this.endWatch();
@@ -282,7 +288,7 @@ export class IrbidScene extends BaseScene {
   }
 
   private passerbyLeaves(p: Phaser.GameObjects.Image): void {
-    this.tweens.add({ targets: p, x: -80, duration: 3000, ease: 'Linear', onComplete: () => p.destroy() });
+    this.tweens.add({ targets: p, x: view().x - 80, duration: 3000, ease: 'Linear', onComplete: () => p.destroy() });
     if (this.passerby === p) this.passerby = null;
   }
 
@@ -302,11 +308,11 @@ export class IrbidScene extends BaseScene {
     if (this.watcher === 'passerby' && this.passerby) {
       const p = this.passerby;
       p.setTexture('passerby_look');
-      fitHeight(p, 136);
+      fitHeight(p, PASSERBY_H);
       this.time.delayedCall(900, () => {
         if (!this.alive) return;
         p.setTexture('passerby_walk');
-        fitHeight(p, 136);
+        fitHeight(p, PASSERBY_H);
         this.passerbyLeaves(p);
       });
     }
@@ -382,7 +388,7 @@ export class IrbidScene extends BaseScene {
     // and takes it inside. She never learns who left it. Nothing happens to him.
     sfx('door', { volume: 0.6 });
     const n = this.add.image(DOOR.x, DOOR.step, 'neighbor_basket').setOrigin(0.5, 1).setDepth(27).setAlpha(0);
-    fitHeight(n, 150);
+    fitHeight(n, BOY_H * 1.25); // the neighbor: 1.25 of the boy (art checklist)
     this.tweens.add({ targets: n, alpha: 1, duration: 600 });
     await this.wait(800);
     if (!this.alive) return;
@@ -410,7 +416,8 @@ export class IrbidScene extends BaseScene {
 
   private pose(key: string): void {
     this.boyImg.setTexture(key);
-    fitHeight(this.boyImg, BOY_H);
+    // Crouching to peek, he is 0.7 of his standing height (art checklist).
+    fitHeight(this.boyImg, BOY_H * (key === 'boy_peek' ? 0.7 : 1));
   }
 
   private showHint(): void {

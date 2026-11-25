@@ -4,6 +4,7 @@ import { droplets, glowRing, HintHand, motes, waterStream } from '../../core/fx'
 import { music } from '../../core/music';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
+import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
@@ -426,7 +427,7 @@ export class UmmQaisScene extends BaseScene {
     this.time.delayedCall(1400, () => this.alive && sfx('bark', { volume: 0.6 }));
     await Promise.all([done, this.wait(2200)]);
     if (!this.alive) return;
-    this.tweens.add({ targets: this.dog, x: -120, y: 470, scale: 0.6, duration: 3600, ease: 'Sine.easeIn' });
+    this.tweens.add({ targets: this.dog, x: view().x - 80, y: 470, scale: 0.6, duration: 3600, ease: 'Sine.easeIn' });
     this.tweens.add({ targets: this.dogImg, y: { from: 0, to: -6 }, duration: 180, yoyo: true, repeat: 9 });
     for (let i = 0; i < 6; i++) this.time.delayedCall(i * 500, () => this.alive && sfx('step', { volume: 0.35 }));
     await this.wait(3800);

@@ -21,19 +21,22 @@ import { BaseScene } from '../BaseScene';
 // cart_empty (768 x 371): the wheel hub is at (210, 230), the wheel's bottom at
 // y = 365, the bed's top rim at y = 15 to 60, the shaft tips at x = 760.
 const CART_ART = { hubX: 210, hubY: 230, wheelBottom: 365, rimY: 60 };
-const CART_W = 190;
-const AXLE = { x: 172, y: 652 };
+// Sizes follow the art checklist (boy = 1.0): cart 1.3 wide, old man 1.3, donkey 1.0
+// (0.9 tired), small sack 0.3, big sack 0.5, bucket 0.43.
+const CART_W = 161;
+const AXLE = { x: 170, y: 652 };
 const CART_S = CART_W / 768;
 const GROUND = AXLE.y + (CART_ART.wheelBottom - CART_ART.hubY) * CART_S; // under the wheel
-const DONKEY = { x: AXLE.x + 146, h: 118 };
-const ELDER = { x: 62, h: 140 };
+// The donkey stands at the shaft tips (hub to tip: 550 px of the cart art).
+const DONKEY = { x: AXLE.x + Math.round(550 * CART_S) + 12, h: 124, tiredH: 112 };
+const ELDER = { x: 68, h: 161 };
 const BOY = { x: 262, y: 736, h: 124 };
 const SMALL_H = 38; // a small sack on the ground
-const BED_SMALL_H = 44;
-const BED_BIG_H = 60;
+const BED_SMALL_H = 40;
+const BED_BIG_H = 56;
 // Where sacks sit in the bed, relative to the axle (x), bottoms hidden behind the rim.
 const BED_BOTTOM = -(CART_ART.hubY - 75) * CART_S;
-const SLOTS = { left: [-26, -44, -10], right: [34, 52, 18] };
+const SLOTS = { left: [-22, -35, -9], right: [26, 39, 13] };
 const BED_CENTER = 4;
 const TILT_PER_SACK = 4; // degrees
 // Kept above y = 734, so the speech bubble never covers them on shorter phones.
@@ -131,7 +134,7 @@ export class CartScene extends BaseScene {
       this.sacks.push({ img, home: spot, side: null, base });
     }
     const big = this.add.image(ELDER.x + 46, GROUND + 22, 'sack_big').setOrigin(0.5, 1).setDepth(34.7).setAngle(-6);
-    fitHeight(big, 56);
+    fitHeight(big, BOY.h * 0.5);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.move(p));
@@ -351,7 +354,7 @@ export class CartScene extends BaseScene {
     if (!this.alive) return;
     // Water for the donkey instead.
     this.bucket = this.add.image(BUCKET_SPOT.x, BUCKET_SPOT.y, 'bucket_full').setOrigin(0.5, 1).setDepth(35);
-    this.bucketScale = fitHeight(this.bucket, 44);
+    this.bucketScale = fitHeight(this.bucket, BOY.h * 0.43);
     this.bucket.setScale(0.01);
     this.tweens.add({ targets: this.bucket, scale: this.bucketScale, duration: 400, ease: 'Back.easeOut' });
     this.bucketRing = glowRing(this, BUCKET_SPOT.x, BUCKET_SPOT.y - 22, 30, 34);
@@ -363,7 +366,9 @@ export class CartScene extends BaseScene {
 
   private donkeyPose(key: 'donkey_stand' | 'donkey_tired'): void {
     this.tweens.killTweensOf(this.donkey);
-    this.donkey.setTexture(key).setScale(this.donkeyScale);
+    this.donkey.setTexture(key);
+    if (key === 'donkey_tired') fitHeight(this.donkey, DONKEY.tiredH);
+    else this.donkey.setScale(this.donkeyScale);
     // The tired picture leans its head forward: keep the body over the same spot.
     this.donkey.setX(key === 'donkey_tired' ? DONKEY.x + 12 : DONKEY.x);
     this.tweens.add({ targets: this.donkey, scaleY: this.donkey.scaleY * 1.012, duration: 1700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });

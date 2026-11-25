@@ -27,11 +27,12 @@ let playsSinceOpen = 0;
 
 const GROUND = 712; // feet line on the Treasury plaza
 const BOY_H = 128;
-const GUARD = { x: 165, h: 150 };
+// Heights follow the art checklist (boy = 1.0): adults 1.35, the girl 0.7, the pouch 0.18.
+const GUARD = { x: 165, h: 173 };
 const BESIDE_GUARD = 232;
 const TRAVELER_X = { left: 62, right: 330 };
-const TRAVELER_H = 150;
-const POUCH_H = 26;
+const TRAVELER_H = 173;
+const POUCH_H = 23;
 // Where the tie-string knot and the star patch are on the pouch art (fractions).
 const KNOT = { x: 0.5, y: 0.34 };
 const PATCH = { x: 0.5, y: 0.68 };
@@ -442,7 +443,7 @@ export class PouchScene extends BaseScene {
     const v = view();
     const fromRight = t.x > 195;
     const girl = this.add.image(fromRight ? v.right + 40 : v.x - 40, GROUND + 4, 'girl_happy').setOrigin(0.5, 1).setDepth(31);
-    fitHeight(girl, 80);
+    fitHeight(girl, BOY_H * 0.7);
     girl.setFlipX(fromRight); // girl_happy runs to the right
     this.tweens.add({ targets: girl, angle: { from: -3, to: 3 }, duration: 200, yoyo: true, repeat: 5 });
     await new Promise<void>((res) => this.tweens.add({ targets: girl, x: t.x + (fromRight ? 36 : -36), duration: 1300, ease: 'Sine.easeOut', onComplete: () => res() }));

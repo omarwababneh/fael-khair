@@ -322,15 +322,15 @@ button {
   padding: 4px 16px 0;
 }
 
-/* Wide screens (a computer, a tablet): keep the interface in a phone-shaped
-   column over the game instead of stretching it across the whole width. */
-@media (min-aspect-ratio: 3/4) {
-  #ui {
-    left: 50%;
-    right: auto;
-    width: min(100vw, calc(100vh * 390 / 844));
-    transform: translateX(-50%);
-  }
+/* The interface follows the game's portrait frame (src/core/viewport.ts): the
+   whole screen on a phone, a centered column with plain bars on a wide screen. */
+#ui {
+  left: var(--frame-left, 0px);
+  top: var(--frame-top, 0px);
+  right: auto;
+  bottom: auto;
+  width: var(--frame-width, 100vw);
+  height: var(--frame-height, 100vh);
 }
 
 /* The game is portrait only. iPhone home-screen apps ignore the manifest's
