@@ -8,7 +8,9 @@ import { measure, vp } from './core/viewport';
 import { BootScene } from './scenes/boot/BootScene';
 import { StartScene } from './scenes/start/StartScene';
 import { MapScene } from './scenes/map/MapScene';
-import { PetraScene } from './scenes/petra/PetraScene';
+import { PetraDawnScene, PetraScene } from './scenes/petra/PetraScene';
+import { PouchScene } from './scenes/petra/PouchScene';
+import { CartScene } from './scenes/petra/CartScene';
 import { UmmQaisScene } from './scenes/ummqais/UmmQaisScene';
 import { AmmanScene } from './scenes/amman/AmmanScene';
 import { IrbidScene } from './scenes/irbid/IrbidScene';
@@ -41,7 +43,7 @@ async function boot(): Promise<void> {
     render: { antialias: true, powerPreference: 'high-performance' },
     input: { activePointers: 2 },
     fps: { target: 60 },
-    scene: [BootScene, StartScene, MapScene, PetraScene, UmmQaisScene, AmmanScene, IrbidScene, WadiRumScene],
+    scene: [BootScene, StartScene, MapScene, PetraScene, PouchScene, CartScene, PetraDawnScene, UmmQaisScene, AmmanScene, IrbidScene, WadiRumScene],
   });
 
   let pending = 0;

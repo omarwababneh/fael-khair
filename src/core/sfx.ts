@@ -209,16 +209,20 @@ export function setSfxMuted(muted: boolean, seconds = 0.8): void {
 }
 
 /**
- * Night ambience (Wadi Rum): soft wind and distant crickets, on the sound
- * effects bus. A file at sfx/night.m4a replaces it. Returns a stop function.
+ * Night ambience (Wadi Rum): soft wind and distant crickets. A file at
+ * sfx/night.m4a replaces it. It plays on its own channel (not the effects bus),
+ * so the effects can stop while a soft wind stays under the ayah ("stars and
+ * wind", MISSIONS_V2.md section 7). Returns controls: quiet() stops the
+ * crickets and lowers the wind; stop() ends it.
  */
-export function nightAmbience(): () => void {
+export function nightAmbience(): { quiet: () => void; stop: () => void } {
   const ctx = audio.ctx;
-  if (!ctx) return () => undefined;
+  if (!ctx) return { quiet: () => undefined, stop: () => undefined };
   const out = ctx.createGain();
   out.gain.value = 0;
-  out.gain.linearRampToValueAtTime(1, ctx.currentTime + 2);
-  out.connect(audio.buses.sfx);
+  out.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 2);
+  out.connect(audio.master);
+  let crickets = true;
   const nodes: AudioScheduledSourceNode[] = [];
   let timer = 0;
   if (hasAudio('sfx', 'night')) {
@@ -252,7 +256,7 @@ export function nightAmbience(): () => void {
     nodes.push(wind, lfo);
     // Crickets: short high chirps in small groups.
     timer = window.setInterval(() => {
-      if (ctx.state !== 'running') return;
+      if (ctx.state !== 'running' || !crickets) return;
       const t = ctx.currentTime;
       const base = 4200 + Math.random() * 600;
       for (let i = 0; i < 3; i++) {
@@ -267,15 +271,24 @@ export function nightAmbience(): () => void {
       }
     }, 900 + Math.random() * 500);
   }
-  return () => {
-    window.clearInterval(timer);
+  const fadeTo = (level: number, seconds: number) => {
     const t = ctx.currentTime;
     out.gain.cancelScheduledValues(t);
     out.gain.setValueAtTime(out.gain.value, t);
-    out.gain.linearRampToValueAtTime(0, t + 0.8);
-    window.setTimeout(() => {
-      for (const n of nodes) { try { n.stop(); } catch { /* stopped */ } }
-      out.disconnect();
-    }, 1000);
+    out.gain.linearRampToValueAtTime(level, t + seconds);
+  };
+  return {
+    quiet: () => {
+      crickets = false;
+      fadeTo(0.45, 1.2);
+    },
+    stop: () => {
+      window.clearInterval(timer);
+      fadeTo(0, 0.8);
+      window.setTimeout(() => {
+        for (const n of nodes) { try { n.stop(); } catch { /* stopped */ } }
+        out.disconnect();
+      }, 1000);
+    },
   };
 }

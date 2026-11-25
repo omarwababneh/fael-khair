@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { DESIGN_H, DESIGN_W, view, vp } from '../core/viewport';
 import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
-import { session, type Adventure } from '../core/session';
+import { completeMission, type Place } from '../core/session';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
@@ -108,15 +108,18 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   /**
-   * Every adventure ends the same way: the father's hadith line over a calm
-   * final frame, then back to the map. Nothing about the player changes.
+   * Every mission ends the same way: the father's closing line (from the
+   * registry) over a calm final frame, then back to the map. A quiet deed passes
+   * null: no closing line at all. Nothing about the player changes.
    */
-  protected async finishAdventure(id: Adventure, hadithLine: string): Promise<void> {
+  protected async finishAdventure(place: Place, closingLine: string | null): Promise<void> {
     this.setIdle(null);
     // The story's consequence is done: the place counts even if he taps home now.
-    session.done.add(id);
-    await Voice.say(hadithLine);
-    if (!this.alive) return;
+    completeMission(place);
+    if (closingLine) {
+      await Voice.say(closingLine);
+      if (!this.alive) return;
+    }
     await this.wait(2600);
     if (!this.alive) return;
     this.goTo('map');

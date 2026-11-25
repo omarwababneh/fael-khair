@@ -37,6 +37,7 @@ Never trade test 2 or 3 for test 1.
 
 ### Ethical design
 - Forbidden: coins, points, stars, levels-as-rank, inventories, unlockable rewards, loot boxes, random prizes, streaks, daily login pressure, countdown timers, leaderboards, social features, notifications, ads, purchases, analytics, tracking, any network request after the app is installed.
+- **Coins.** The ban is on coins as a reward or currency for the player. A coin that is part of a story, which he hands back and never keeps or counts for himself (I2), is allowed. Coin art stays plain, with no face and no writing.
 - No fail screens, no "wrong" buzzer, no lives. A slip is followed by a gentle retry.
 - Consequences of a good act land on other characters and on the world, never on the player's status. Example: the dog drinks; the road is clear.
 - The secret good deed gets no acknowledgment of any kind (section 4D).
@@ -45,7 +46,7 @@ Never trade test 2 or 3 for test 1.
 
 ### Privacy
 - The repository is public. Never commit names, photos or personal details of the family.
-- **Storage.** The game may store, on the device only, the parents' sound settings (sound choice, music volume, voice speed) and one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere.
+- **Storage.** The game may store, on the device only, the sound choice, the music volume, the voice speed, and one number per place for the next mission. Nothing about what he chose or how he played. It is never shown, never counted and never sent anywhere. (Confirmed by the owner for version 2.)
 
 ### Rules added by MISSIONS_V2
 Every rule above still holds. `MISSIONS_V2.md` section 4 adds rules that apply to every mission, old and new: mercy with wisdom (a trusted adult whenever a stranger, an animal in trouble, broken glass, a leak or a lost child is involved; never alone with a stranger; never touching a wild or unfamiliar animal; light loads only; food shared only after asking, never a shared cup; good and bad secrets), no shame, the father describes and does not grade, everyday remembrance (only بسم الله، الحمد لله، إن شاء الله، ما شاء الله، سبحان الله are used freely; any other religious sentence comes from the registry), Quran in missions only as the short paraphrase, no jingle or musical sting for a moral choice or a good deed, and short two-form voice lines.
@@ -88,8 +89,8 @@ Shared rules: every mission opens with one father voice line that sets the situa
 | Id | Mission | Place | Value | Source | Status |
 |---|---|---|---|---|---|
 | P1 | Clearing the road | Petra | removing harm from the path | `bukhari_2472` | built |
-| P2 | The lost pouch | Petra | trust (amanah), returning what is lost | `bukhari_2427` | wave 1 |
-| P3 | Loading the cart | Petra | helping someone with his load | `bukhari_2989` (mount) | wave 1 |
+| P2 | The lost pouch | Petra | trust (amanah), returning what is lost | `bukhari_2427` | built (wave 1) |
+| P3 | Loading the cart | Petra | helping someone with his load | `bukhari_2989` (mount) | built (wave 1) |
 | U1 | The thirsty dog | Umm Qais | mercy to animals | `bukhari_2363` | built |
 | U2 | The olive saplings | Umm Qais | planting good others enjoy later; patience; trust in Allah | `muslim_1553a` | wave 2 |
 | U3 | Sharing the harvest | Umm Qais | fairness between two | `bukhari_2989` (justice) | wave 2 |
@@ -174,6 +175,8 @@ Rules, the same as Irbid today:
 - Nobody in the story learns who did it. Nobody thanks him. He is not shown being noticed.
 - No chime, no sparkle on him, no hadith line, no closing praise. The father says at most one plain line about what changed in the world, then the map.
 - The world shows the result after he has gone: someone arrives and simply enjoys it.
+
+**One exception:** Irbid's quiet deed (I1) keeps its closing hadith line (`bukhari_660`). It is the one quiet deed whose hadith is about giving in secret. Every other quiet deed ends without a hadith line.
 
 One quiet deed per place. Keep them short (about 60 seconds) and reuse art.
 
@@ -558,8 +561,32 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `ir_secret` | she goes in | لم يعرف أحد من فعل الخير. لكنّ الله يعلم. | ما حدا عرف مين عمل الخير. بس الله بيعرف. |
 | `ir_hadith` R | ending | registry `bukhari_660` | registry `bukhari_660` |
 | `wr_open` | night start | انظر إلى النجوم. من خلق كلّ هذا؟ | شوف النجوم. مين اللي خلق كل هاد؟ |
-| `wr_subhan` | after stars | سبحان الله. | سبحان الله. |
+| `wr_close` R | after stars, before the ayah | registry `quran_2_215` | registry `quran_2_215` |
 | `wr_night` | close | تصبح على خير يا حبيبي. | تصبح على خير يا حبيبي. |
+| `qdp_open` | Petra quiet deed start | ما زال الفجر، والطريق فارغ. سقطت حجارة في الليل. بسم الله. | لسّا الفجر، والطريق فاضية. وقعت حجار بالليل. بسم الله. |
+| `qdp_end` | after the family passes | مرّت العائلة، والطريق نظيف. | مرقت العيلة، والطريق نظيفة. |
+| `p2_open` | P2 start | بسم الله. انظر، هناك شيء على الرمل! | بسم الله. شوف، في إشي عالرمل! |
+| `p2_hint` | idle, pouch in the sand | اضغط على الكيس. | اكبس عالكيس. |
+| `p2_look` | close-up of the pouch | لا نفتحه. ننظر إلى رباطه وعلامته. | ما بنفتحه. بنطّلع على رباطه وعلامته. |
+| `p2_string` | taps the tie-string | رباط أحمر. | رباط أحمر. |
+| `p2_patch` | taps the patch | وعليه نجمة صفراء. | وعليه نجمة صفرا. |
+| `p2_guard` | after looking | نعطيه لحارس المكان، وننتظر صاحبه عنده. | بنعطيه لحارس المكان، وبنستنّى صاحبه عنده. |
+| `p2_guard_wait` | guard, boy beside him | لننتظر صاحبه هنا معاً. | خلّينا نستنّى صاحبه هون سوا. |
+| `p2_match` | travelers arrive | لمن هذا الكيس؟ انظر إلى الصور. | لمين هالكيس؟ طلّع عالصور. |
+| `p2_notmine` | wrong traveler | لا، كيسي ليس هذا. | لا، كيسي مش هاد. |
+| `p2_relief` | right traveler | الحمد لله! هذا ثمن الماء لأولادي. | الحمد لله! هاد حقّ الميّ لولادي. |
+| `p2_found_other` | guard finds the other pouch | وهذا كيسك، وجدتُه هنا. | وهاد كيسك، لقيته هون. |
+| `p2_end` | they walk on | عاد الكيس إلى صاحبه، وسيشرب أولاده الماء. | رجع الكيس لصاحبه، وولاده رح يشربوا ميّ. |
+| `p2_hadith` R | P2 ending | registry `bukhari_2427` | registry `bukhari_2427` |
+| `p3_open` | P3 start | بسم الله. سقطت أكياس العمّ عن عربته. هيّا نساعده. | بسم الله. وقعت أكياس عمّو عن عربيّته. يلّا نساعده. |
+| `p3_big` | old man lifts the big sack | الكيس الكبير ثقيل، أنا أرفعه. | الكيس الكبير تقيل، أنا بشيله. |
+| `p3_hint` | loading | اسحب كيساً صغيراً إلى العربة. | اسحب كيس زغير عالعربيّة. |
+| `p3_balance` | the cart tips | مالت العربة! ضع الكيس على الجهة الأخرى. | مالت العربيّة! حطّ الكيس عالجهة الثانية. |
+| `p3_toomuch` | one sack too many | انظر إلى الحمار. هذا الكيس كثير عليه. | شوف الحمار. هالكيس كتير عليه. |
+| `p3_nexttrip` | old man | آخذه في المرّة القادمة إن شاء الله. | بوخذه المشوار الجاي إن شاء الله. |
+| `p3_water` | bucket appears | الحمار عطشان. أعطه ماءً. | الحمار عطشان. اسقيه ميّ. |
+| `p3_end` | the cart rolls on | العربة مستوية، والحمار يمشي مرتاحاً. الحمد لله. | العربيّة مستوية، والحمار ماشي مرتاح. الحمد لله. |
+| `p3_hadith` R | P3 ending | registry `bukhari_2989`, part `mount` | registry `bukhari_2989`, part `mount` |
 
 ### 7.3 Music
 Copied word for word from `MISSIONS_V2.md` section 9 (its point 9 is carried out by this section):
@@ -701,7 +728,7 @@ Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما 
   - Pause all sound when the app goes to the background.
 - **Storage:** only what section 2 allows (the parents' sound settings and one rotation number per place), in `localStorage`, wrapped in try/catch.
 - **Performance:** steady 60 frames per second on an iPhone from the last five years. Total download under 25 MB.
-- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. As version 2 adds places and missions, each gets a matching debug name (for example a place name plus its mission number); the pull request of each wave lists them. Remove nothing from production; it is harmless.
+- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Version 2 adds `p2`, `p3` and `petra-dawn` (Petra's quiet deed); each later wave lists its own. Remove nothing from production; it is harmless.
 
 ### Repository layout
 

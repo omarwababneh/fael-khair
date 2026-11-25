@@ -21,5 +21,23 @@
       "مين بنقدر نفرّحه بالسرّ هالأسبوع؟"
     ]
   },
-  "invitation": "اعملوا إشي حلو لحدا اليوم، بدون ما تحكوا لحدا."
+  "invitation": "اعملوا إشي حلو لحدا اليوم، بدون ما تحكوا لحدا.",
+  "secret_note": {
+    "place": "irbid",
+    "intro": "قلها لابنك بكلماتك:",
+    "text": "السرّ الحلو هو اللي بيفرّح الناس. وأي سرّ بيخوّفك أو بيزعّلك، بتحكيه لماما وبابا دايماً."
+  },
+  "music_credit": {
+    "text": "Music: Kevin MacLeod (incompetech.com), licensed under Creative Commons: By Attribution 4.0.",
+    "tracks": [
+      "Carefree",
+      "Monkeys Spinning Monkeys",
+      "Merry Go",
+      "Fluffing a Duck",
+      "Sneaky Snitch",
+      "Bumbly March",
+      "Wallpaper",
+      "Life of Riley"
+    ]
+  }
 }

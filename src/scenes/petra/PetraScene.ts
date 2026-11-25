@@ -3,14 +3,19 @@ import { fitHeight, fitWidth, hasArt } from '../../core/assets';
 import { dustPuff, glowRing, motes } from '../../core/fx';
 import { addLabel } from '../../core/labels';
 import { music } from '../../core/music';
-import { session } from '../../core/session';
+import { completeMission } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
-// Petra: clearing the road (value: removing harm from people's path; source bukhari_2472).
+// Petra: clearing the road (P1; value: removing harm from people's path; source bukhari_2472).
+//
+// The same scene at dawn is Petra's quiet deed (scene key 'petra-dawn',
+// MISSIONS_V2.md section 6): before sunrise the Siq is empty; he clears the
+// fallen stones and leaves; later a family walks through without knowing. No
+// chime, no sparkle on him, no closing hadith line, nobody thanks him.
 
 interface ObstacleDef {
   key: string;
@@ -62,6 +67,10 @@ const STEP = 10; // how far the boy and cart move up after each cleared obstacle
 const VANISH = { x: 200, y: 482 }; // where the path disappears into the Siq
 const HINT_AFTER = 6000;
 
+// The quiet deed: four fallen stones, no branches, no cart.
+const DAWN_ROCKS = OBSTACLES.filter((o) => o.kind === 'rock');
+const DAWN_TINT = 0x27346e; // cool blue light before sunrise, laid over the art
+
 export class PetraScene extends BaseScene {
   private obstacles: Obstacle[] = [];
   private nooks: Nook[] = [];
@@ -81,12 +90,17 @@ export class PetraScene extends BaseScene {
   private finished = false;
   private walkTimer?: Phaser.Time.TimerEvent;
   private poseTimer?: Phaser.Time.TimerEvent;
+  /** The dawn quiet deed rather than P1. */
+  private quiet = false;
+  private dawn: Phaser.GameObjects.Rectangle | null = null;
 
-  constructor() {
-    super('petra');
+  constructor(key = 'petra') {
+    super(key);
   }
 
   create(): void {
+    this.quiet = this.scene.key === 'petra-dawn';
+    this.dawn = null;
     this.setup();
     this.obstacles = [];
     this.nooks = [];
@@ -106,16 +120,22 @@ export class PetraScene extends BaseScene {
     const bg = this.addCover('bg_petra_siq');
     // A very slow breath on the canyon so the frame is never perfectly still.
     this.tweens.add({ targets: bg, scale: bg.scale * 1.012, duration: 8000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    motes(this, { x: 60, y: 120, w: 270, h: 560 }, 40);
+    motes(this, { x: 60, y: 120, w: 270, h: 560 }, 40, this.quiet ? 0xcfd8ff : undefined);
+    if (this.quiet) {
+      // Before sunrise: a cool, dim light over the canyon (code may tint delivered art).
+      const v = view();
+      this.dawn = this.add.rectangle(v.x - 20, v.y - 20, v.w + 40, v.h + 40, DAWN_TINT, 0.4)
+        .setOrigin(0).setDepth(80);
+    }
 
     for (const n of NOOKS) {
       this.nooks.push({ ...n, used: false, ring: glowRing(this, n.x, n.y, 32, 5) });
     }
 
-    // The cart behind the boy, the boy on the path.
+    // The cart behind the boy, the boy on the path. At dawn the Siq is empty: no cart.
     this.cartImg = this.add.image(0, 0, 'elder_cart').setOrigin(0.5, 1);
     fitHeight(this.cartImg, CART.h);
-    this.cart = this.add.container(CART.x, CART.y, [this.cartImg]).setDepth(32);
+    this.cart = this.add.container(CART.x, CART.y, [this.cartImg]).setDepth(32).setVisible(!this.quiet);
     this.tweens.add({ targets: this.cartImg, scaleY: this.cartImg.scaleY * 1.012, duration: 1900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     this.boyImg = this.add.image(0, 0, 'boy_idle').setOrigin(0.5, 1);
@@ -124,7 +144,15 @@ export class PetraScene extends BaseScene {
     // The boy breathes when idle.
     this.tweens.add({ targets: this.boy, scaleY: 1.02, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
-    for (const def of OBSTACLES) this.makeObstacle(def);
+    if (this.quiet) {
+      // Small variation on replay: the stones lie a little differently each time.
+      const mirror = Math.random() < 0.5;
+      for (const d of DAWN_ROCKS) {
+        this.makeObstacle({ ...d, x: (mirror ? 396 - d.x : d.x) + Phaser.Math.Between(-8, 8), y: d.y + Phaser.Math.Between(-4, 4) });
+      }
+    } else {
+      for (const def of OBSTACLES) this.makeObstacle(def);
+    }
 
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.onMove(p));
     this.input.on('pointerup', (p: Phaser.Input.Pointer) => this.onUp(p));
@@ -137,7 +165,7 @@ export class PetraScene extends BaseScene {
     // Birds by day, now and then.
     this.time.addEvent({ delay: 7000, loop: true, callback: () => Math.random() < 0.7 && sfx('birds', { volume: 0.5 }) });
 
-    void Voice.say('petra_open');
+    void Voice.say(this.quiet ? 'qdp_open' : 'petra_open');
     this.resetIdle();
   }
 
@@ -329,7 +357,8 @@ export class PetraScene extends BaseScene {
     });
     if (o.weight > 0.5) this.cameras.main.shake(160, 0.003 + o.weight * 0.004);
     this.tweens.add({ targets: nook.ring, alpha: 0, scale: nook.ring.scale * 1.6, duration: 500, onComplete: () => nook.ring.destroy() });
-    this.time.delayedCall(260, () => sfx('chime', { volume: 0.55 }));
+    // A finished step chimes, except in a quiet deed, which has no chime at all.
+    if (!this.quiet) this.time.delayedCall(260, () => sfx('chime', { volume: 0.55 }));
 
     const remaining = this.obstacles.filter((x) => !x.placed).length;
     if (remaining === 0) void this.finale();
@@ -340,6 +369,7 @@ export class PetraScene extends BaseScene {
   private advance(): void {
     this.walk(true);
     this.tweens.add({ targets: this.boy, y: this.boy.y - STEP, duration: 650, ease: 'Sine.easeInOut', onComplete: () => this.walk(false) });
+    if (this.quiet) return; // no cart at dawn
     this.time.delayedCall(250, () => {
       sfx('creak', { volume: 0.8 });
       this.tweens.add({ targets: this.cart, y: this.cart.y - STEP, duration: 800, ease: 'Sine.easeInOut' });
@@ -455,6 +485,7 @@ export class PetraScene extends BaseScene {
     this.clearHint();
     await this.wait(700);
     if (!this.alive) return;
+    if (this.quiet) return this.dawnEnding();
     const said = Voice.say('petra_clear');
 
     // The boy and the cart walk on up the cleared path.
@@ -527,10 +558,51 @@ export class PetraScene extends BaseScene {
     // The father's hadith line over the calm final frame.
     m.frequency = 400;
     // The story's consequence is done: the place counts even if he taps home now.
-    session.done.add('petra');
+    completeMission('petra');
     await Voice.say('petra_hadith');
     if (!this.alive) return;
     await this.wait(2600);
+    if (!this.alive) return;
+    this.goTo('map');
+  }
+
+  /**
+   * The quiet deed's ending: he simply walks away up the Siq. The sun comes up.
+   * Later a family walks through on the clear path without knowing anyone
+   * helped. One plain line about what changed, then the map.
+   */
+  private async dawnEnding(): Promise<void> {
+    // The spare nooks stop glowing: there is nothing left to do.
+    for (const n of this.nooks) if (!n.used && n.ring.active) this.tweens.add({ targets: n.ring, alpha: 0, duration: 600, onComplete: () => n.ring.destroy() });
+    this.walk(true);
+    this.tweens.add({ targets: this.boy, y: VANISH.y + 10, x: VANISH.x - 12, scale: 0.3, alpha: { from: 1, to: 0 }, duration: 4200, ease: 'Sine.easeIn' });
+    await this.wait(4300);
+    if (!this.alive) return;
+    this.walk(false);
+    // Sunrise: the cool light lifts.
+    if (this.dawn) this.tweens.add({ targets: this.dawn, fillAlpha: 0, duration: 3500, ease: 'Sine.easeInOut' });
+    this.time.delayedCall(1200, () => this.alive && sfx('birds', { volume: 0.6 }));
+    await this.wait(2600);
+    if (!this.alive) return;
+    // The place counts now: the world has changed, and he is not there to see it noticed.
+    completeMission('petra');
+    // A father and his daughter walk up the path, chatting, without stopping.
+    const v = view();
+    const dad = this.add.image(v.x - 50, v.bottom + 20, 'traveler_happy').setOrigin(0.5, 1).setDepth(31);
+    fitHeight(dad, 150);
+    const girl = this.add.image(v.x - 100, v.bottom + 26, 'girl_happy').setOrigin(0.5, 1).setDepth(32);
+    fitHeight(girl, 82);
+    const steps = this.time.addEvent({ delay: 420, loop: true, callback: () => sfx('step', { volume: 0.35 }) });
+    for (const [img, dx, delay] of [[dad, 6, 0], [girl, -18, 500]] as const) {
+      this.tweens.add({ targets: img, angle: { from: -2, to: 2 }, duration: 300, yoyo: true, repeat: -1 });
+      this.tweens.add({ targets: img, x: VANISH.x + dx, y: VANISH.y + 8, scale: img.scale * 0.3, alpha: { from: 1, to: 0 }, delay, duration: 7000, ease: 'Sine.easeIn' });
+    }
+    await this.wait(5600);
+    if (!this.alive) return;
+    await Voice.say('qdp_end');
+    if (!this.alive) return;
+    await this.wait(2500);
+    steps.remove();
     if (!this.alive) return;
     this.goTo('map');
   }
@@ -548,5 +620,12 @@ export class PetraScene extends BaseScene {
       this.tweens.add({ targets: b, scaleY: b.scaleY * 0.6, duration: 180 + Math.random() * 60, yoyo: true, repeat: -1 });
       this.tweens.add({ targets: b, x: v.x - 120 + dx, y: b.y - 60, duration: 7500, ease: 'Linear', onComplete: () => b.destroy() });
     }
+  }
+}
+
+/** Petra's quiet deed: the same Siq before sunrise (MISSIONS_V2.md section 6). */
+export class PetraDawnScene extends PetraScene {
+  constructor() {
+    super('petra-dawn');
   }
 }

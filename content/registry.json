@@ -8,6 +8,10 @@
     "child_paraphrase_tts": "أخبرنا نبيّنا محمد صلى الله عليه وسلم عن رجل وجد غصن شوك في الطريق فأبعده، فشكر الله له وغفر له.",
     "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم حكالنا عن رجل لقى غصن شوك بالطريق فشاله، فشكر الله له وغفر له.",
     "fictional_adaptation": "A boy clears rocks and branches in the Siq for a man with a cart. Invented.",
+    "used_in": [
+      "P1"
+    ],
+    "kind": "direct",
     "approval_status": "pending"
   },
   {
@@ -19,6 +23,14 @@
     "child_paraphrase_tts": "أخبرنا نبيّنا محمد صلى الله عليه وسلم عن رجل رأى كلباً عطشان جداً، فسقاه ماءً، فغفر الله له.",
     "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم حكالنا عن رجل شاف كلب عطشان كثير، فسقاه ميّ، فغفر الله له.",
     "fictional_adaptation": "A boy draws water with a rope and bucket for a stray dog. Invented.",
+    "used_in": [
+      "U1",
+      "Q1"
+    ],
+    "kind": {
+      "U1": "direct",
+      "Q1": "application"
+    },
     "approval_status": "pending"
   },
   {
@@ -30,6 +42,10 @@
     "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن الصدق يهدي إلى البرّ، وأن البرّ يهدي إلى الجنة.",
     "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنّه الصدق بيوصّل للخير، والخير بيوصّل للجنة.",
     "fictional_adaptation": "A boy breaks a jar and tells his mother. Invented.",
+    "used_in": [
+      "A1"
+    ],
+    "kind": "direct",
     "approval_status": "pending"
   },
   {
@@ -41,6 +57,10 @@
     "child_paraphrase_tts": "أخبرنا نبيّنا محمد صلى الله عليه وسلم أن من الذين يُظلّهم الله في ظلّه يوم القيامة رجلاً تصدّق بصدقة فأخفاها.",
     "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم حكالنا إنّه من الناس اللي الله بيظلّهم بظلّه يوم القيامة واحد تصدّق وخبّى صدقته.",
     "fictional_adaptation": "A boy leaves a food basket at a neighbor's door unseen. Invented.",
+    "used_in": [
+      "I1"
+    ],
+    "kind": "direct",
     "approval_status": "pending"
   },
   {
@@ -54,6 +74,270 @@
     "tts": false,
     "note": "Not spoken synthetically. Not paraphrased. Shown only as still text in the night-sky ending.",
     "fictional_adaptation": "The night-sky ending.",
+    "used_in": [
+      "WR"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "bukhari_2427",
+    "reference": "Sahih al-Bukhari 2427",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 2427 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن من وجد شيئاً ضائعاً يعرف وعاءه ورباطه، ويسأل عن صاحبه، فإذا جاء صاحبه أعطاه إياه.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه اللي بيلاقي إشي ضايع بيعرف وعاه ورباطه، وبيسأل عن صاحبه، ولمّا ييجي صاحبه بيعطيه إياه.",
+    "fictional_adaptation": "A boy finds a lost pouch at the Treasury in Petra, looks at its tie-string and patch without opening it, and returns it with the site guard to the traveler who lost it. Invented.",
+    "used_in": [
+      "P2"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "bukhari_2989",
+    "reference": "Sahih al-Bukhari 2989",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 2989 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": null,
+    "child_paraphrase_script": null,
+    "note": "One hadith, four parts. Each mission uses only its own part, so the closing line says only what that part says.",
+    "parts": {
+      "mount": {
+        "used_in": [
+          "P3"
+        ],
+        "kind": "direct",
+        "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن من يساعد رجلاً فيرفع له متاعه على دابّته، فذلك صدقة.",
+        "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه اللي بيساعد زلمة وبيرفعله غراضه على دابّته، هاي صدقة."
+      },
+      "justice": {
+        "used_in": [
+          "U3"
+        ],
+        "kind": "direct",
+        "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن العدل بين اثنين صدقة.",
+        "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه العدل بين اثنين صدقة."
+      },
+      "good_word": {
+        "used_in": [
+          "I3"
+        ],
+        "kind": "application",
+        "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن الكلمة الطيبة صدقة.",
+        "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه الكلمة الطيبة صدقة."
+      },
+      "harm": {
+        "used_in": [
+          "J1"
+        ],
+        "kind": "direct",
+        "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن إبعاد الأذى عن الطريق صدقة.",
+        "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه إبعاد الأذى عن الطريق صدقة."
+      }
+    },
+    "fictional_adaptation": "P3: a boy helps an old man load his donkey cart at the Royal Tombs in Petra. U3, I3, J1: see MISSIONS_V2.md section 5. Invented.",
+    "used_in": [
+      "P3",
+      "U3",
+      "I3",
+      "J1"
+    ],
+    "kind": {
+      "P3": "direct",
+      "U3": "direct",
+      "I3": "application",
+      "J1": "direct"
+    },
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "muslim_1553a",
+    "reference": "Sahih Muslim 1553a",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih Muslim 1553a from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أخبرنا نبيّنا محمد صلى الله عليه وسلم أن المسلم إذا زرع شجرة فأكل منها إنسان أو طير أو حيوان، كان ذلك له صدقة.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم حكالنا إنه المسلم إذا زرع شجرة وأكل منها إنسان أو طير أو حيوان، بتصيرله صدقة.",
+    "fictional_adaptation": "U2: a boy plants olive saplings at Umm Qais. Invented.",
+    "used_in": [
+      "U2"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "bukhari_6114",
+    "reference": "Sahih al-Bukhari 6114",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 6114 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن القويّ ليس من يغلب الناس، بل القويّ من يملك نفسه عند الغضب.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه القوي مش اللي بيغلب الناس، القوي اللي بيملك حاله وقت الغضب.",
+    "fictional_adaptation": "A2: a boy calms his anger when his sister knocks over his tower. Invented.",
+    "used_in": [
+      "A2"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_17_23",
+    "reference": "Quran, Al-Isra 17:23",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Quran, Al-Isra 17:23 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أمرنا الله أن نُحسن إلى الوالدين.",
+    "child_paraphrase_script": "الله أمرنا نحسن للوالدين.",
+    "note": "Only this short paraphrase is used in the mission. The ayah text itself appears only in the Wadi Rum ending.",
+    "fictional_adaptation": "A3: a boy carries his mother's light shopping bags up the stairs. Invented.",
+    "used_in": [
+      "A3"
+    ],
+    "kind": "application",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_4_58",
+    "reference": "Quran, An-Nisa 4:58",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Quran, An-Nisa 4:58 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أمرنا الله أن نردّ الأمانات إلى أصحابها.",
+    "child_paraphrase_script": "الله أمرنا نرجّع الأمانات لأصحابها.",
+    "note": "Only this short paraphrase is used in the mission.",
+    "fictional_adaptation": "I2: a boy returns extra change to the baker. Invented.",
+    "used_in": [
+      "I2"
+    ],
+    "kind": "application",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "muslim_2699a",
+    "reference": "Sahih Muslim 2699a",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih Muslim 2699a from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن الله في عون العبد ما دام العبد في عون أخيه.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه الله بيعين العبد طول ما العبد بيعين أخوه.",
+    "fictional_adaptation": "J2: a boy stays with a lost girl and fetches the guide. Invented.",
+    "used_in": [
+      "J2"
+    ],
+    "kind": "application",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "bukhari_12",
+    "reference": "Sahih al-Bukhari 12",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 12 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "سُئل نبيّنا محمد صلى الله عليه وسلم: أيّ الإسلام خير؟ فقال: أن تُطعم الطعام، وتسلّم على من عرفت ومن لم تعرف.",
+    "child_paraphrase_script": "انسأل نبيّنا محمد صلى الله عليه وسلم: شو أحسن إشي بالإسلام؟ قال: إنك تطعم الأكل، وتسلّم على اللي بتعرفه واللي ما بتعرفه.",
+    "fictional_adaptation": "J3: a boy shares half his sandwich with a classmate. Invented.",
+    "used_in": [
+      "J3"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_7_31",
+    "reference": "Quran, Al-A'raf 7:31",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Quran, Al-A'raf 7:31 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "علّمنا الله أن نأكل ونشرب دون إسراف.",
+    "child_paraphrase_script": "الله علّمنا ناكل ونشرب بدون إسراف.",
+    "note": "Only this short paraphrase is used in the mission.",
+    "fictional_adaptation": "D1: a boy turns off dripping taps. Invented.",
+    "used_in": [
+      "D1"
+    ],
+    "kind": "application",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_14_7",
+    "reference": "Quran, Ibrahim 14:7",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Quran, Ibrahim 14:7 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "علّمنا الله أن نشكره على نعمه.",
+    "child_paraphrase_script": "الله علّمنا نشكره على نعمه.",
+    "note": "The paraphrase speaks only of thanking. It leaves out the promise of increase on purpose, so a child does not hear gratitude as a way to get more things. The owner may change this at review.",
+    "fictional_adaptation": "D2: a boy names his blessings with his father. Invented.",
+    "used_in": [
+      "D2"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "tirmidhi_1920",
+    "reference": "Jami' at-Tirmidhi 1920 (graded hasan)",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Jami' at-Tirmidhi 1920 (graded hasan) from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن نرحم الصغير ونعرف قدر الكبير.",
+    "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا نرحم الصغير ونعرف قدر الكبير.",
+    "fictional_adaptation": "D3: a boy walks with his grandfather. Invented.",
+    "used_in": [
+      "D3"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_55_9",
+    "reference": "Quran, Ar-Rahman 55:9",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Quran, Ar-Rahman 55:9 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أمرنا الله أن نزن بالعدل ولا ننقص الميزان.",
+    "child_paraphrase_script": "الله أمرنا نوزن بالعدل وما ننقّص الميزان.",
+    "note": "Only this short paraphrase is used in the mission.",
+    "fictional_adaptation": "Q2: a boy helps a fisherman weigh honestly. Invented.",
+    "used_in": [
+      "Q2"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_17_34",
+    "reference": "Quran, Al-Isra 17:34",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Quran, Al-Isra 17:34 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "أمرنا الله أن نوفي بالعهد.",
+    "child_paraphrase_script": "الله أمرنا نوفي بالعهد.",
+    "note": "Only this short paraphrase is used in the mission.",
+    "fictional_adaptation": "Q3: a boy keeps his promise to build a sandcastle. Invented.",
+    "used_in": [
+      "Q3"
+    ],
+    "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "quran_2_215",
+    "reference": "Quran, Al-Baqarah 2:215",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "TODO owner: paste the exact Arabic text and translation of Quran, Al-Baqarah 2:215 from the collection. Do not fill from memory.",
+    "child_paraphrase_tts": "يا حبيبي، انظر ما أجمل ما خلق الله. اليوم ساعدنا ناساً وحيوانات في اللعبة، وغداً إن شاء الله نستطيع أن نفعل الخير في حياتنا. لا يلزم أن يرانا أحد أو يشكرنا، فالله يعلم الخير الذي نفعله.",
+    "child_paraphrase_script": "يا حبيبي، شوف قديش خلق الله جميل. اليوم ساعدنا ناس وحيوانات باللعبة، وبكرا إن شاء الله بنقدر نعمل خير بحياتنا. مش لازم حدا يشوفنا أو يشكرنا، الله بعرف الخير اللي بنعمله.",
+    "note": "This is the closing line of section 7, which rests on this ayah. It is spoken in the father's voice or the phone's voice; the ayah itself is never spoken synthetically.",
+    "fictional_adaptation": "The father's closing line in the Wadi Rum night ending, before the ayah. The script is copied exactly from MISSIONS_V2.md section 7. The ayah text itself is not spoken.",
+    "used_in": [
+      "WR"
+    ],
+    "kind": "direct",
     "approval_status": "pending"
   }
 ]

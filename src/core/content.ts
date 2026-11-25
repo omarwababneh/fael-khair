@@ -1,12 +1,16 @@
 import linesJson from '../../content/lines.json';
 import registryJson from '../../content/registry.json';
 
-interface RawLine { tts?: string; script?: string; registry?: string; speak?: boolean }
-interface RegistryEntry {
-  source_id: string;
+interface RawLine { tts?: string; script?: string; registry?: string; part?: string; speak?: boolean }
+interface Paraphrase {
   child_paraphrase_tts: string | null;
   child_paraphrase_script: string | null;
+}
+interface RegistryEntry extends Paraphrase {
+  source_id: string;
   tts?: boolean;
+  /** One source used by several missions keeps one paraphrase per part (bukhari_2989). */
+  parts?: Record<string, Paraphrase>;
   approval_status: string;
 }
 
@@ -30,11 +34,13 @@ export function getLine(id: string): Line {
     // Religious lines come only from the registry.
     const e = registry.find((r) => r.source_id === raw.registry);
     if (!e) throw new Error(`Registry entry missing: ${raw.registry}`);
+    const p: Paraphrase | undefined = raw.part ? e.parts?.[raw.part] : e;
+    if (!p) throw new Error(`Registry part missing: ${raw.registry} ${raw.part}`);
     return {
       id,
-      tts: e.child_paraphrase_tts ?? '',
-      script: e.child_paraphrase_script ?? e.child_paraphrase_tts ?? '',
-      speakable: e.tts !== false && !!e.child_paraphrase_tts,
+      tts: p.child_paraphrase_tts ?? '',
+      script: p.child_paraphrase_script ?? p.child_paraphrase_tts ?? '',
+      speakable: e.tts !== false && !!p.child_paraphrase_tts,
     };
   }
   return { id, tts: raw.tts ?? '', script: raw.script ?? raw.tts ?? '', speakable: raw.speak !== false };

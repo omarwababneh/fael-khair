@@ -19,7 +19,7 @@ export async function loadIndex(): Promise<void> {
 export const hasAudio = (kind: keyof AssetIndex['audio'], name: string): boolean =>
   assetIndex.audio[kind].includes(name);
 
-/** Required art used by Milestone 1 scenes, with placeholder proportions (w, h). */
+/** Required art used by the built scenes, with placeholder proportions (w, h). */
 export const ART: Record<string, [number, number]> = {
   bg_map: [1170, 1755],
   bg_petra_siq: [1170, 1755],
@@ -31,6 +31,25 @@ export const ART: Record<string, [number, number]> = {
   boy_worried: [400, 768],
   boy_happy: [400, 768],
   elder_cart: [768, 520],
+  // Petra, version 2 (P2, P3, the dawn quiet deed)
+  bg_petra_tombs: [1170, 1755],
+  boy_offer: [360, 768],
+  boy_kneel: [686, 768],
+  guard_stand: [352, 768],
+  traveler_worried: [400, 768],
+  traveler_happy: [376, 768],
+  traveler_b: [421, 768],
+  girl_happy: [590, 768],
+  elder_stand: [430, 768],
+  donkey_stand: [643, 768],
+  donkey_tired: [768, 622],
+  cart_empty: [768, 371],
+  pouch_red: [655, 768],
+  pouch_blue: [668, 768],
+  pouch_red_moon: [682, 768],
+  pouch_red_bluestring: [659, 768],
+  sack_small: [680, 768],
+  sack_big: [768, 734],
   rock_a: [400, 300],
   rock_b: [420, 320],
   rock_c: [440, 340],

@@ -12,12 +12,15 @@ import { BaseScene } from '../BaseScene';
 // the boy_pull art; the handle he drags is a glow ring (interface chrome).
 // Positions are in the 390 x 844 design frame; tune them once the art arrives.
 
-const WELL = { x: 262, mouth: 470, bottomY: 560, topY: 402 };
+// Measured on the delivered bg_ummqais_well (design frame): the well's crossbar is
+// centred at x = 250, y = 385; its mouth's back rim is at y = 470; the trough's
+// basin is at the far left, its water line about (62, 521).
+const WELL = { x: 250, mouth: 470, bottomY: 560, topY: 426 };
 const HANDLE = { x: 318, top: 566, bottom: 676 };
 const BOY = { x: 340, y: 690, h: 150 };
-const TROUGH = { x: 92, y: 596, w: 140 };
-const DOG = { x: 205, y: 652, h: 104 };
-const POUR_SPOT = { x: TROUGH.x + 34, y: TROUGH.y - 92 };
+const TROUGH = { x: 62, y: 521, w: 96 };
+const DOG = { x: 196, y: 632, h: 100 };
+const POUR_SPOT = { x: TROUGH.x + 40, y: TROUGH.y - 60 };
 
 // One full pull is about four steady strokes. Pulling too fast sloshes water out.
 const RISE_PER_POINT = 1 / 440;
@@ -393,7 +396,9 @@ export class UmmQaisScene extends BaseScene {
     await this.wait(600);
     if (!this.alive) return;
     // The dog goes to the trough and drinks.
-    this.tweens.add({ targets: this.dog, x: TROUGH.x + 70, y: TROUGH.y + 46, duration: 1200, ease: 'Sine.easeInOut' });
+    // It walks back to the trough's right end (smaller: it is farther away) and
+    // drinks with its nose in the water, in the gap between the trough and the well.
+    this.tweens.add({ targets: this.dog, x: TROUGH.x + 76, y: TROUGH.y + 24, scale: 0.75, duration: 1200, ease: 'Sine.easeInOut' });
     this.tweens.add({ targets: this.dogImg, angle: { from: -2, to: 2 }, duration: 160, yoyo: true, repeat: 6 });
     await this.wait(1300);
     if (!this.alive) return;

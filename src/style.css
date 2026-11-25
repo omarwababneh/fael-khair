@@ -280,6 +280,12 @@ button {
   background: var(--sand);
 }
 .fk-speed[aria-pressed='true'] { background: var(--olive); color: var(--cream); }
+.fk-group { display: flex; flex-direction: column; gap: 6px; font-size: 22px; }
+.fk-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.fk-row[hidden] { display: none; }
+.fk-credit { font-size: 11px; line-height: 1.35; opacity: 0.75; direction: ltr; text-align: left; }
+.fk-secret-intro { font-size: 15px !important; opacity: 0.8; margin-bottom: 0 !important; }
+.fk-secret { font-weight: 700; }
 .fk-voice-status { font-size: 16px; line-height: 1.4; direction: rtl; }
 .fk-parent-card { max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 32px); }
 .fk-parent-scroll {
