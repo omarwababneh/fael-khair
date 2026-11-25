@@ -35,12 +35,13 @@ export const CHARACTERS = [
   'donkey_tired', 'girl_happy',
   // MISSIONS_V2, wave 2
   'boy_water', 'boy_angry', 'boy_breathe', 'boy_carry_bags', 'boy_kick',
-  'boy_wave', 'grandpa_sit', 'birds_eating', 'friend_a', 'friend_b',
-  'sister_play', 'sister_sorry', 'sister_happy', 'mama_bags', 'cat_sleeping',
-  'baker_busy', 'baker_smile', 'newboy_alone', 'newboy_happy',
+  'boy_wave', 'birds_eating', 'friend_a', 'friend_b', 'sister_play',
+  'sister_sorry', 'sister_happy', 'mama_bags', 'cat_sleeping', 'baker_busy',
+  'baker_smile', 'newboy_alone', 'newboy_happy', 'stranger_rest',
   // MISSIONS_V2, wave 3
-  'boy_sit_front', 'girl_crying', 'mother_search', 'visitor_a', 'visitor_b',
-  'classmate_hungry', 'classmate_happy', 'baba_sit', 'grandpa_baba_walk',
+  'boy_sit_front', 'grandpa_sit', 'girl_crying', 'mother_search',
+  'visitor_a', 'visitor_b', 'classmate_hungry', 'classmate_happy',
+  'baba_sit', 'grandpa_baba_walk', 'mother_hug', 'guard_sweep',
   // MISSIONS_V2, wave 4
   'turtle_tangled', 'turtle_free', 'ranger_stand', 'ranger_kneel',
   'fisherman_stand', 'customer_basket', 'sister_bucket_wait',
@@ -54,20 +55,20 @@ export const OBJECTS = [
   'food_tomatoes', 'food_apples',
   // MISSIONS_V2, wave 1
   'pouch_red', 'pouch_blue', 'pouch_red_moon', 'sack_small', 'sack_big',
-  'cart_empty',
+  'pouch_red_bluestring', 'cart_empty',
   // MISSIONS_V2, wave 2
   'sapling_small', 'soil_mound', 'watering_can', 'olives_pile',
   'basket_olives', 'olive_young', 'olive_young_wilt', 'olive_tree_fruit',
   'scale_base', 'scale_beam', 'scale_pan', 'block', 'bag_light', 'bag_heavy',
-  'blanket_messy', 'blanket_folded', 'coin', 'bread_bag',
+  'blanket_messy', 'blanket_folded', 'coin', 'bread_bag', 'plant_dry',
+  'plant_fresh',
   // MISSIONS_V2, wave 3
   'litter_bottle', 'litter_paper', 'litter_peel', 'glass_broken', 'bin',
   'sandwich_whole', 'sandwich_half', 'cup_empty', 'cup_full', 'water_bottle',
-  'tap_body', 'tap_handle', 'pipe_leak', 'plant_dry', 'plant_fresh', 'bench',
-  'bag_small',
+  'tap_body', 'tap_handle', 'pipe_leak', 'bench', 'bag_small',
   // MISSIONS_V2, wave 4
-  'plastic_bag', 'fish_big', 'fish_small', 'weight_iron', 'sand_bucket',
-  'sand_tower', 'shell',
+  'plastic_bag', 'litter_sack', 'fish_big', 'fish_small', 'weight_iron',
+  'sand_bucket', 'sand_tower', 'shell',
 ];
 
 export const ICON = 'icon_app';

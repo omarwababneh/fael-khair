@@ -36,10 +36,10 @@ Never trade test 2 or 3 for test 1.
 - Language of love, hope and gratitude toward Allah. Never "Allah is angry with you", never shame.
 
 ### Ethical design
-- Forbidden: coins as rewards (a coin as a story object, like the change in I2, is fine), points, stars, levels-as-rank, inventories, unlockable rewards, loot boxes, random prizes, streaks, daily login pressure, countdown timers, leaderboards, social features, notifications, ads, purchases, analytics, tracking, any network request after the app is installed.
+- Forbidden: coins, points, stars, levels-as-rank, inventories, unlockable rewards, loot boxes, random prizes, streaks, daily login pressure, countdown timers, leaderboards, social features, notifications, ads, purchases, analytics, tracking, any network request after the app is installed.
 - No fail screens, no "wrong" buzzer, no lives. A slip is followed by a gentle retry.
 - Consequences of a good act land on other characters and on the world, never on the player's status. Example: the dog drinks; the road is clear.
-- The secret good deed and every quiet deed get no acknowledgment of any kind (sections 4.2 I1 and 4.3).
+- The secret good deed gets no acknowledgment of any kind (section 4D).
 - Never punish him for stopping or for missing a day. Nothing is lost by closing the app.
 - Never teach an action that is dangerous to copy. He never climbs into the well.
 
@@ -56,7 +56,7 @@ Every rule above still holds. `MISSIONS_V2.md` section 4 adds rules that apply t
 
 1. **Start screen.** The app title "فاعل خير" over the map art, and one large button "يَلّا" (Let's go). The first tap unlocks audio (required on iOS).
 
-From the map on, a day works as follows (copied from `MISSIONS_V2.md` section 3; section numbers inside refer to that file, where the quiet deed is section 6, here 4.3):
+From the map on, a day works as follows (copied word for word from `MISSIONS_V2.md` section 3; its storage rule is now in section 2). Section numbers inside the list refer to `MISSIONS_V2.md`.
 
 1. **Map.** All seven places are open from the first second. No locks, no "coming soon", no marks showing what was played.
 2. **One mission per place per day.** When he taps a place, it plays that place's next mission in its rotation (mission 1, then 2, then 3, then 1 again). A place he has played today becomes scenery with a voice for the rest of the day, the way Jerash behaves now: it bounces and says its name.
@@ -67,7 +67,7 @@ From the map on, a day works as follows (copied from `MISSIONS_V2.md` section 3;
 7. **Rotation moves by play, not by the calendar.** A place's rotation advances only when its mission is finished. Missing a day changes nothing.
 8. **Small variation on replay.** Each mission has two or three light variations chosen at random: where objects lie, how many there are, which side a character stands on. The story and the value never change.
 
-**Storage.** The game may now store, on the device only, one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. (Section 2, Privacy.)
+**Storage.** The game may now store, on the device only, one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. Update the privacy rule in `GAME_SPEC.md` section 2 to say exactly this.
 
 A full day should take 8 to 10 minutes. Each mission lasts 60 to 120 seconds.
 
@@ -112,7 +112,7 @@ Shared rules: every mission opens with one father voice line that sets the situa
 ### 4.2 The four built missions
 They stay as they are and become the first mission of their place, with the safeguards `MISSIONS_V2.md` adds.
 
-#### P1. Petra: clearing the road
+#### P1. Petra: clearing the road (formerly 4A)
 
 - **Value:** removing harm from people's path. **Source:** `bukhari_2472`.
 - **Place:** the Siq, the narrow rose-red canyon that leads into Petra. Portrait suits it: tall walls, a sandy path running up the screen.
@@ -125,7 +125,7 @@ They stay as they are and become the first mission of their place, with the safe
 - **Ending line:** the father's hadith line.
 - **Added (MISSIONS_V2):** Safeguard to add: the obstacles are loose stones and fallen branches only. He never moves, climbs or touches the ancient carved rock. Add one father line saying we look after the old place.
 
-#### U1. Umm Qais: the thirsty dog
+#### U1. Umm Qais: the thirsty dog (formerly 4B)
 
 - **Value:** mercy to animals. **Source:** `bukhari_2363`.
 - **Place:** the old hilltop village of Umm Qais: black basalt columns, a stone well, a wide view over the valley and the lake far below.
@@ -139,7 +139,7 @@ They stay as they are and become the first mission of their place, with the safe
 - **Ending line:** the father's hadith line.
 - **Added (MISSIONS_V2):** Safeguard to add: he pours the water into the trough and steps back. He does not pet or approach the dog. The well stays covered by its frame, as now.
 
-#### A1. Amman: the broken jar
+#### A1. Amman: the broken jar (formerly 4C)
 
 - **Value:** truthfulness, then repair without shame. **Source:** `muslim_2607c`.
 - **Place:** the family home in Amman. An arched window looks over the city's hills of pale stone houses, with the Citadel columns on the skyline.
@@ -151,7 +151,7 @@ They stay as they are and become the first mission of their place, with the safe
 - **Ending line:** the father's hadith line.
 - **Added (MISSIONS_V2):** Safeguards to add: he does not touch the shards with his hands. He tells Mama, and she handles the sharp pieces while he sweeps with the long broom. Check that no line suggests the accident itself was a wrong.
 
-#### I1. Irbid: the secret helper
+#### I1. Irbid: the secret helper (formerly 4D)
 
 - **Value:** sincerity, doing good without being seen. **Source:** `bukhari_660`.
 - **Place:** a street in old Irbid at dusk: dark basalt and pale limestone houses, an arched green door, an old olive tree.
@@ -161,13 +161,12 @@ They stay as they are and become the first mission of their place, with the safe
   2. **Sneak to the door.** Hold a finger on the screen to tiptoe; lift it to freeze. Freeze when the curtain moves or a passerby turns his head. If he is noticed, the passerby simply smiles and walks on, the boy ducks back behind the tree, and he tries again.
   3. **Deliver.** Set the basket down, tap the door three times to knock, then swipe toward the olive tree to hide.
 - **Consequence:** the neighbor opens the door, looks left and right, finds the basket, smiles and takes it inside. She never learns who left it.
-- **Hard rule:** no thanks to the boy, no sparkle around him, no cheer, no special sound, no badge, nothing unlocked. The only reward is watching her smile from behind the tree. The return to the map looks exactly like the return from any other adventure.
+- **Hard rule:** no thanks to the boy, no sparkle around him, no cheer, no special sound, no badge, nothing unlocked. The only reward is watching her smile from behind the tree. The return to the map looks exactly like the return from any other mission.
 - **Ending line:** the father's line that nobody knew, but Allah knows; then the hadith line.
 - **Added (MISSIONS_V2):** No change to the scene. The sentence about good and bad secrets goes in the parents' corner, not in the scene.
-- **Open question for the owner:** I1 is Irbid's quiet deed, and quiet deeds end with "no hadith line, no closing praise" (section 4.3), but I1 as built ends with `ir_secret` and the hadith line `ir_hadith`. Until the owner decides, I1 stays as built.
 
 ### 4.3 The quiet deed (fourth mission of every day)
-Copied from `MISSIONS_V2.md` section 6 (section numbers inside refer to that file).
+Copied word for word from `MISSIONS_V2.md` section 6. Section numbers inside it refer to `MISSIONS_V2.md`.
 
 The governing idea of this game is that he does good when there is no screen, no reward and nobody watching. So every day ends its missions with a good deed that nobody sees.
 
@@ -190,15 +189,15 @@ One quiet deed per place. Keep them short (about 60 seconds) and reuse art.
 
 Because I1 is Irbid's quiet deed, Irbid's rotation for the first three slots is I2, I3 only. Every other place rotates through its three missions.
 
-### 4.4 Wadi Rum: the night sky (ending)
+### 4.4 Wadi Rum: the night sky (ending; formerly 4E)
 - **Value:** reflection on creation (tafakkur) and gratitude. **Source:** `quran_3_190`.
 - **Place:** Wadi Rum at night: red sandstone mountains, a sky full of stars. The boy sits on a rock, seen from behind.
 - **Play:** slow and quiet. He drags a finger across the sky and stars brighten where he touches. Now and then a shooting star crosses. No goal, no count.
 - **Ayah:** still text with its reference "آل عمران ١٩٠". If the file `audio/quran/3_190.m4a` exists, play it; otherwise show the text in silence for 10 seconds. Never use a synthetic voice here. All input and sound effects are stopped while it shows.
 
-Changes from `MISSIONS_V2.md` section 7, copied (section numbers inside refer to that file):
+Changes from `MISSIONS_V2.md` section 7, copied word for word ("section 4E" there is this section, 4.4):
 
-Build it as described above, with these changes:
+Build it as `GAME_SPEC.md` section 4E describes, with these changes:
 
 - **No music at all in Wadi Rum.** Wind and a few crickets only. Remove the generated Wadi Rum melody.
 - After he has brightened the stars for about 30 seconds, or when he stops: input off, sound effects off.
@@ -217,11 +216,11 @@ The game must feel alive. This matters as much as the content.
 
 - **Motion everywhere.** Olive leaves sway, dust motes drift in light, birds cross the sky, water ripples, the boy breathes when idle. Nothing on screen is perfectly still.
 - **Juice on every touch.** Objects squash and stretch when grabbed and dropped. Every action has a sound and a small particle burst (dust, droplets, leaves).
-- **Easy first win.** The first obstacle in every adventure takes one obvious gesture and succeeds within 10 seconds.
-- **Rising challenge.** Each adventure gets slightly harder as it goes: heavier rocks, the careful grip on the thorn branch, the steady rope rhythm, the timing of the sneak.
+- **Easy first win.** The first obstacle in every mission takes one obvious gesture and succeeds within 10 seconds.
+- **Rising challenge.** Each mission gets slightly harder as it goes: heavier rocks, the careful grip on the thorn branch, the steady rope rhythm, the timing of the sneak.
 - **Surprise in the story, never in a prize.** The Treasury reveal, the dog's stretch, Mama kneeling, the neighbor's face.
 - **Responsive controls.** Touch response within one frame. Large hit areas (at least 56 points). Forgiving drag targets.
-- **Short.** No adventure runs past two minutes.
+- **Short.** No mission runs past two minutes.
 
 ---
 
@@ -297,7 +296,7 @@ The exact descriptions used for the art (clothes and colors chosen so a six-year
 ### 6.5 Asset manifest
 Backgrounds are portrait, at least 1024 x 1536 pixels, with the important content in the middle 70 percent and calm space at the top and bottom for interface. Sprites are at least 1024 pixels on the long side (384 for an object on a sheet), full figure, no cast shadow, on a transparent or plain pure-white background. Art arrives in `art/incoming/` under these names (`.png`, `.jpg` or `.webp`).
 
-**The full reference is `art/Fael_Khair_Art_Checklist.xlsx`:** one row per image with its wave, the missions it is used in, a ready-to-paste prompt, the references to attach, and in its notes which way it faces, where the boy holds it, its height on screen compared with the boy standing (boy = 1.0), and which objects may share a sheet. `scripts/art-lib.mjs` holds the same names. The list below is generated from the same data (156 images: 52 from the first version, 104 added by `MISSIONS_V2.md`). "Wave" is the build wave an image is first needed in; "existing" means it was in the first version.
+**The full reference is `art/Fael_Khair_Art_Checklist.xlsx`:** one row per image with its wave, the missions it is used in, a ready-to-paste prompt, the references to attach, and in its notes which way it faces, where the boy holds it, its height on screen compared with the boy standing (boy = 1.0), and which objects may share a sheet. `scripts/art-lib.mjs` holds the same names. The list below is generated from the same data (161 images: 52 from the first version, 109 added by `MISSIONS_V2.md`). "Wave" is the build wave an image is first needed in; "existing" means it was in the first version.
 
 **Backgrounds**
 
@@ -360,7 +359,7 @@ Backgrounds are portrait, at least 1024 x 1536 pixels, with the important conten
 | `boy_water` | The boy. Standing, tilting a small green watering can forward with both hands (no water drawn). | 2 |
 | `friend_a` | A boy about 7 years old, curly black hair, an orange t-shirt, blue shorts, white sneakers. Standing, ready to play, smiling. | 2 |
 | `friend_b` | A boy about 7 years old, short light-brown hair, a yellow t-shirt, grey shorts, green sneakers. Standing, ready to play, smiling. | 2 |
-| `grandpa_sit` | Grandfather: white hair and beard, white thobe, a walking stick, full friendly face. Sitting on a bench facing the viewer, his stick leaning beside him, one hand held out to his side at child-head height (as if resting on a child's head), gentle smile. | 2 |
+| `stranger_rest` | An old man, a stranger passing by (not Grandfather): grey hair, a brown jacket, a grey cap, sitting on a low basalt stone in the shade, resting peacefully, eyes half closed. | 2 |
 | `boy_angry` | The boy. Standing, fists clenched, cheeks red, frowning, upset but not frightening. | 2 |
 | `boy_breathe` | The boy. Standing calmly, eyes closed, one hand on his chest, breathing in. | 2 |
 | `boy_carry_bags` | The boy. Climbing a step, one small light shopping bag in each hand. | 2 |
@@ -379,11 +378,14 @@ Backgrounds are portrait, at least 1024 x 1536 pixels, with the important conten
 | `classmate_happy` | A boy about 7 years old, short curly brown hair, a red t-shirt, dark shorts. Sitting on a stone step, eating half a sandwich, happy, legs swinging. | 3 |
 | `classmate_hungry` | A boy about 7 years old, short curly brown hair, a red t-shirt, dark shorts. Sitting on a stone step facing the viewer, empty hands in his lap, a little sad. | 3 |
 | `girl_crying` | A little girl about 4 years old, short dark hair with a red hair clip, a pink dress. Standing alone, crying, hands at her eyes. | 3 |
+| `guard_sweep` | A friendly site guard: a man in a khaki shirt and trousers, a cap, and a lanyard with a plain card (no writing on it). Sweeping with a long broom into a dustpan, careful. | 3 |
+| `mother_hug` | The same mother (green headscarf, long blue dress, yellow handbag), kneeling and hugging her little daughter (the girl in the pink dress with the red hair clip), both relieved and happy. Both in one picture. | 3 |
 | `mother_search` | A mother in modest everyday clothes: a green headscarf, a long blue dress and a yellow handbag. Looking around, worried, searching. | 3 |
 | `visitor_a` | A woman visitor in modest everyday clothes: a red headscarf, a long brown dress, no bag. Walking. | 3 |
 | `visitor_b` | A man visitor in modest everyday clothes: a white shirt, grey trousers, a black backpack. Walking. | 3 |
 | `baba_sit` | Baba: a man in his thirties, short dark hair, short trimmed beard, plain shirt and trousers, full friendly face. Sitting on a bench, turned slightly to his right as if talking with his son beside him, one hand open. | 3 |
 | `grandpa_baba_walk` | Baba: a man in his thirties, short dark hair, short trimmed beard, plain shirt and trousers, full friendly face. Grandfather: white hair and beard, white thobe, a walking stick, full friendly face. Baba walks beside Grandfather and supports his arm; Grandfather walks slowly with his stick. Both in one picture. | 3 |
+| `grandpa_sit` | Grandfather: white hair and beard, white thobe, a walking stick, full friendly face. Sitting on a bench facing the viewer, his stick leaning beside him, one hand held out to his side at child-head height (as if resting on a child's head), gentle smile. | 3 |
 | `customer_basket` | A woman customer in modest everyday clothes, a purple headscarf, holding an empty basket, smiling. | 4 |
 | `fisherman_stand` | A fisherman: sun-browned, sleeves rolled up, a straw hat. Standing, friendly, pointing to one side. | 4 |
 | `ranger_kneel` | A marine ranger: a man in a light blue shirt, shorts and a cap. Kneeling, gently freeing something on the ground with both hands. | 4 |
@@ -423,6 +425,7 @@ Backgrounds are portrait, at least 1024 x 1536 pixels, with the important conten
 | `cart_empty` | the same small wooden two-wheeled cart as in elder_cart, empty, without the donkey. Side view. | 1 |
 | `pouch_blue` | the same small cloth pouch in blue, with a blue tie-string and a yellow star patch. | 1 |
 | `pouch_red` | a small cloth pouch, red, tied at the top with a red tie-string, a small yellow star patch sewn on the front. | 1 |
+| `pouch_red_bluestring` | the same red cloth pouch with the yellow star patch, but tied with a blue tie-string instead of a red one. | 1 |
 | `pouch_red_moon` | the same red cloth pouch with a red tie-string, but a small white moon patch instead of the star. | 1 |
 | `sack_big` | a big, heavy, bulging burlap sack tied at the top. | 1 |
 | `sack_small` | a small, light burlap sack tied at the top. | 1 |
@@ -442,6 +445,8 @@ Backgrounds are portrait, at least 1024 x 1536 pixels, with the important conten
 | `blanket_folded` | the same striped wool blanket, neatly folded. | 2 |
 | `blanket_messy` | a crumpled striped wool blanket lying on a sofa cushion. | 2 |
 | `block` | a plain wooden toy building block (a cube), no letters, no numbers. | 2 |
+| `plant_dry` | a clay pot with a mint plant, wilted and dry. | 2 |
+| `plant_fresh` | the same clay pot with the mint plant fresh and green. | 2 |
 | `bread_bag` | a paper bag with round flatbread showing at the top, no writing. | 2 |
 | `coin` | a plain round gold-coloured coin with a simple rim, no face, no writing, no numbers. | 2 |
 | `bin` | a plain grey recycling bin with an open top and a blank round label area on the front (left empty). | 3 |
@@ -457,12 +462,11 @@ Backgrounds are portrait, at least 1024 x 1536 pixels, with the important conten
 | `bag_small` | Grandfather's small cloth shoulder bag. | 3 |
 | `bench` | a simple wooden bench, three-quarter view. | 3 |
 | `pipe_leak` | a short metal pipe with a joint, leaking a few drops of water. | 3 |
-| `plant_dry` | a clay pot with a mint plant, wilted and dry. | 3 |
-| `plant_fresh` | the same clay pot with the mint plant fresh and green. | 3 |
 | `tap_body` | an old brass water tap without its handle, spout pointing down, side view, on a short pipe stub. | 3 |
 | `tap_handle` | the separate round cross-shaped handle of that brass tap, seen from the front. | 3 |
 | `fish_big` | a large silver fish. | 4 |
 | `fish_small` | a small silver fish. | 4 |
+| `litter_sack` | an open cloth litter sack with its top folded down, empty, standing on the sand. | 4 |
 | `plastic_bag` | a crumpled white plastic bag. | 4 |
 | `sand_bucket` | a small red plastic beach bucket, empty. | 4 |
 | `sand_tower` | a sandcastle tower shaped by a bucket, golden sand. | 4 |
@@ -558,7 +562,7 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `wr_night` | close | تصبح على خير يا حبيبي. | تصبح على خير يا حبيبي. |
 
 ### 7.3 Music
-Copied from `MISSIONS_V2.md` section 9 (section numbers inside refer to that file: section 4 = its added rules, here section 2; section 7 = Wadi Rum, here 4.4):
+Copied word for word from `MISSIONS_V2.md` section 9 (its point 9 is carried out by this section):
 
 The slow plucked melody is retired. Recorded tracks are already in the repository, one per place, at `public/assets/audio/music/<place>.m4a`: `map`, `petra`, `ummqais`, `amman`, `irbid`, `jerash`, `deadsea`, `aqaba`. Credits are in `README.md`.
 
@@ -574,8 +578,7 @@ The slow plucked melody is retired. Recorded tracks are already in the repositor
 6. Music is silent in Wadi Rum and never plays under Quran text or recitation.
 7. No jingle, fanfare or musical sting for a moral choice, a finished good deed or a quiet deed (section 4).
 8. **Credit.** The license requires it. Show this at the bottom of the parents' corner, in small text: "Music: Kevin MacLeod (incompetech.com), licensed under Creative Commons: By Attribution 4.0." with the track titles from `README.md`.
-
-**Status note (25 November 2026):** the eight tracks and their credits are on the branch `music/kids-tracks`, not yet merged into `main`. Merging them (without losing the Milestone 3 code, which that branch predates) is the first step of wave 1.
+9. Rewrite `GAME_SPEC.md` section 7.3 to match.
 
 ### 7.4 Sound effects
 Generate with Web Audio as well: rock thud, dust puff, rope creak, water splash and pour, dog lapping and a soft happy bark, ball bounce, jar breaking, sweeping, footsteps, knock on wood, door creak, birds by day, crickets and soft wind at night, a gentle chime for a finished step. A file at `public/assets/audio/sfx/<name>.m4a` overrides the generated sound.
@@ -605,9 +608,9 @@ Leave `original_arabic` and `translation` empty for the four hadith entries, wit
 Display the ayah in the Amiri typeface, bundled locally.
 
 ### 8.1 Sources added by MISSIONS_V2
-Copied from `MISSIONS_V2.md` section 8 (section numbers inside refer to that file):
+Copied word for word from `MISSIONS_V2.md` section 8. The entries go into `content/registry.json` in wave 1.
 
-`MISSIONS_V2.md` section 8 adds these to `content/registry.json` (done in wave 1). Every entry starts `"approval_status": "pending"`. Leave `original_arabic` and `translation` empty with the same `TODO owner` note; do not fill them from memory. Copy the paraphrases below exactly; write the Jordanian `child_paraphrase_script` in the pattern of the existing entries.
+Add these to `content/registry.json`. Every entry starts `"approval_status": "pending"`. Leave `original_arabic` and `translation` empty with the same `TODO owner` note; do not fill them from memory. Copy the paraphrases below exactly; write the Jordanian `child_paraphrase_script` in the pattern of the existing entries.
 
 Add two fields to every entry, old and new: `used_in` (list of mission ids) and `kind`, which is `direct` when the text teaches this very act, or `application` when the mission applies a broader teaching. One source may be used by several missions. `bukhari_2989` has four parts; store one paraphrase per part.
 
@@ -649,7 +652,7 @@ He is starting to read, so short words help him; long text does not.
 - Buttons and place names: one to three words, large (at least 22 points), with full vowel marks (tashkeel) on place names: البَتْرا، أُمّ قَيْس، عَمّان، إِرْبِد، جَرَش، البَحْر المَيِّت، العَقَبة، وادي رَمّ.
 - The speech bubble shows the current voice line in one or two lines.
 - Everything is right-to-left. Typeface: Baloo Bhaijaan 2, bundled locally (no web font requests).
-- Interface layout on every adventure screen: place name in a rounded pill at top center; round home button at top right; speech bubble with a round "hear it again" speaker button along the bottom.
+- Interface layout on every mission screen: place name in a rounded pill at top center; round home button at top right; speech bubble with a round "hear it again" speaker button along the bottom.
 
 ---
 
@@ -658,7 +661,7 @@ He is starting to read, so short words help him; long text does not.
 Opened by holding the small lock button on the map for 3 seconds (a ring fills while holding). Contents:
 
 - **Sound:** the sound choice and music volume (section 7.3), and the voice speed.
-- **Conversation starters:** after each adventure, three questions for father and son to talk through (text below).
+- **Conversation starters:** after each mission, three questions for father and son to talk through (text below).
 - **An optional invitation:** one small real-life act of kindness. It is never tracked, confirmed, reported or tied to anything in the game.
 - **Recording guide:** the list of `script` lines, with a note that recordings named `<lineId>.m4a` go in the `vo` folder.
 - **Review status:** how many registry entries are still pending.
@@ -674,7 +677,7 @@ Conversation starters:
 
 Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما تحكوا لحدا.
 
-**Added by MISSIONS_V2** (copied from its section 10; section numbers inside refer to that file):
+**Added by MISSIONS_V2** (copied word for word from its section 10; section numbers inside it refer to `MISSIONS_V2.md`):
 
 - The sound choice and the music credit (section 9).
 - Conversation starters for every new mission: three short questions each, in Jordanian Arabic, in the style of the existing ones. One of the three should point to real life ("شو بنقدر نعمل بكرا؟").
@@ -696,9 +699,9 @@ Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما 
   - Disable page zoom, text selection, long-press callouts, pull-to-refresh and rubber-band scrolling.
   - Unlock Web Audio and speech on the first tap.
   - Pause all sound when the app goes to the background.
-- **Storage:** only the music setting, in `localStorage`, wrapped in try/catch.
+- **Storage:** only what section 2 allows (the parents' sound settings and one rotation number per place), in `localStorage`, wrapped in try/catch.
 - **Performance:** steady 60 frames per second on an iPhone from the last five years. Total download under 25 MB.
-- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Remove nothing from production; it is harmless.
+- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. As version 2 adds places and missions, each gets a matching debug name (for example a place name plus its mission number); the pull request of each wave lists them. Remove nothing from production; it is harmless.
 
 ### Repository layout
 
@@ -747,7 +750,7 @@ For each milestone, list in the pull request what was tested and how, and what c
 Milestones 1 to 3 are done.
 
 ### Version 2: missions (MISSIONS_V2)
-Copied from `MISSIONS_V2.md` section 12 (section numbers inside refer to that file):
+Copied word for word from `MISSIONS_V2.md` section 12. Section numbers inside it refer to `MISSIONS_V2.md`.
 
 Work in waves. Each wave is one pull request. At the end of each, list what you tested and how, and what needs checking on the real phone. Then stop and wait.
 
