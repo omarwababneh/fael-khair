@@ -36,7 +36,7 @@ const POUCH_H = 23;
 // Where the tie-string knot and the embroidered flower are on pouch_red (fractions,
 // measured on the 710 x 768 art: knot near x 490, y 235; flower head near x 335, y 440).
 const KNOT = { x: 0.69, y: 0.31 };
-const FLOWER = { x: 0.47, y: 0.6 };
+const FLOWER = { x: 0.47, y: 0.575 };
 
 type State = 'find' | 'look' | 'toGuard' | 'wait' | 'give' | 'end';
 
@@ -270,19 +270,26 @@ export class PouchScene extends BaseScene {
 
   private tapDetail(x: number, y: number): void {
     if (!this.closeUp) return;
-    for (const r of this.closeUp.list) {
-      if (!(r instanceof Phaser.GameObjects.Image) || !r.getData('kind')) continue;
-      const kind = r.getData('kind') as 'knot' | 'flower';
-      if (this.seen[kind] || Phaser.Math.Distance.Between(x, y, r.x, r.y) > 60) continue;
+    // The nearest unseen detail within reach answers (the two are close together).
+    let r: Phaser.GameObjects.Image | null = null;
+    let best = 60;
+    for (const o of this.closeUp.list) {
+      if (!(o instanceof Phaser.GameObjects.Image) || !o.getData('kind')) continue;
+      if (this.seen[o.getData('kind') as 'knot' | 'flower']) continue;
+      const d = Phaser.Math.Distance.Between(x, y, o.x, o.y);
+      if (d <= best) { best = d; r = o; }
+    }
+    if (r) {
+      const ring = r;
+      const kind = ring.getData('kind') as 'knot' | 'flower';
       this.seen[kind] = true;
       sfx('pop');
-      this.tweens.add({ targets: r, scale: r.scale * 1.5, alpha: 0, duration: 500, onComplete: () => r.setVisible(false) });
+      this.tweens.add({ targets: ring, scale: ring.scale * 1.5, alpha: 0, duration: 500, onComplete: () => ring.setVisible(false) });
       // Close the view only after the last detail's line has finished.
       const n = ++this.detailSay;
       void Voice.say(kind === 'knot' ? 'p2_string' : 'p2_patch').then(() => {
         if (this.alive && n === this.detailSay && this.seen.knot && this.seen.flower && this.state === 'look') void this.closeCloseUp();
       });
-      return;
     }
   }
 

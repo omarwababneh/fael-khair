@@ -14,12 +14,12 @@ import { BaseScene } from '../BaseScene';
 // (interface chrome).
 
 // Measured on bg_ummqais_well (world = picture coordinates): the crossbar is
-// centred at x = 250, y = 390; an iron safety grille covers the well, with a
+// centered at x = 250, y = 390; an iron safety grille covers the well, with a
 // small bucket hatch in the middle (x 228 to 272, its opening at y = 500), so
 // the bucket (42 wide) is seen only above the hatch. The trough's basin is at
 // the far left, its water line about (62, 521).
 const WELL = { x: 250, mouth: 500, bottomY: 572, topY: 426 };
-const BOY = { x: 360, y: 694, h: 150 }; // a step back from the well's rim (it ends at x = 335)
+const BOY = { x: 352, y: 694, h: 150 }; // a step back from the well's rim (it ends at x = 335), fully on a 390-wide screen
 const HANDLE = { x: BOY.x - 22, top: 566, bottom: 676 };
 const TROUGH = { x: 62, y: 521, w: 96 };
 const DOG = { x: 196, y: 632, h: 100 };
@@ -397,7 +397,7 @@ export class UmmQaisScene extends BaseScene {
     this.setIdle(null);
     this.handle.setVisible(false);
     // U1 safeguard: he pours and steps back. He does not pet or go near the dog.
-    this.tweens.add({ targets: this.boy, x: BOY.x + 12, duration: 600, ease: 'Sine.easeInOut' });
+    this.tweens.add({ targets: this.boy, x: BOY.x + 8, duration: 600, ease: 'Sine.easeInOut' });
     await Voice.say('uq_stepback');
     if (!this.alive) return;
     // The dog goes to the trough and drinks.

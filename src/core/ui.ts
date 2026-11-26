@@ -2,7 +2,7 @@
 // right-to-left, and inside the iPhone safe area.
 import parentsJson from '../../content/parents.json';
 import linesContent from '../../content/lines.json';
-import { getLine, registry } from './content';
+import { getLine, registry, type Paraphrase } from './content';
 
 const parentsContent = parentsJson as {
   starters: Record<string, string[]>;
@@ -94,10 +94,14 @@ function parentSections(): HTMLElement[] {
     const own = r.kind === 'father_own_words';
     head.textContent = `${own ? 'كلام الأب نفسه، مش نص ديني' : r.reference} · ${r.used_in.join('، ')}`;
     li.append(head);
-    const texts = r.parts ? Object.values(r.parts) : [r];
-    for (const t of texts) {
+    const texts: [string, Paraphrase][] = r.parts ? Object.entries(r.parts) : [['', r]];
+    for (const [part, t] of texts) {
       const txt = el('span', 'fk-review-text');
-      txt.textContent = t.child_paraphrase_script ?? t.child_paraphrase_tts ?? 'النص يُعرض كما هو، بدون صياغة للأطفال.';
+      const words = t.child_paraphrase_script ?? t.child_paraphrase_tts;
+      // An entry with no children's wording (the Wadi Rum ayah) is shown as its
+      // exact text, which the owner pastes into original_arabic.
+      txt.textContent = words ?? 'نص الآية الأصلي يُعرض كما هو؛ أضِفه في original_arabic.';
+      if (part) txt.textContent = `${part}: ${txt.textContent}`;
       li.append(txt);
     }
     reviewList.append(li);

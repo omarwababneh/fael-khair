@@ -2,7 +2,7 @@ import linesJson from '../../content/lines.json';
 import registryJson from '../../content/registry.json';
 
 interface RawLine { tts?: string; script?: string; registry?: string; part?: string; speak?: boolean }
-interface Paraphrase {
+export interface Paraphrase {
   child_paraphrase_tts: string | null;
   child_paraphrase_script: string | null;
 }

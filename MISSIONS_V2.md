@@ -104,7 +104,7 @@ Safeguard to add: the obstacles are loose stones and fallen branches only. He ne
 ### Umm Qais
 
 **U1. The thirsty dog** (built). Value: mercy to animals. Source: `bukhari_2363`.
-Safeguard to add: he pours the water into the trough and steps back. He does not pet or approach the dog. The well stays covered by its frame, as now.
+Safeguard to add: he pours the water into the trough and steps back. He does not pet or approach the dog. The well has an iron safety grille with a small bucket hatch in the middle; the bucket passes only through the hatch, and he pulls the rope standing a step back, never leaning over the well.
 
 **U2. The olive saplings.** Value: planting good that others enjoy later; patience; trust in Allah. Source: `muslim_1553a`.
 - Place: new `bg_ummqais_grove` (a terraced olive grove among black basalt stones, the valley and the distant lake behind).

@@ -47,7 +47,7 @@ class Track {
   private stopped = false;
   private rng: () => number;
 
-  constructor(private ctx: AudioContext, private place: MusicPlace, readonly mode: Exclude<SoundMode, 'off'>) {
+  constructor(private ctx: AudioContext, private place: MusicPlace, private mode: Exclude<SoundMode, 'off'>) {
     this.out = ctx.createGain();
     this.out.gain.value = 0;
     this.out.connect(audio.buses.music);
