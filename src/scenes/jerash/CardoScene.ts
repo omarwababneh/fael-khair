@@ -89,13 +89,11 @@ export class CardoScene extends BaseScene {
 
   private async intro(): Promise<void> {
     sfx('rustle', { volume: 0.3 });
-    await Voice.say('j2_open');
-    if (!this.alive) return;
     // He stays with her and calls the guide.
     this.state = 'call';
     this.guideRing = glowRing(this, this.guide.x, this.guide.y - this.guide.displayHeight * 0.55, 44, 25);
     this.setIdle(() => this.showHint());
-    await Voice.say('j2_stay');
+    this.open('j2_open', 'j2_stay');
   }
 
   private down(p: Phaser.Input.Pointer): void {
@@ -109,7 +107,7 @@ export class CardoScene extends BaseScene {
     } else if (this.state === 'look') {
       // The walker under the finger, nearest first.
       const hit = this.walkers
-        .filter((w) => w.img.active && w.img.getBounds().contains(x, y))
+        .filter((w) => w.img.active && Phaser.Geom.Rectangle.Inflate(w.img.getBounds(), 12, 0).contains(x, y))
         .sort((a, b) => Math.abs(a.img.x - x) - Math.abs(b.img.x - x))[0];
       if (!hit) return;
       if (hit.mother) void this.found(hit);

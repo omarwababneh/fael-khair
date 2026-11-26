@@ -87,7 +87,7 @@ export class StairsScene extends BaseScene {
     // Two light bags at her feet; she holds the heavy one.
     for (const dx of [44, 72]) {
       const b = this.add.image(MAMA.x + dx, MAMA.y + 2, 'bag_light').setOrigin(0.5, 1).setDepth(31);
-      fitHeight(b, BOY_H * 0.2);
+      fitHeight(b, BOY_H * 0.3); // he takes them: at least 44 points tall
       this.bags.push(b);
     }
     this.heavy = this.add.image(MAMA.x + 4, MAMA.y - MAMA_H * 0.18, 'bag_heavy').setOrigin(0.5, 1).setDepth(32).setVisible(false);
@@ -122,11 +122,11 @@ export class StairsScene extends BaseScene {
 
   private async intro(): Promise<void> {
     // Nobody asks him: the father only says what he sees.
-    await Voice.say('a3_open');
-    if (!this.alive) return;
     this.state = 'offer';
-    // Nobody asks him: the hint hand waits a long time before showing the bags.
-    this.setIdle(() => this.showHint(), 16000);
+    this.open('a3_open');
+    // Nobody asks him: the hint hand waits a while before showing the bags, but
+    // not so long that the first win misses ten seconds.
+    this.setIdle(() => this.showHint(), 7000, false);
   }
 
   // ---------------------------------------------------------------- the offer

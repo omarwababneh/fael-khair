@@ -3,6 +3,8 @@
 import parentsJson from '../../content/parents.json';
 import linesContent from '../../content/lines.json';
 import { getLine, registry, type Paraphrase } from './content';
+import { audio } from './audio';
+import { canRecord, recordings, startRecording } from './recordings';
 
 const parentsContent = parentsJson as {
   starters: Record<string, string[]>;
@@ -14,6 +16,7 @@ const parentsContent = parentsJson as {
 type SoundMode = 'music' | 'nature' | 'off';
 type MusicVolume = 'quiet' | 'medium';
 type VoiceSpeed = 'slower' | 'normal' | 'faster';
+interface VoiceTestInfo { speech: boolean; total: number; arabic: string[]; mode: 'voice' | 'lang' | 'text'; unlock: string; session: string | null }
 
 const ICONS = {
   home: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15.5 16 5l12 10.5" fill="none" stroke="#4a2c17" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 13.5V27h6v-7h4v7h6V13.5" fill="#c8623a" stroke="#4a2c17" stroke-width="2.6" stroke-linejoin="round"/></svg>`,
@@ -22,6 +25,31 @@ const ICONS = {
 };
 
 const PLACE_NAMES: Record<string, string> = { petra: 'البَتْرا', ummqais: 'أُمّ قَيْس', amman: 'عَمّان', irbid: 'إِرْبِد', jerash: 'جَرَش', deadsea: 'البَحْر المَيِّت', aqaba: 'العَقَبة' };
+
+// Plain Arabic names for the review list (no file or code words).
+const MISSION_AR: Record<string, string> = {
+  P1: 'البترا: تنظيف الطريق', P2: 'البترا: الكيس الضايع', P3: 'البترا: تحميل العربة', 'QD-P': 'البترا: عمل الخير الخفي',
+  U1: 'أم قيس: الكلب العطشان', U2: 'أم قيس: شتلات الزيتون', U3: 'أم قيس: تقسيم الزيتون', 'QD-U': 'أم قيس: عمل الخير الخفي',
+  A1: 'عمّان: الجرّة المكسورة', A2: 'عمّان: برج المكعّبات', A3: 'عمّان: أغراض ماما', 'QD-A': 'عمّان: عمل الخير الخفي',
+  I1: 'إربد: السلّة السرّية', I2: 'إربد: الباقي الزيادة', I3: 'إربد: الولد الجديد',
+  J1: 'جرش: بعد المهرجان', J2: 'جرش: البنت الضايعة', J3: 'جرش: الأكل المنسي', 'QD-J': 'جرش: عمل الخير الخفي',
+  D1: 'البحر الميت: الحنفيات', D2: 'البحر الميت: النِّعم', D3: 'البحر الميت: المشي مع سيدو', 'QD-D': 'البحر الميت: عمل الخير الخفي',
+  Q1: 'العقبة: السلحفاة', Q2: 'العقبة: الميزان', Q3: 'العقبة: الوعد', 'QD-Q': 'العقبة: عمل الخير الخفي',
+  WR: 'ليلة وادي رم', 'Wadi Rum closing line': 'ليلة وادي رم', 'Wadi Rum ayah': 'ليلة وادي رم',
+};
+const SURAH_AR: Record<string, string> = { '2': 'البقرة', '3': 'آل عمران', '4': 'النساء', '7': 'الأعراف', '14': 'إبراهيم', '17': 'الإسراء', '55': 'الرحمن' };
+const PART_AR: Record<string, string> = { mount: 'مساعدة الرجل على دابّته', justice: 'العدل بين اثنين', good_word: 'الكلمة الطيبة', harm: 'إبعاد الأذى عن الطريق' };
+
+/** "bukhari_2472" → "صحيح البخاري، حديث 2472"; "quran_3_190" → "القرآن الكريم، سورة آل عمران، آية 190". */
+function referenceAr(id: string): string {
+  const [book, a, b] = id.split('_');
+  if (book === 'quran') return `القرآن الكريم، سورة ${SURAH_AR[a] ?? a}، آية ${b}`;
+  if (book === 'bukhari') return `صحيح البخاري، حديث ${a}`;
+  if (book === 'muslim') return `صحيح مسلم، حديث ${a}`;
+  if (book === 'tirmidhi') return `جامع الترمذي، حديث ${a} (حسن)`;
+  return id;
+}
+const missionsAr = (ids: string[]): string => ids.map((m) => MISSION_AR[m] ?? m).join('، ');
 
 function section(title: string, ...children: HTMLElement[]): HTMLDetailsElement {
   const d = el('details', 'fk-section');
@@ -60,23 +88,29 @@ function parentSections(): HTMLElement[] {
   // An optional invitation: never tracked, confirmed or tied to the game.
   const inv = el('p', 'fk-invite');
   inv.textContent = parentsContent.invitation;
-  // Recording guide: every line the father can record, by file name.
+  // Recording guide: every line the father can record, with a recorder beside
+  // each one. Recordings stay on this phone only and are never uploaded.
   const note = el('p', '');
-  note.textContent = 'سجّل كل جملة بصوتك، واحفظها باسمها (مثلاً start.m4a) داخل مجلد:';
+  note.textContent = canRecord()
+    ? 'سجّل كل جملة بصوتك: اكبس «سجّل»، احكي الجملة، واكبس «وقّف». التسجيل بيضل على هالجهاز بس، وما بينبعت لأي مكان. اللعبة بتشغّل تسجيلك بدل صوت الجهاز.'
+    : 'هالجهاز ما بيقدر يسجّل من هون. بتقدر تسجّل كل جملة بملف باسمها (مثلاً start.m4a) داخل مجلد:';
   const path = el('p', 'fk-path');
   path.textContent = 'public/assets/audio/vo/';
+  path.hidden = canRecord();
   const note2 = el('p', '');
-  note2.textContent = 'اللعبة بتستعمل تسجيلك تلقائياً بدل صوت الجهاز. الآية الكريمة لا تُقرأ بصوت الجهاز أبداً.';
+  note2.textContent = 'الآية الكريمة لا تُقرأ بصوت الجهاز أبداً، ولا تُسجَّل هون.';
   const list = el('ul', 'fk-lines');
   for (const id of Object.keys(linesContent)) {
     const line = getLine(id);
     if (!line.speakable && !line.script) continue;
+    if (isQuranText(id)) continue; // never offer recording for Quran text
     const li = el('li', '');
     const file = el('span', 'fk-file');
     file.textContent = `${id}.m4a`;
     const txt = el('span', '');
     txt.textContent = line.script;
     li.append(file, txt);
+    if (canRecord()) li.append(recorder(id));
     list.append(li);
   }
   // Review list: every registry entry not yet approved, with the words the
@@ -85,7 +119,7 @@ function parentSections(): HTMLElement[] {
   const pendingEntries = registry.filter((r) => r.approval_status !== 'approved');
   const review = el('p', '');
   review.textContent = pendingEntries.length
-    ? `${pendingEntries.length} من ${registry.length} نصوص بانتظار مراجعتك في content/registry.json:`
+    ? `${pendingEntries.length} من ${registry.length} نصوص بانتظار مراجعتك:`
     : 'كل النصوص الدينية تمّت مراجعتها.';
   const reviewList = el('ul', 'fk-lines');
   for (const r of pendingEntries) {
@@ -93,12 +127,14 @@ function parentSections(): HTMLElement[] {
     const own = r.kind === 'father_own_words';
     if (own) {
       const mark = el('span', 'fk-review-own');
-      mark.textContent = `كلام الأب نفسه، مش نص ديني (${r.used_in.join('، ')})`;
+      mark.textContent = `كلام الأب نفسه، مش نص ديني (${missionsAr(r.used_in)})`;
       li.append(mark);
     } else {
-      const head = el('span', 'fk-file');
-      head.textContent = `${r.reference} · ${r.used_in.join(', ')}`;
-      li.append(head);
+      const head = el('span', 'fk-review-ref');
+      head.textContent = referenceAr(r.source_id);
+      const where = el('span', 'fk-review-where');
+      where.textContent = missionsAr(r.used_in);
+      li.append(head, where);
     }
     const texts: [string, Paraphrase][] = r.parts ? Object.entries(r.parts) : [['', r]];
     for (const [part, t] of texts) {
@@ -106,10 +142,10 @@ function parentSections(): HTMLElement[] {
       const words = t.child_paraphrase_script ?? t.child_paraphrase_tts;
       // An entry with no children's wording (the Wadi Rum ayah) is shown as its
       // exact text, which the owner pastes into original_arabic.
-      txt.textContent = words ?? 'نص الآية الأصلي يُعرض كما هو؛ أضِفه في original_arabic.';
+      txt.textContent = words ?? 'هذه الآية تُعرض بنصّها كما هو، ولم يُضَف نصّها بعد.';
       if (part) {
-        const label = el('span', 'fk-file');
-        label.textContent = `part: ${part}`;
+        const label = el('span', 'fk-review-where');
+        label.textContent = PART_AR[part] ?? part;
         li.append(label);
       }
       li.append(txt);
@@ -122,6 +158,71 @@ function parentSections(): HTMLElement[] {
     section('دليل التسجيل', note, path, note2, list),
     section('مراجعة النصوص الدينية', review, reviewList),
   ];
+}
+
+/** A line whose text is Quran itself (the ayah). None of the spoken lines is; this is a guard. */
+function isQuranText(id: string): boolean {
+  const raw = (linesContent as Record<string, { registry?: string }>)[id];
+  const e = raw?.registry ? registry.find((r) => r.source_id === raw.registry) : undefined;
+  return !!e && e.source_id.startsWith('quran_') && e.tts === false;
+}
+
+/** Record, play and delete buttons for one line. */
+function recorder(id: string): HTMLElement {
+  const row = el('div', 'fk-rec');
+  const rec = el('button', 'fk-rec-btn');
+  const play = el('button', 'fk-rec-btn');
+  const del = el('button', 'fk-rec-btn');
+  const status = el('span', 'fk-rec-status');
+  play.textContent = 'اسمع';
+  del.textContent = 'احذف';
+  let session: { stop: () => Promise<Blob | null> } | null = null;
+  const refresh = () => {
+    rec.textContent = session ? 'وقّف' : recordings.has(id) ? 'سجّل من جديد' : 'سجّل';
+    rec.classList.toggle('is-recording', !!session);
+    play.hidden = del.hidden = !recordings.has(id) || !!session;
+  };
+  rec.addEventListener('click', async () => {
+    if (session) {
+      const s = session;
+      session = null;
+      const blob = await s.stop();
+      if (blob && blob.size > 800) {
+        const ok = await recordings.put(id, blob);
+        status.textContent = ok ? 'انحفظ على هالجهاز.' : 'ما قدرت أحفظ التسجيل.';
+      } else status.textContent = 'التسجيل قصير كتير، جرّب مرة ثانية.';
+      // Recording can change the phone's audio mode; put it back.
+      audio.reapplySession();
+      refresh();
+      return;
+    }
+    try {
+      status.textContent = 'عم بسجّل…';
+      session = await startRecording();
+    } catch (e) {
+      session = null;
+      status.textContent = `ما قدرت أفتح الميكروفون: ${(e as Error).name || e}`;
+    }
+    refresh();
+  });
+  play.addEventListener('click', async () => {
+    const blob = await recordings.get(id);
+    const buf = blob ? await audio.decodeBlob(blob) : null;
+    if (!buf) {
+      status.textContent = 'ما قدرت أشغّل التسجيل.';
+      return;
+    }
+    status.textContent = '';
+    audio.playVoiceBuffer(buf);
+  });
+  del.addEventListener('click', async () => {
+    await recordings.remove(id);
+    status.textContent = 'انحذف. رح يرجع صوت الجهاز لهاي الجملة.';
+    refresh();
+  });
+  refresh();
+  row.append(rec, play, del, status);
+  return row;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, html = ''): HTMLElementTagNameMap[K] {
@@ -334,6 +435,8 @@ class UI {
   openParent(opts: {
     sound: SoundMode; volume: MusicVolume; voice: string | null; speed: VoiceSpeed;
     onSound: (m: SoundMode) => void; onVolume: (v: MusicVolume) => void; onSpeed: (s: VoiceSpeed) => void; onClose: () => void;
+    voiceInfo: () => VoiceTestInfo; testVoice: (report: (msg: string) => void) => void;
+    throughSilent: boolean; onThroughSilent: (on: boolean) => void;
   }): void {
     const wrap = el('div', 'fk-parent');
     const card = el('div', 'fk-parent-card');
@@ -363,9 +466,48 @@ class UI {
     const speeds = this.options<VoiceSpeed>([['slower', 'أبطأ'], ['normal', 'عادي'], ['faster', 'أسرع']], opts.speed, opts.onSpeed);
     speedRow.append(speedLabel, speeds);
     const voice = el('div', 'fk-voice-status');
+    const mode = opts.voiceInfo().mode;
     voice.textContent = opts.voice
       ? `صوت الجهاز العربي: ${opts.voice}`
-      : 'ما في صوت عربي على الجهاز. الكلام بيظهر مكتوب بس.';
+      : mode === 'lang'
+        ? 'الجهاز ما بيعرض اسم صوت عربي؛ اللعبة بتحكي بالعربي والجهاز بيختار الصوت.'
+        : 'ما في صوت عربي على الجهاز. الكلام بيظهر مكتوب بس.';
+    // Voice test: what the phone offers, and one line spoken now with what happened.
+    const test = el('div', 'fk-voice-test');
+    const testTitle = el('span', 'fk-voice-test-title');
+    testTitle.textContent = 'اختبار الصوت';
+    const facts = el('div', 'fk-voice-facts');
+    const showFacts = () => {
+      const i = opts.voiceInfo();
+      const how = i.mode === 'voice' ? 'بصوت عربي من الجهاز' : i.mode === 'lang' ? 'بالعربي بدون اختيار صوت (الجهاز بيختار)' : 'مكتوب بس، بدون صوت';
+      facts.textContent = [
+        `الكلام: ${i.speech ? 'متوفر' : 'غير متوفر'}`,
+        `عدد الأصوات: ${i.total}`,
+        `الأصوات العربية: ${i.arabic.length ? i.arabic.join('، ') : 'ولا واحد ظاهر'}`,
+        `اللعبة بتحكي: ${how}`,
+        `أول كبسة: ${i.unlock}`,
+        `وضع الصوت بالمتصفح: ${i.session ?? 'غير موجود'}`,
+      ].join('\n');
+    };
+    showFacts();
+    const testBtn = el('button', 'fk-speed');
+    testBtn.textContent = 'جرّب الصوت';
+    const result = el('div', 'fk-voice-result');
+    testBtn.addEventListener('click', () => {
+      result.textContent = 'جاري…';
+      opts.testVoice((msg) => { result.textContent = msg; showFacts(); });
+    });
+    const silentRow = el('div', 'fk-row');
+    const silentLabel = el('span', '');
+    silentLabel.textContent = 'الصوت مع زر الصامت';
+    const silent = this.options<'on' | 'off'>([['on', 'شغّال'], ['off', 'مطفي']], opts.throughSilent ? 'on' : 'off', (v) => {
+      opts.onThroughSilent(v === 'on');
+      showFacts();
+    });
+    silentRow.append(silentLabel, silent);
+    const silentNote = el('p', 'fk-voice-note');
+    silentNote.textContent = 'إذا الكلام «بدأ وانتهى» بس ما سمعت شي، جرّب «مطفي» واكبس «جرّب الصوت» مرة ثانية.';
+    test.append(testTitle, facts, testBtn, result, silentRow, silentNote);
     const close = el('button', 'fk-close');
     close.textContent = 'رجوع';
     close.addEventListener('click', () => {
@@ -380,7 +522,7 @@ class UI {
     // Everything between the title and the close button scrolls together, so on a
     // short screen nothing is squeezed out and "رجوع" always stays in reach.
     const scroll = el('div', 'fk-parent-scroll');
-    scroll.append(soundGroup, volumeRow, speedRow, voice, ...parentSections(), credit, build);
+    scroll.append(soundGroup, volumeRow, speedRow, voice, test, ...parentSections(), credit, build);
     card.append(h, scroll, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());

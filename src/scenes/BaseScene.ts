@@ -5,10 +5,20 @@ import { completeMission, type Place } from '../core/session';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
+/** Before his first touch in a scene, the hint hand shows after this long. */
+const FIRST_HINT_MS = 3000;
+
 /** The cream edge colors of the map picture (top and bottom rows, measured). */
 export const MAP_CREAM = '#f9e8ce';
 const MAP_TOP = 0xfbe7c9;
 const MAP_BOTTOM = 0xf8e8d3;
+/** The map is drawn this fraction of the design frame's width: an 18-point margin each side at 390. */
+export const MAP_SCALE = (DESIGN_W - 36) / DESIGN_W;
+/** A point measured on the map drawn 390 wide (the old layout), where it is now. */
+export const onMap = (x: number, y: number): { x: number; y: number } => ({
+  x: DESIGN_W / 2 + (x - DESIGN_W / 2) * MAP_SCALE,
+  y: DESIGN_H / 2 + (y - DESIGN_H / 2) * MAP_SCALE,
+});
 
 /** Shared camera fitting, background covering and scene changes. */
 export abstract class BaseScene extends Phaser.Scene {
@@ -18,13 +28,20 @@ export abstract class BaseScene extends Phaser.Scene {
   private baseIdleTimer?: Phaser.Time.TimerEvent;
   private idleAction: (() => void) | null = null;
   private idleMs = 6000;
+  /** Until his first touch, the hint comes sooner: the first easy win within ten seconds. */
+  private touched = false;
+  private earlyHint = true;
 
   protected setup(): void {
     this.alive = true;
     this.covers = [];
     this.baseIdleTimer = undefined;
     this.idleAction = null;
-    this.input.on('pointerdown', () => this.kickIdle());
+    this.touched = false;
+    this.input.on('pointerdown', () => {
+      this.touched = true;
+      this.kickIdle();
+    });
     clearLabels();
     this.fit();
     const onResize = () => this.fit();
@@ -72,14 +89,14 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   /**
-   * The map picture: shown whole, 390 points wide in the design frame (cropping
-   * it would cut off the Dead Sea and Aqaba). The space around it is filled with
-   * the picture's own cream color.
+   * The map picture: shown whole, with a margin on every side (MAP_SCALE of the
+   * design frame's width), so nothing touches the screen edge at any phone size.
+   * The space around it is filled with the picture's own cream color.
    */
   protected addMapPicture(key: string): Phaser.GameObjects.Image {
     this.cameras.main.setBackgroundColor(MAP_CREAM);
     const img = this.add.image(DESIGN_W / 2, DESIGN_H / 2, key).setDepth(0);
-    img.setScale(DESIGN_W / img.frame.width);
+    img.setScale((DESIGN_W * MAP_SCALE) / img.frame.width);
     // Bands above and below in the picture's own edge colors, so no seam shows.
     const h = img.frame.height * img.scale;
     const top = DESIGN_H / 2 - h / 2, bottom = DESIGN_H / 2 + h / 2;
@@ -98,9 +115,10 @@ export abstract class BaseScene extends Phaser.Scene {
    * What to show if he does nothing for 6 seconds (the hint hand).
    * Any touch restarts the wait; null switches hints off.
    */
-  protected setIdle(action: (() => void) | null, ms = 6000): void {
+  protected setIdle(action: (() => void) | null, ms = 6000, early = true): void {
     this.idleAction = action;
     this.idleMs = ms;
+    this.earlyHint = early;
     this.kickIdle(ms);
   }
 
@@ -109,6 +127,7 @@ export abstract class BaseScene extends Phaser.Scene {
     this.baseIdleTimer?.remove();
     this.baseIdleTimer = undefined;
     if (!this.idleAction || !this.alive) return;
+    if (!this.touched && this.earlyHint) ms = Math.min(ms, FIRST_HINT_MS);
     this.baseIdleTimer = this.time.delayedCall(ms, () => {
       if (this.alive && this.idleAction) this.idleAction();
     });
@@ -143,6 +162,16 @@ export abstract class BaseScene extends Phaser.Scene {
     this.cameras.main.fadeOut(350, 243, 223, 180);
     fadeLabels(0, 350);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start(key, data));
+  }
+
+  /**
+   * The opening: one line, then (if nothing else has been said meanwhile) what to
+   * do. Never awaited: he can act as soon as the scene is visible.
+   */
+  protected open(first: string, then?: string): void {
+    void Voice.say(first).then(() => {
+      if (this.alive && then && Voice.lastId === first) void Voice.say(then);
+    });
   }
 
   /** Promise that resolves after ms of game time (pauses with the game). */

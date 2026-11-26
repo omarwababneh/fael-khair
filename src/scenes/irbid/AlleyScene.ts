@@ -94,9 +94,8 @@ export class AlleyScene extends BaseScene {
   }
 
   private async intro(): Promise<void> {
-    await Voice.say('i3_open');
-    if (!this.alive) return;
     this.state = 'play';
+    this.open('i3_open');
     this.setIdle(() => this.showHint());
   }
 

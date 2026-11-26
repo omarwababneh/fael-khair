@@ -33,7 +33,7 @@ const PLANT_H = 150 * 0.34;
 // Taps and handles are drawn larger than the checklist (0.18 and 0.1 of the
 // boy, about 27 and 15 points): a handle has to be big enough to turn with a finger.
 const TAP_H = 62;
-const HANDLE_D = 42;
+const HANDLE_D = 46;
 // Measured on the art: tap_body's handle stem tops out at (0.48, 0.04), the
 // spout opens at (0.12, 0.97); pipe_leak's drops start below 0.47 of its height.
 const STEM = { x: 0.48, y: 0.04 };
@@ -106,7 +106,7 @@ export class TapsScene extends BaseScene {
       // The leaking joint, low on the wall at the right, by the attendant.
       const px = 282;
       this.pipe = this.add.image(px, 572, 'pipe_leak').setOrigin(0.5, 0).setDepth(22);
-      fitWidth(this.pipe, 72);
+      fitHeight(this.pipe, 46); // he touches it: at least 44 points tall
       this.pipeDrip = this.time.addEvent({ delay: 650, loop: true, callback: () => this.drip(px + 4, 572 + this.pipe!.displayHeight * 0.45) });
       // Thirsty plants along the foot of the wall.
       for (const x of [112, 184, 256]) {
@@ -161,11 +161,9 @@ export class TapsScene extends BaseScene {
   }
 
   private async intro(): Promise<void> {
-    await Voice.say(this.quiet ? 'qdd_open' : 'd1_open');
-    if (!this.alive) return;
     this.state = 'turn';
     this.setIdle(() => this.showHint());
-    if (!this.quiet) await Voice.say('d1_hint');
+    this.open(this.quiet ? 'qdd_open' : 'd1_open', this.quiet ? undefined : 'd1_hint');
   }
 
   // ---------------------------------------------------------------- input
@@ -190,7 +188,8 @@ export class TapsScene extends BaseScene {
         void this.stepTo(tap.cx - 80);
         return;
       }
-      if (this.pipe && !this.pipeFixed && this.pipe.getBounds().contains(x, y)) {
+      const pipeArea = this.pipe ? Phaser.Geom.Rectangle.Inflate(this.pipe.getBounds(), 8, 10) : null;
+      if (this.pipe && pipeArea && !this.pipeFixed && pipeArea.contains(x, y)) {
         void this.touchPipe();
         return;
       }

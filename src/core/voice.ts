@@ -1,16 +1,23 @@
 // Voice.say(lineId):
-//  1. If public/assets/audio/vo/<lineId>.m4a exists, play it.
-//  2. Otherwise speak the line's `tts` text with the phone's best Arabic voice.
-//  3. Always show the text in the speech bubble at the same time.
-// If the phone has no Arabic voice, show the text only (never another language's voice).
+//  1. If the parent recorded this line on the phone (parents' corner), play that.
+//  2. Otherwise, if public/assets/audio/vo/<lineId>.m4a exists, play it.
+//  3. Otherwise speak the line's `tts` text with the phone's Arabic voice.
+//  4. Always show the text in the speech bubble at the same time.
+// If the phone has no Arabic voice at all, show the text only (never another
+// language's voice). On an iPhone the voice list often arrives late or stays
+// empty to a web page, so while no voice is listed the line is still spoken
+// with lang "ar-SA" and no voice set: iOS then picks its own Arabic voice.
 import { audio } from './audio';
 import { hasAudio } from './assets';
 import { getLine } from './content';
 import { music } from './music';
+import { recordings } from './recordings';
 import { ui } from './ui';
 import { getVoiceSpeed, VOICE_RATES } from './settings';
 
 const synth: SpeechSynthesis | null = 'speechSynthesis' in window ? window.speechSynthesis : null;
+const APPLE = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && /Apple/.test(navigator.vendor || '');
+const FALLBACK_LANG = 'ar-SA';
 
 // The owner found the spec's 0.9 too slow: natural speed by default, and the
 // parent can choose slower or faster in the parents' corner.
@@ -19,13 +26,29 @@ function readingTime(text: string): number {
   return Math.max(1800, text.length * 85 + 700);
 }
 
+/** What the voice test in the parents' corner shows. */
+export interface VoiceInfo {
+  speech: boolean;
+  total: number;
+  arabic: string[];
+  chosen: string | null;
+  /** How a line is spoken now: with a chosen voice, by language only (iPhone), or as text only. */
+  mode: 'voice' | 'lang' | 'text';
+  unlock: string;
+}
+
 class VoiceSystem {
   private voice: SpeechSynthesisVoice | null = null;
+  /** The phone listed its voices and none is Arabic, or speaking by language failed. */
+  private noArabic = false;
   private token = 0;
   private finishCurrent: (() => void) | null = null;
-  private source: AudioBufferSourceNode | null = null;
+  private stopSource: (() => void) | null = null;
   private utter: SpeechSynthesisUtterance | null = null;
   private timers: number[] = [];
+  private unlocked = false;
+  private unlockResult = 'لم يُفتح بعد';
+  private decoded = new Map<string, AudioBuffer>();
   lastId: string | null = null;
 
   /**
@@ -44,8 +67,16 @@ class VoiceSystem {
       if (v.localService) s += 1;
       return s;
     };
-    const ar = synth.getVoices().filter((x) => (x.lang || '').toLowerCase().startsWith('ar'));
-    if (!ar.length) return;
+    const all = synth.getVoices();
+    const ar = all.filter((x) => (x.lang || '').toLowerCase().replace('_', '-').startsWith('ar'));
+    if (!ar.length) {
+      // A listed set with no Arabic voice in it means this device has none, except
+      // on an iPhone, whose list can leave out voices that are installed: there
+      // only a failed attempt to speak by language says so (see speak()).
+      if (all.length && !APPLE) this.noArabic = true;
+      return;
+    }
+    this.noArabic = false;
     const best = ar.reduce((a, b) => (score(b) > score(a) ? b : a));
     if (!this.voice || score(best) > score(this.voice)) this.voice = best;
   }
@@ -65,6 +96,30 @@ class VoiceSystem {
     audio.onHiddenChange((hidden) => {
       if (hidden) this.stop(false);
     });
+    recordings.onChange(() => this.decoded.clear());
+    void recordings.init();
+  }
+
+  /** How a line would be spoken right now. */
+  private mode(): 'voice' | 'lang' | 'text' {
+    if (!synth) return 'text';
+    if (this.voice) return 'voice';
+    // No voice object: on an iPhone or Mac, speak by language unless the phone
+    // has shown it has no Arabic voice at all.
+    return APPLE && !this.noArabic ? 'lang' : 'text';
+  }
+
+  /** An utterance in Arabic, with the chosen voice if there is one. */
+  private utterance(text: string): SpeechSynthesisUtterance {
+    const u = new SpeechSynthesisUtterance(text);
+    if (this.voice) {
+      u.voice = this.voice;
+      u.lang = this.voice.lang;
+    } else {
+      u.lang = FALLBACK_LANG;
+    }
+    u.rate = VOICE_RATES[getVoiceSpeed()];
+    return u;
   }
 
   /** For the parents' corner: which Arabic voice the phone offers, if any. */
@@ -73,17 +128,67 @@ class VoiceSystem {
     return this.voice ? `${this.voice.name} (${this.voice.lang})` : null;
   }
 
-  /** Speak one silent utterance inside the first tap, which unlocks speech on iOS. */
-  unlock(): void {
-    if (!synth) return;
+  info(): VoiceInfo {
+    this.pick();
+    const all = synth ? synth.getVoices() : [];
+    return {
+      speech: !!synth,
+      total: all.length,
+      arabic: all.filter((x) => (x.lang || '').toLowerCase().startsWith('ar')).map((x) => `${x.name || '—'} (${x.lang})`),
+      chosen: this.voice ? `${this.voice.name} (${this.voice.lang})` : null,
+      mode: this.mode(),
+      unlock: this.unlockResult,
+    };
+  }
+
+  /**
+   * Inside the first tap: speak a real short word ("يلّا", what the start button
+   * says), at normal volume. iOS only lets a page speak after it has spoken once
+   * inside a tap; a blank utterance at zero volume does not always count.
+   */
+  unlock(word = 'يلّا'): void {
+    if (!synth || this.unlocked) return;
+    this.pick();
+    if (this.mode() === 'text') return;
+    this.unlocked = true;
     try {
-      const u = new SpeechSynthesisUtterance(' ');
-      u.volume = 0;
-      if (this.voice) u.voice = this.voice;
+      const u = this.utterance(word);
+      u.onstart = () => { this.unlockResult = 'بدأ'; };
+      u.onend = () => { this.unlockResult = 'انتهى'; };
+      u.onerror = (e) => {
+        this.unlockResult = `خطأ: ${e.error}`;
+        // No Arabic voice at all: text only from the first line on.
+        if (!this.voice && (e.error === 'language-unavailable' || e.error === 'voice-unavailable')) this.noArabic = true;
+      };
+      this.utter = u;
       synth.speak(u);
-    } catch {
-      /* ignore */
+    } catch (e) {
+      this.unlockResult = `خطأ: ${String(e)}`;
     }
+  }
+
+  /**
+   * The parents' corner voice test: speak one line now (inside the tap) and
+   * report what happened: started, ended, or the error.
+   */
+  test(text: string, report: (msg: string) => void): void {
+    this.stop(false);
+    this.pick();
+    if (!synth) return report('هذا المتصفح لا يدعم الكلام.');
+    let started = false;
+    const u = this.utterance(text);
+    u.onstart = () => { started = true; report('بدأ الكلام…'); };
+    u.onend = () => report(started ? 'بدأ وانتهى. إذا ما سمعت شي، جرّب خيار زر الصامت تحت.' : 'انتهى بدون ما يبدأ.');
+    u.onerror = (e) => report(`خطأ: ${e.error}`);
+    this.utter = u;
+    try {
+      if (synth.speaking || synth.pending) synth.cancel();
+      synth.speak(u);
+    } catch (e) {
+      report(`خطأ: ${String(e)}`);
+      return;
+    }
+    window.setTimeout(() => { if (!started) report('ما بدأ الكلام خلال ٤ ثواني.'); }, 4000);
   }
 
   /** Resolves when the line has finished (or was replaced or stopped). */
@@ -93,7 +198,8 @@ class VoiceSystem {
     const token = ++this.token;
     this.lastId = id;
     const line = getLine(id);
-    const recorded = hasAudio('vo', id);
+    const own = recordings.has(id);
+    const recorded = own || hasAudio('vo', id);
     const text = recorded ? line.script : line.tts;
     ui.showBubble(text, () => void this.say(id));
     ui.setSpeaking(true);
@@ -116,32 +222,42 @@ class VoiceSystem {
 
       const textOnly = () => this.timers.push(window.setTimeout(finish, readingTime(text)));
       const speak = () => {
-        if (!synth || !this.voice || !line.speakable || !line.tts) return textOnly();
-        const u = new SpeechSynthesisUtterance(line.tts);
-        u.voice = this.voice;
-        u.lang = this.voice.lang;
-        u.rate = VOICE_RATES[getVoiceSpeed()];
+        const mode = this.mode();
+        if (!synth || mode === 'text' || !line.speakable || !line.tts) return textOnly();
+        const u = this.utterance(line.tts);
         u.onend = finish;
-        u.onerror = finish;
+        u.onerror = (e) => {
+          // Speaking by language failed: this phone has no Arabic voice. Text from now on.
+          if (mode === 'lang' && (e.error === 'language-unavailable' || e.error === 'voice-unavailable')) this.noArabic = true;
+          finish();
+        };
         this.utter = u; // keep a reference: iOS drops events of collected utterances
         // Safety net in case the end event never arrives.
         this.timers.push(window.setTimeout(finish, readingTime(line.tts) * 1.8 + 3000));
         synth.speak(u);
       };
+      const playBuffer = (buf: AudioBuffer | null) => {
+        if (token !== this.token || done) return;
+        if (!buf) return speak();
+        const p = audio.playVoiceBuffer(buf);
+        this.stopSource = p.stop;
+        void p.done.then(finish);
+        this.timers.push(window.setTimeout(finish, buf.duration * 1000 + 1500));
+      };
 
       if (recorded && audio.ready && audio.ctx) {
-        const ctx = audio.ctx;
-        void audio.load(`assets/audio/vo/${id}.m4a`).then((buf) => {
-          if (token !== this.token || done) return;
-          if (!buf) return speak();
-          const src = ctx.createBufferSource();
-          src.buffer = buf;
-          src.connect(audio.buses.voice);
-          src.onended = finish;
-          this.source = src;
-          src.start();
-          this.timers.push(window.setTimeout(finish, buf.duration * 1000 + 1500));
-        });
+        if (own) {
+          // The parent's own recording, decoded once and kept.
+          const cached = this.decoded.get(id);
+          if (cached) playBuffer(cached);
+          else void recordings.get(id).then((blob) => (blob ? audio.decodeBlob(blob) : null)).then((buf) => {
+            if (buf) this.decoded.set(id, buf);
+            if (buf || !hasAudio('vo', id)) return playBuffer(buf);
+            return audio.load(`assets/audio/vo/${id}.m4a`).then(playBuffer);
+          });
+        } else {
+          void audio.load(`assets/audio/vo/${id}.m4a`).then(playBuffer);
+        }
       } else if (synth && (synth.speaking || synth.pending)) {
         synth.cancel();
         // iOS can drop an utterance queued right after cancel().
@@ -156,10 +272,8 @@ class VoiceSystem {
   stop(clearBubble = false): void {
     this.token++;
     this.clearTimers();
-    if (this.source) {
-      try { this.source.stop(); } catch { /* already stopped */ }
-      this.source = null;
-    }
+    this.stopSource?.();
+    this.stopSource = null;
     if (synth && (synth.speaking || synth.pending)) synth.cancel();
     this.utter = null;
     const f = this.finishCurrent;
@@ -177,3 +291,6 @@ class VoiceSystem {
 }
 
 export const Voice = new VoiceSystem();
+
+// Debug mode (?scene=) has no start tap: unlock speech on the first touch anywhere.
+window.addEventListener('pointerdown', () => Voice.unlock(), { capture: true, once: true });

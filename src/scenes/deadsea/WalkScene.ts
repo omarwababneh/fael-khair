@@ -24,7 +24,11 @@ import { breathe, CupPour, pose } from '../kit';
 const PAIR = { foot: 676, h: 150 * 1.4, startX: 36, stopX: 196 };
 const BOY = { foot: 714, h: 150 };
 const STONE_Y = 682;
-const STONE_W = 30;
+// Pebbles at least 44 points tall: he must touch them (larger than the checklist).
+const STONE_H = 44;
+// The boy walks just ahead of the two men, never over them: his center stays at
+// least this far ahead of theirs (their picture is about 155 wide, his about 80).
+const MIN_AHEAD = 116;
 // At the bench: it stands a little back so Grandfather's hand, held out at
 // child-head height, comes to rest on the boy's head.
 const BENCH = { x: 222, foot: 656, w: 150 * 1.1, h: 150 * 0.45 };
@@ -91,17 +95,18 @@ export class WalkScene extends BaseScene {
     this.addCover('bg_deadsea_shore');
     motes(this, { x: 20, y: 200, w: 350, h: 420 }, 40);
 
-    const xs = lap ? [138, 176, 214] : [146, 200, 252];
+    // Far enough along that he reaches the first one at once; a little closer together on a later lap.
+    const xs = lap ? [214, 262, 310] : [214, 270, 326];
     for (const x of xs) {
       const img = this.add.image(x + Phaser.Math.Between(-6, 6), STONE_Y + Phaser.Math.Between(-3, 3), 'rock_a').setOrigin(0.5, 1).setDepth(40);
-      fitWidth(img, STONE_W);
+      fitHeight(img, STONE_H);
       this.stones.push({ img, moved: false });
     }
 
     // Baba and Grandfather, together in one picture, facing right.
     this.pair = this.add.image(PAIR.startX, PAIR.foot, 'grandpa_baba_walk').setOrigin(0.5, 1).setDepth(45);
     fitHeight(this.pair, PAIR.h);
-    this.boy = this.add.image(PAIR.startX + 58, BOY.foot, 'boy_walk_a').setOrigin(0.5, 1).setDepth(60);
+    this.boy = this.add.image(PAIR.startX + MIN_AHEAD, BOY.foot, 'boy_walk_a').setOrigin(0.5, 1).setDepth(60);
     fitHeight(this.boy, BOY.h);
     this.bag = this.add.image(0, 0, 'bag_small').setOrigin(0.5, 0.2).setDepth(61);
     fitHeight(this.bag, 150 * 0.2);
@@ -128,12 +133,10 @@ export class WalkScene extends BaseScene {
   }
 
   private async intro(): Promise<void> {
-    await Voice.say('d3_open');
-    if (!this.alive) return;
+    this.pairBob = this.tweens.add({ targets: this.pair, y: PAIR.foot - 3, duration: 380, yoyo: true, repeat: -1, paused: true });
     this.state = 'walk';
     this.setIdle(() => this.showHint());
-    this.pairBob = this.tweens.add({ targets: this.pair, y: PAIR.foot - 3, duration: 380, yoyo: true, repeat: -1, paused: true });
-    await Voice.say('d3_hint');
+    this.open('d3_open', 'd3_hint');
   }
 
   update(_t: number, dt: number): void {
@@ -148,7 +151,8 @@ export class WalkScene extends BaseScene {
     const s = dt / 1000;
     // Grandfather and Baba walk on slowly, and wait before a stone still on the path.
     const blocker = this.stones.find((x) => !x.moved && x.img.x > this.grandpaFront() - 4 && x.img.x - this.grandpaFront() < 26);
-    const pairMoves = !blocker && this.pair.x < PAIR.stopX;
+    // They also wait while he is right in front of them: he never walks over them.
+    const pairMoves = !blocker && this.pair.x < PAIR.stopX && this.boy.x - this.pair.x > MIN_AHEAD + 2;
     if (pairMoves) this.pair.x = Math.min(PAIR.stopX, this.pair.x + this.pairSpeed * s);
     if (this.pairBob) {
       if (pairMoves && this.pairBob.isPaused()) this.pairBob.resume();
@@ -165,19 +169,20 @@ export class WalkScene extends BaseScene {
       boyMoves = true;
       this.boy.setFlipX(true);
       this.boy.x -= 80 * s;
-      if (ahead <= 76) this.turning = false;
+      if (ahead <= MIN_AHEAD + 20) this.turning = false;
     } else if (this.holdId !== -1 && !this.moving) {
       // He stops just before a stone still on the path (so it stays in sight, in front of him).
       const next = this.stones.filter((x) => !x.moved).sort((a, b) => a.img.x - b.img.x)[0];
-      const limit = next ? next.img.x - 46 : 352;
+      const limit = next ? next.img.x - 58 : 352;
       boyMoves = this.boy.x < limit - 0.5;
       this.boy.setFlipX(false);
-      this.boy.x = Math.min(limit, this.boy.x + 66 * s);
+      // Only ever forward: never back over the two men.
+      if (boyMoves) this.boy.x = Math.min(limit, this.boy.x + 66 * s);
       if (!boyMoves && next && !this.stoneSaid) {
         this.stoneSaid = true;
         void Voice.say('d3_stone');
       }
-      if (ahead > 150) {
+      if (ahead > MIN_AHEAD + 110) {
         // He has run ahead: nothing bad happens. He turns and comes back.
         this.turning = true;
         if (!this.waitSaid) {
@@ -220,7 +225,7 @@ export class WalkScene extends BaseScene {
     if (this.state === 'walk') {
       // Only the nearest stone still on the path can be moved: he never walks past one.
       const nearest = this.stones.filter((st) => !st.moved).sort((a, b) => a.img.x - b.img.x)[0];
-      const stone = nearest && Phaser.Math.Distance.Between(x, y, nearest.img.x, nearest.img.y - 10) < 36 ? nearest : undefined;
+      const stone = nearest && Phaser.Math.Distance.Between(x, y, nearest.img.x, nearest.img.y - 20) < 36 ? nearest : undefined;
       if (stone && !this.moving) {
         void this.moveStone(stone);
         return;
@@ -260,7 +265,7 @@ export class WalkScene extends BaseScene {
   private async moveStone(st: Stone): Promise<void> {
     this.moving = st;
     this.holdId = -1;
-    const to = st.img.x - 34;
+    const to = Math.max(st.img.x - 50, this.pair.x + MIN_AHEAD);
     const dir = to < this.boy.x ? -1 : 1;
     this.boy.setFlipX(dir < 0);
     const steps = this.time.addEvent({ delay: 170, loop: true, callback: () => {
@@ -331,7 +336,7 @@ export class WalkScene extends BaseScene {
     // The cup, by the boy, to hand to Grandfather.
     this.cupHome = { x: 312, y: 690 };
     this.cup = this.add.image(this.cupHome.x, this.cupHome.y, 'cup_full').setOrigin(0.5, 1).setDepth(62);
-    fitHeight(this.cup, 150 * 0.16);
+    fitHeight(this.cup, 44); // he hands it over: at least 44 points tall
     this.ring = glowRing(this, this.grandpa.x, SEAT_Y - GRANDPA.h * 0.2, 40, 29);
     this.state = 'give';
     this.setIdle(() => this.showHint());
@@ -354,6 +359,8 @@ export class WalkScene extends BaseScene {
     const handX = g.x - g.displayWidth / 2 + g.displayWidth * HAND.x;
     const handY = g.y - g.displayHeight + g.displayHeight * HAND.y;
     this.tweens.add({ targets: this.bag, alpha: 0, duration: 300 });
+    // He stands beside Grandfather's knee, just behind his hand: the hand is drawn over his head.
+    this.boy.setDepth(30);
     await new Promise<void>((res) => this.tweens.add({ targets: this.boy, x: handX + 6, y: handY + BOY.h - 4, duration: 600, ease: 'Sine.easeInOut', onComplete: () => res() }));
     if (!this.alive) return;
     pose(this, this.boy, 'boy_happy', BOY.h);
@@ -372,7 +379,7 @@ export class WalkScene extends BaseScene {
     if (this.holdId !== -1 || this.pourId !== -1 || this.cupId !== -1 || this.moving) return again();
     if (this.state === 'walk') {
       const st = this.stones.find((x) => !x.moved);
-      if (st && st.img.x - this.grandpaFront() < 90) this.hint.show('tap', { x: st.img.x, y: st.img.y - 10 }, undefined, again);
+      if (st && this.boy.x >= st.img.x - 64) this.hint.show('tap', { x: st.img.x, y: st.img.y - 20 }, undefined, again);
       else this.hint.show('hold', { x: this.boy.x + 40, y: 600 }, { x: this.boy.x + 40, y: 600 }, again);
     } else if (this.state === 'pour') {
       this.hint.show('hold', { x: CLOSE.x + 120, y: CLOSE.y - 90 }, { x: CLOSE.x + 120, y: CLOSE.y - 90 }, again);

@@ -31,8 +31,8 @@ const GROUND = AXLE.y + (CART_ART.wheelBottom - CART_ART.hubY) * CART_S; // unde
 const DONKEY = { x: AXLE.x + Math.round(550 * CART_S) + 12, h: 124, tiredH: 112 };
 const ELDER = { x: 68, h: 161 };
 const BOY = { x: 262, y: 726, h: 124 };
-const SMALL_H = 38; // a small sack on the ground
-const BED_SMALL_H = 40;
+const SMALL_H = 44; // a small sack on the ground (at least 44 points: he must touch it)
+const BED_SMALL_H = 44;
 const BED_BIG_H = 56;
 // Where sacks sit in the bed, relative to the axle (x), bottoms hidden behind the rim.
 const BED_BOTTOM = -(CART_ART.hubY - 75) * CART_S;

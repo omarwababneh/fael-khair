@@ -45,7 +45,7 @@ Do not draw scenery, characters or objects in code. Code may add light, tint, pa
 7. **Rotation moves by play, not by the calendar.** A place's rotation advances only when its mission is finished. Missing a day changes nothing.
 8. **Small variation on replay.** Each mission has two or three light variations chosen at random: where objects lie, how many there are, which side a character stands on. The story and the value never change.
 
-**Storage.** The game may now store, on the device only, one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. Update the privacy rule in `GAME_SPEC.md` section 2 to say exactly this.
+**Storage.** The game may now store, on the device only, one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. Update the privacy rule in `GAME_SPEC.md` section 2 to say exactly this. (Owner, later: the parent's own recordings of the voice lines, made in the parents' corner, may also be stored on the phone. They are never uploaded or sent anywhere.)
 
 A full day should take 8 to 10 minutes. Each mission lasts 60 to 120 seconds.
 
@@ -69,7 +69,7 @@ These came out of the religious and child-safety review. They apply to every mis
 - The father opens each mission's work with "بسم الله".
 - He says "الحمد لله" when the good outcome arrives, and "إن شاء الله" about anything in the future.
 - Where the story fits, he ties the effort to trust in Allah (see mission U2).
-- Only these fixed phrases are used freely: بسم الله، الحمد لله، إن شاء الله، ما شاء الله، سبحان الله. Any other religious sentence must come from `content/registry.json`.
+- Only these fixed phrases are used freely: بسم الله، الحمد لله، إن شاء الله، ما شاء الله، سبحان الله، الله يرضى عليك. Any other religious sentence must come from `content/registry.json`.
 
 **Quran in missions.** Missions whose source is an ayah use only the short paraphrase in section 8. The ayah text itself appears only in the Wadi Rum ending and is never spoken by a synthetic voice.
 

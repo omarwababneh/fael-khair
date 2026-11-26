@@ -78,9 +78,9 @@ export class BlessingsScene extends BaseScene {
     breathe(this, this.baba, 0.01);
     // The water and the bread stand on the paving on either side of the bench, well apart from his hands.
     this.bottle = this.add.image(318, 704, 'water_bottle').setOrigin(0.5, 1).setDepth(32);
-    fitHeight(this.bottle, 150 * 0.24);
+    fitHeight(this.bottle, 46); // things he taps are at least 44 points tall
     this.bread = this.add.image(64, 702, 'food_bread').setOrigin(0.5, 1).setDepth(32);
-    fitWidth(this.bread, 150 * 0.36);
+    fitHeight(this.bread, 46);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
     this.events.once('shutdown', () => this.hint.clear());
@@ -88,20 +88,16 @@ export class BlessingsScene extends BaseScene {
   }
 
   private async intro(): Promise<void> {
-    await this.wait(600);
-    if (!this.alive) return;
-    await Voice.say('d2_open');
-    if (!this.alive) return;
     this.state = 'look';
     this.setIdle(() => this.showHint(), 8000);
-    await Voice.say('d2_hint');
+    this.open('d2_open', 'd2_hint');
   }
 
   /** Where each thing is, for the soft glow. */
   private spot(t: Thing, x = 0, y = 0): { x: number; y: number; r: number } {
     switch (t) {
-      case 'hands': return { x: this.boy.x, y: this.boy.y - BOY.h * 0.36, r: 24 };
-      case 'water': return { x: this.bottle.x, y: this.bottle.y - this.bottle.displayHeight / 2, r: 26 };
+      case 'hands': return { x: this.boy.x, y: this.boy.y - BOY.h * 0.36, r: 28 };
+      case 'water': return { x: this.bottle.x, y: this.bottle.y - this.bottle.displayHeight / 2, r: 28 };
       case 'bread': return { x: this.bread.x, y: this.bread.y - this.bread.displayHeight / 2, r: 34 };
       case 'baba': return { x: this.baba.x, y: this.baba.y - BABA.h * 0.6, r: 44 };
       default: return { x, y, r: 60 };

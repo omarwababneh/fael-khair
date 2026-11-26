@@ -114,8 +114,7 @@ export class BlocksScene extends BaseScene {
   }
 
   private async intro(): Promise<void> {
-    await Voice.say('a2_open');
-    if (!this.alive) return;
+    this.open('a2_open');
     this.state = 'build';
     this.nextBlock();
     this.setIdle(() => this.showHint());

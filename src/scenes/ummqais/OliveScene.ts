@@ -26,7 +26,8 @@ const GROUND = 706;
 const SPOTS = [80, 200, 320];
 const BOY_H = 140;
 // Heights from the art checklist (boy = 1.0).
-const H = { sapling: 0.35, soil: 0.15, can: 0.3, young: 0.9, grown: 2.2, stranger: 0.85, birds: 0.25, stone: 0.48 };
+// The sapling he lifts and the can are drawn larger than the checklist: at least 44 points tall.
+const H = { sapling: 0.35, lying: 0.55, soil: 0.15, can: 0.4, young: 0.9, grown: 2.2, stranger: 0.85, birds: 0.25, stone: 0.48 };
 const CAN_REST = { x: 360, y: GROUND + 2 };
 const RUB_NEED = [260, 460, 320]; // points of rubbing to dig each hole; the second soil is harder
 const POUR_NEED = [1500, 1800, 2600]; // ms of pouring; the last one needs a longer pour
@@ -121,8 +122,7 @@ export class OliveScene extends BaseScene {
   // ---------------------------------------------------------------- U2
 
   private async startPlanting(): Promise<void> {
-    await Voice.say('u2_open');
-    if (!this.alive) return;
+    this.open('u2_open');
     this.beginSpot(0);
   }
 
@@ -169,11 +169,11 @@ export class OliveScene extends BaseScene {
     const need = RUB_NEED[this.cur] * (currentLap() ? 1.2 : 1);
     if (!s.mound) {
       s.mound = this.add.image(s.x + 24, GROUND + 4, 'soil_mound').setOrigin(0.5, 1).setDepth(31);
-      fitWidth(s.mound, BOY_H * 0.4);
+      fitWidth(s.mound, BOY_H * 0.72); // 44 points tall: he presses it
       s.mound.setScale(0.01);
     }
     const k = Math.min(1, this.rubbed / need);
-    const full = (BOY_H * 0.4) / s.mound.frame.width;
+    const full = (BOY_H * 0.72) / s.mound.frame.width;
     s.mound.setScale(full * (0.2 + 0.8 * k));
     if (this.time.now - this.lastPuff > 120) {
       this.lastPuff = this.time.now;
@@ -193,7 +193,7 @@ export class OliveScene extends BaseScene {
     // The sapling lies ready beside the hole (on the side away from the boy).
     const lx = this.cur === 2 ? s.x + 52 : s.x + 60;
     this.lying = this.add.image(lx, GROUND + 6, 'sapling_small').setOrigin(0.5, 1).setDepth(34).setAngle(70);
-    fitHeight(this.lying, BOY_H * H.sapling);
+    fitHeight(this.lying, BOY_H * H.lying);
     this.lying.setData('home', { x: lx, y: GROUND + 6 });
     if (this.cur === 0) void Voice.say('u2_plant');
     this.kickIdle();
@@ -326,10 +326,9 @@ export class OliveScene extends BaseScene {
       fitHeight(s.tree, BOY_H * H.young);
       s.pour.y = GROUND - BOY_H * H.young * 0.55;
     }
-    await Voice.say('qdu_open');
-    if (!this.alive) return;
     this.state = 'water';
     this.setIdle(() => this.showHint());
+    this.open('qdu_open');
   }
 
   /** He leaves; in the evening the trees stand up straight. One plain line. */

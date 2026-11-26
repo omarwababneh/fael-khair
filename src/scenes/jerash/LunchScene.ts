@@ -27,7 +27,7 @@ const MATE_X = 262;
 const STEP_Y = 676; // where things are set down on the step, between the two boys
 const CLOSE = { x: 195, y: 410 };
 
-type State = 'intro' | 'cut' | 'pour' | 'give' | 'end';
+type State = 'intro' | 'ask' | 'cut' | 'pour' | 'give' | 'end';
 
 export class LunchScene extends BaseScene {
   private state: State = 'intro';
@@ -84,9 +84,9 @@ export class LunchScene extends BaseScene {
     this.mate = this.add.image(MATE_X, SEAT_FOOT, 'classmate_hungry').setOrigin(0.5, 1).setDepth(40);
     fitHeight(this.mate, KID_H);
     breathe(this, this.mate, 0.01);
-    const bottle = this.add.image(BOY_X - 52, STEP_Y, 'water_bottle').setOrigin(0.5, 1).setDepth(41);
+    const bottle = this.add.image(BOY_X - 66, STEP_Y, 'water_bottle').setOrigin(0.5, 1).setDepth(41);
     fitHeight(bottle, 150 * 0.22);
-    const myCup = this.add.image(BOY_X - 34, STEP_Y + 2, 'cup_full').setOrigin(0.5, 1).setDepth(42);
+    const myCup = this.add.image(BOY_X - 46, STEP_Y + 2, 'cup_full').setOrigin(0.5, 1).setDepth(42);
     fitHeight(myCup, 150 * 0.12);
     this.whole = this.add.image(BOY_X + 52, STEP_Y, 'sandwich_whole').setOrigin(0.5, 1).setDepth(41);
     fitWidth(this.whole, 150 * 0.3);
@@ -116,10 +116,20 @@ export class LunchScene extends BaseScene {
     }
   }
 
+  /** His first action is to ask: he taps his classmate (who glows) and asks about cheese. */
   private async intro(): Promise<void> {
-    await Voice.say('j3_open');
-    if (!this.alive) return;
-    // He asks first.
+    this.state = 'ask';
+    this.mateRing = glowRing(this, this.mate.x, SEAT_FOOT - KID_H * 0.45, 40, 39);
+    this.setIdle(() => this.showHint());
+    this.open('j3_open');
+  }
+
+  private async ask(): Promise<void> {
+    this.state = 'intro';
+    this.setIdle(null);
+    this.mateRing?.destroy();
+    this.mateRing = null;
+    sfx('pop', { volume: 0.4 });
     await Voice.say('j3_ask');
     if (!this.alive) return;
     this.tweens.add({ targets: this.mate, y: SEAT_FOOT - 5, duration: 160, yoyo: true, repeat: 1 });
@@ -204,10 +214,11 @@ export class LunchScene extends BaseScene {
     // The halves go down to the step; then the pour.
     halves[0].destroy();
     halves[1].destroy();
-    const mine = this.add.image(BOY_X + 34, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(41);
-    fitHeight(mine, 150 * 0.16);
-    const his = this.add.image(BOY_X + 62, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(42).setFlipX(true);
-    fitHeight(his, 150 * 0.16);
+    // His own half by his side; his friend's half, the one he hands over, at least 44 points tall.
+    const mine = this.add.image(BOY_X - 24, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(41);
+    fitHeight(mine, 150 * 0.18);
+    const his = this.add.image(BOY_X + 48, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(42).setFlipX(true);
+    fitHeight(his, 44);
     this.gifts.push(his);
     this.openPour();
   }
@@ -242,8 +253,8 @@ export class LunchScene extends BaseScene {
     await this.pour?.close();
     this.pour = null;
     if (!this.alive) return;
-    const cup = this.add.image(BOY_X + 88, STEP_Y + 2, 'cup_full').setOrigin(0.5, 1).setDepth(42);
-    fitHeight(cup, 150 * 0.14);
+    const cup = this.add.image(BOY_X + 94, STEP_Y + 2, 'cup_full').setOrigin(0.5, 1).setDepth(42);
+    fitHeight(cup, 44);
     this.gifts.push(cup);
     // He hands both over.
     this.state = 'give';
@@ -257,7 +268,9 @@ export class LunchScene extends BaseScene {
   private down(p: Phaser.Input.Pointer): void {
     if (!this.alive) return;
     this.hint.clear();
-    if (this.state === 'cut' && this.strokeId === -1) {
+    if (this.state === 'ask') {
+      if (this.mate.getBounds().contains(p.worldX, p.worldY) || Phaser.Math.Distance.Between(p.worldX, p.worldY, this.mate.x, SEAT_FOOT - KID_H * 0.5) < 60) void this.ask();
+    } else if (this.state === 'cut' && this.strokeId === -1) {
       this.strokeId = p.id;
       this.stroke = [new Phaser.Math.Vector2(p.worldX, p.worldY)];
       this.trail.clear();
@@ -344,7 +357,9 @@ export class LunchScene extends BaseScene {
   private showHint(): void {
     if (!this.alive) return;
     const again = () => this.kickIdle();
-    if (this.state === 'cut' && this.whole) {
+    if (this.state === 'ask') {
+      this.hint.show('tap', { x: this.mate.x, y: SEAT_FOOT - KID_H * 0.5 }, undefined, again);
+    } else if (this.state === 'cut' && this.whole) {
       const b = this.sandwichBox();
       this.hint.show('drag', { x: b.x, y: b.y - b.h * 0.8 }, { x: b.x, y: b.y + b.h * 0.8 }, again);
     } else if (this.state === 'pour') {

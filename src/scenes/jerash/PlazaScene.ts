@@ -30,10 +30,10 @@ const BIN_X = [112, 196, 280];
 // The litter picture sits on the bin's round label (measured on the bin art).
 const LABEL = { x: 0.5, y: 0.56, d: 0.4 };
 const GUARD = { x: 352, foot: 505 };
-// Litter is drawn larger than the checklist (about twice): at the checklist's
-// size a piece of paper would be 14 points wide, too small to see or hold.
-const SIZE: Record<Kind, number> = { bottle: 46, paper: 30, peel: 34 };
-const GLASS_W = 40;
+// Litter is drawn larger than the checklist: anything he must touch is at least
+// 44 points tall (at the checklist's size a piece of paper would be 14 wide).
+const LITTER_H = 44;
+const GLASS_H = 44;
 const HIT = 34;
 
 type Kind = 'bottle' | 'paper' | 'peel';
@@ -122,7 +122,7 @@ export class PlazaScene extends BaseScene {
       const home = places[i];
       const kind = pieces[i];
       const img = this.add.image(home.x, home.y, `litter_${kind}`).setDepth(30 + home.y / 100);
-      fitWidth(img, SIZE[kind]);
+      fitHeight(img, LITTER_H);
       img.setAngle(Phaser.Math.Between(-25, 25));
       this.litter.push({ img, kind, home: { ...home }, binned: false });
     }
@@ -136,7 +136,7 @@ export class PlazaScene extends BaseScene {
       // It lies away from the right edge, so the guard sweeping it stays in sight.
       const free = places.slice(count).find((s) => s.y < 660 && s.x >= 150 && s.x <= 270) ?? { x: 228, y: 612 };
       this.glass = this.add.image(free.x, free.y, 'glass_broken').setDepth(29);
-      fitWidth(this.glass, GLASS_W);
+      fitHeight(this.glass, GLASS_H);
       this.time.addEvent({ delay: 1900, loop: true, callback: () => this.glint() });
     }
 
@@ -154,14 +154,9 @@ export class PlazaScene extends BaseScene {
   }
 
   private async intro(): Promise<void> {
-    await Voice.say(this.quiet ? 'qdj_open' : 'j1_open');
-    if (!this.alive) return;
     this.state = 'play';
     this.setIdle(() => this.showHint());
-    if (!this.quiet) {
-      await Voice.say('j1_hint');
-      if (!this.alive) return;
-    }
+    this.open(this.quiet ? 'qdj_open' : 'j1_open', this.quiet ? undefined : 'j1_hint');
   }
 
   /** A short sparkle on the glass, so he notices it (the glass itself never moves). */

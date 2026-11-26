@@ -1,5 +1,5 @@
 // Stored on the device only (GAME_SPEC.md section 2): the parents' sound settings
-// (sound choice, music volume, voice speed) and one number per place: which
+// (sound choice, music volume, voice speed, the silent switch) and one number per place: which
 // mission comes next and whether he has been around once. Nothing about what he
 // chose or how he played.
 // Every read and write is wrapped: without storage, settings last until the app closes.
@@ -72,6 +72,23 @@ export function getVoiceSpeed(): VoiceSpeed {
 
 export function setVoiceSpeed(speed: VoiceSpeed): void {
   write(RATE_KEY, speed);
+}
+
+// ---------------------------------------------------------------- silent switch
+
+/**
+ * Whether sound plays even when the iPhone's silent switch is on (Safari's
+ * navigator.audioSession.type = "playback"). On by default; the parents' corner
+ * can turn it off if the phone's voice stays silent with it on.
+ */
+const THROUGH_SILENT_KEY = 'fk.throughSilent';
+
+export function getThroughSilent(): boolean {
+  return read(THROUGH_SILENT_KEY) !== 'off';
+}
+
+export function setThroughSilent(on: boolean): void {
+  write(THROUGH_SILENT_KEY, on ? 'on' : 'off');
 }
 
 // ---------------------------------------------------------------- rotation

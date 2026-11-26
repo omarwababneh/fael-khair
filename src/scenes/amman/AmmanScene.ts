@@ -220,7 +220,8 @@ export class AmmanScene extends BaseScene {
     dustPuff(this, PUDDLE.x, PUDDLE.y, 8, 0xd9a37a, 45);
     this.shards = SHARD_KEYS.map((key, i) => {
       const img = this.add.image(SHARDS[1].x, FLOOR - 20, key).setDepth(22);
-      fitWidth(img, 44);
+      // At least 44 points tall (he drags or sweeps them), and bigger than the small bits.
+      fitHeight(img, 54);
       this.tweens.add({ targets: img, x: SHARDS[i].x, y: SHARDS[i].y, angle: Phaser.Math.Between(-40, 40), duration: 380, ease: 'Quad.easeOut' });
       return { img, done: false };
     });
@@ -364,7 +365,7 @@ export class AmmanScene extends BaseScene {
     const mid = this.shards[1];
     for (const dx of [-26, 24]) {
       const img = this.add.image(mid.img.x + dx, mid.img.y + Phaser.Math.Between(-4, 6), SHARD_KEYS[1]).setDepth(22).setAngle(Phaser.Math.Between(-60, 60));
-      fitWidth(img, 24);
+      fitHeight(img, 44); // he sweeps them: at least 44 points tall
       this.shards.push({ img, done: false });
     }
     await said;

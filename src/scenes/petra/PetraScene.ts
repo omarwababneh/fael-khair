@@ -47,12 +47,12 @@ interface Nook { x: number; y: number; used: boolean; ring: Phaser.GameObjects.I
 // Laid out on the path in bg_petra_siq (visible from about y = 480 down):
 // nearer obstacles lower and bigger, farther ones higher and smaller.
 const OBSTACLES: ObstacleDef[] = [
-  { key: 'rock_a', kind: 'rock', x: 184, y: 656, w: 58, follow: 0.5, weight: 0.15 },
+  { key: 'rock_a', kind: 'rock', x: 184, y: 656, w: 60, follow: 0.5, weight: 0.15 },
   { key: 'rock_b', kind: 'rock', x: 168, y: 608, w: 62, follow: 0.33, weight: 0.35 },
   { key: 'rock_c', kind: 'rock', x: 236, y: 584, w: 66, follow: 0.24, weight: 0.55 },
-  { key: 'thorn_branch', kind: 'branch', x: 192, y: 556, w: 124, follow: 0.3, weight: 0.25, grip: 0.3 },
+  { key: 'thorn_branch', kind: 'branch', x: 192, y: 556, w: 142, follow: 0.3, weight: 0.25, grip: 0.3 },
   { key: 'rock_d', kind: 'rock', x: 170, y: 528, w: 74, follow: 0.12, weight: 1 },
-  { key: 'big_branch', kind: 'branch', x: 210, y: 500, w: 140, follow: 0.2, weight: 0.6, grip: 0.24 },
+  { key: 'big_branch', kind: 'branch', x: 210, y: 500, w: 140, follow: 0.2, weight: 0.6, grip: 0.27 },
 ];
 
 // Glowing nooks at the foot of the canyon walls. Any obstacle fits any free nook.
@@ -88,6 +88,8 @@ export class PetraScene extends BaseScene {
   private hint: Phaser.GameObjects.Image | null = null;
   private hintTweens: Phaser.Tweens.BaseTween[] = [];
   private hintCount = 0;
+  /** He has cleared his first stone or branch. */
+  private placedOne = false;
   private finished = false;
   private walkTimer?: Phaser.Time.TimerEvent;
   private poseTimer?: Phaser.Time.TimerEvent;
@@ -110,6 +112,7 @@ export class PetraScene extends BaseScene {
     this.hint = null;
     this.hintTweens = [];
     this.hintCount = 0;
+    this.placedOne = false;
     this.finished = false;
     this.idleTimer = this.walkTimer = this.poseTimer = undefined;
 
@@ -168,7 +171,8 @@ export class PetraScene extends BaseScene {
 
     // P1 safeguard: only loose stones and fallen branches; the carved rock is never touched.
     if (this.quiet) void Voice.say('qdp_open');
-    else void Voice.say('petra_open').then(() => { if (this.alive && !this.finished) void Voice.say('petra_care'); });
+    // One opening line, then straight to what to do; the care line comes after his first stone.
+    else void Voice.say('petra_open').then(() => { if (this.alive && !this.finished && !this.placedOne) void Voice.say('petra_hint'); });
     this.resetIdle();
   }
 
@@ -218,7 +222,7 @@ export class PetraScene extends BaseScene {
         const d = (dx / (w / 2 + 12)) ** 2 + (dy / (h / 2 + 12)) ** 2;
         if (d <= 1) score = d;
       } else {
-        const band = Math.max(18, h / 2 + 8);
+        const band = Math.max(28, h / 2 + 8); // at least 56 points tall
         if (Math.abs(dx) <= w / 2 + 12 && Math.abs(dy) <= band) score = 0.25 * (dy / band) ** 2;
       }
       if (score < bestScore) { bestScore = score; best = o; }
@@ -362,6 +366,9 @@ export class PetraScene extends BaseScene {
     this.tweens.add({ targets: nook.ring, alpha: 0, scale: nook.ring.scale * 1.6, duration: 500, onComplete: () => nook.ring.destroy() });
     // A finished step chimes, except in a quiet deed, which has no chime at all.
     if (!this.quiet) this.time.delayedCall(260, () => sfx('chime', { volume: 0.55 }));
+    // After his first stone: we look after the old place (P1 safeguard).
+    if (!this.placedOne && !this.quiet) this.time.delayedCall(500, () => this.alive && !this.finished && Voice.say('petra_care'));
+    this.placedOne = true;
 
     const remaining = this.obstacles.filter((x) => !x.placed).length;
     if (remaining === 0) void this.finale();
@@ -432,7 +439,8 @@ export class PetraScene extends BaseScene {
   private resetIdle(): void {
     this.idleTimer?.remove();
     if (this.finished) return;
-    this.idleTimer = this.time.delayedCall(HINT_AFTER, () => this.showHint());
+    // The first hint comes sooner, before anything is cleared.
+    this.idleTimer = this.time.delayedCall(this.placedOne ? HINT_AFTER : 3000, () => this.showHint());
   }
 
   private clearHint(): void {
@@ -473,7 +481,7 @@ export class PetraScene extends BaseScene {
       },
     }));
     this.hintCount++;
-    if (this.hintCount === 1 && o.kind === 'rock') void Voice.say('petra_hint');
+    if (this.hintCount === 1 && o.kind === 'rock' && this.placedOne) void Voice.say('petra_hint');
     else if (o.kind === 'branch' && !o.thornSaid) {
       o.thornSaid = true;
       void Voice.say('petra_thorn');
