@@ -1,6 +1,7 @@
 // Stored on the device only (GAME_SPEC.md section 2): the parents' sound settings
-// (sound choice, music volume, voice speed) and one number per place, which
-// mission comes next. Nothing about what he chose or how he played.
+// (sound choice, music volume, voice speed) and one number per place: which
+// mission comes next and whether he has been around once. Nothing about what he
+// chose or how he played.
 // Every read and write is wrapped: without storage, settings last until the app closes.
 
 function read(key: string): string | null {
@@ -76,16 +77,19 @@ export function setVoiceSpeed(speed: VoiceSpeed): void {
 // ---------------------------------------------------------------- rotation
 
 /**
- * One small number per place: which of its three missions comes next (0, 1 or 2).
- * Never shown, never counted, never sent anywhere.
+ * One small number per place, 0 to 5: the mission that comes next is the number
+ * modulo the place's number of missions, and a number at or past that count
+ * means he has been around once (the "first lap" plays the easy version). After
+ * the last value it goes back to the start of the second lap, so it never counts
+ * up. Never shown, never sent anywhere.
  */
 const ROT_PREFIX = 'fk.next.';
 
 export function getNextIndex(place: string): number {
   const n = Number(read(ROT_PREFIX + place));
-  return Number.isInteger(n) && n >= 0 && n <= 2 ? n : 0;
+  return Number.isInteger(n) && n >= 0 && n <= 5 ? n : 0;
 }
 
 export function setNextIndex(place: string, n: number): void {
-  write(ROT_PREFIX + place, String(((n % 3) + 3) % 3));
+  if (Number.isInteger(n) && n >= 0 && n <= 5) write(ROT_PREFIX + place, String(n));
 }

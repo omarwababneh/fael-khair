@@ -11,7 +11,7 @@ npm run build        # production build (fails if required art is missing)
 ALLOW_PLACEHOLDERS=1 npm run build   # build with magenta placeholders
 ```
 
-Debug: add `?scene=petra` (or `map`, `p2`, `p3`, `petra-dawn`, `ummqais`, `amman`, `irbid`, `wadirum`) to the address to jump straight to a scene.
+Debug: add `?scene=petra` (or `map`, `p2`, `p3`, `petra-dawn`, `ummqais`, `u2`, `u3`, `ummqais-dusk`, `amman`, `a2`, `a3`, `amman-morning`, `irbid`, `i2`, `i3`, `wadirum`) to the address to jump straight to a scene; add `&lap=1` for the later-lap version.
 
 ## Music credits
 

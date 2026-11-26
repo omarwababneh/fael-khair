@@ -12,8 +12,15 @@ import { PetraDawnScene, PetraScene } from './scenes/petra/PetraScene';
 import { PouchScene } from './scenes/petra/PouchScene';
 import { CartScene } from './scenes/petra/CartScene';
 import { UmmQaisScene } from './scenes/ummqais/UmmQaisScene';
+import { OliveScene, UmmQaisDuskScene } from './scenes/ummqais/OliveScene';
+import { HarvestScene } from './scenes/ummqais/HarvestScene';
 import { AmmanScene } from './scenes/amman/AmmanScene';
+import { BlocksScene } from './scenes/amman/BlocksScene';
+import { StairsScene } from './scenes/amman/StairsScene';
+import { MorningScene } from './scenes/amman/MorningScene';
 import { IrbidScene } from './scenes/irbid/IrbidScene';
+import { BakeryScene } from './scenes/irbid/BakeryScene';
+import { AlleyScene } from './scenes/irbid/AlleyScene';
 import { WadiRumScene } from './scenes/wadirum/WadiRumScene';
 
 // No page zoom, no pinch, no double-tap zoom, no long-press callouts, no pull-to-refresh.
@@ -43,7 +50,8 @@ async function boot(): Promise<void> {
     render: { antialias: true, powerPreference: 'high-performance' },
     input: { activePointers: 2 },
     fps: { target: 60 },
-    scene: [BootScene, StartScene, MapScene, PetraScene, PouchScene, CartScene, PetraDawnScene, UmmQaisScene, AmmanScene, IrbidScene, WadiRumScene],
+    scene: [BootScene, StartScene, MapScene, PetraScene, PouchScene, CartScene, PetraDawnScene, UmmQaisScene, OliveScene, HarvestScene, UmmQaisDuskScene,
+      AmmanScene, BlocksScene, StairsScene, MorningScene, IrbidScene, BakeryScene, AlleyScene, WadiRumScene],
   });
 
   let pending = 0;

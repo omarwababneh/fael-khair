@@ -166,7 +166,9 @@ export class PetraScene extends BaseScene {
     // Birds by day, now and then.
     this.time.addEvent({ delay: 7000, loop: true, callback: () => Math.random() < 0.7 && sfx('birds', { volume: 0.5 }) });
 
-    void Voice.say(this.quiet ? 'qdp_open' : 'petra_open');
+    // P1 safeguard: only loose stones and fallen branches; the carved rock is never touched.
+    if (this.quiet) void Voice.say('qdp_open');
+    else void Voice.say('petra_open').then(() => { if (this.alive && !this.finished) void Voice.say('petra_care'); });
     this.resetIdle();
   }
 
