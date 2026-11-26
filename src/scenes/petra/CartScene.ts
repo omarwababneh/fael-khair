@@ -147,6 +147,8 @@ export class CartScene extends BaseScene {
     // He may start loading at once (an easy first win inside 10 seconds),
     // while the old man lifts the big sack.
     this.state = 'load';
+    // The hint hand is ready at once (it shows after 3 seconds if he has not touched anything).
+    this.setIdle(() => this.showHint());
     void this.intro(big);
   }
 
@@ -175,8 +177,7 @@ export class CartScene extends BaseScene {
     if (!this.alive) return;
     this.introDone = true;
     if (this.state !== 'load') return;
-    this.setIdle(() => this.showHint());
-    if (this.loaded.left + this.loaded.right === 0) void Voice.say('p3_hint');
+    if (this.loaded.left + this.loaded.right === 0 && !Voice.busy) void Voice.say('p3_hint');
   }
 
   // ---------------------------------------------------------------- input
