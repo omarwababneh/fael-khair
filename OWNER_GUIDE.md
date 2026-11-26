@@ -18,9 +18,9 @@ Every change merged into the project publishes itself in about 2 minutes. The re
 ## How a day goes (8 to 10 minutes)
 
 1. The start screen: tap **يَلّا**.
-2. The map: tap a place to play its mission. Each place plays one mission a day and takes its turn through its three missions (Petra, Umm Qais, Amman; Irbid has two ordinary ones plus the secret basket). The first time round each mission is a little easier. Jerash, the Dead Sea and Aqaba come in the next waves. A place already played today, or one not built yet (Jerash, the Dead Sea, Aqaba), just says its name.
+2. The map: tap a place to play its mission. Each place plays one mission a day and takes its turn through its three missions (Petra, Umm Qais, Amman, Jerash, the Dead Sea; Irbid has two ordinary ones plus the secret basket). The first time round each mission is a little easier. Aqaba comes in the next wave. A place already played today, or one not built yet (Aqaba), just says its name.
 3. After each mission the sun moves a step toward sunset. That is the only sign of progress.
-4. **The fourth mission of every day is a quiet good deed** that nobody sees or thanks: in Petra the boy clears the Siq at dawn; in Umm Qais he waters a neighbour's wilting trees; in Amman he waters Mama's mint and folds the blanket before she wakes; in Irbid he leaves the secret basket.
+4. **The fourth mission of every day is a quiet good deed** that nobody sees or thanks: in Petra the boy clears the Siq at dawn; in Umm Qais he waters a neighbor's wilting trees; in Amman he waters Mama's mint and folds the blanket before she wakes; in Irbid he leaves the secret basket; in Jerash he clears the empty plaza early in the morning; at the Dead Sea he turns off a dripping tap with nobody around.
 5. After four missions, the map turns to dusk and **وادي رَمّ** glows. Tapping it opens the night ending: stars, then the father's closing line, then the ayah in still text, then the goodnight line and the button **خلصنا لليوم**.
 6. Starting again begins a fresh day. Nothing is lost by closing the game at any point.
 

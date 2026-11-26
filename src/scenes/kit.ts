@@ -43,6 +43,8 @@ export function walkTo(
   frames: [string, string] = ['boy_walk_a', 'boy_walk_b'], speed = 110,
 ): Promise<void> {
   scene.tweens.killTweensOf(img);
+  // A walk cut short by a new one must stop its own frame timer too.
+  (img.getData('walkTimer') as Phaser.Time.TimerEvent | undefined)?.remove();
   const dist = Math.hypot(to.x - img.x, (to.y ?? img.y) - img.y);
   const dur = Math.max(350, (dist / speed) * 1000);
   let a = true;
@@ -57,9 +59,10 @@ export function walkTo(
       sfx('step', { volume: 0.45 });
     },
   });
+  img.setData('walkTimer', t);
   return new Promise((res) => scene.tweens.add({
     targets: img, x: to.x, y: to.y ?? img.y, duration: dur, ease: 'Sine.easeInOut',
-    onComplete: () => { t.remove(); img.setFlipX(false); res(); },
+    onComplete: () => { t.remove(); img.setData('walkTimer', undefined); img.setFlipX(false); res(); },
   }));
 }
 
@@ -169,5 +172,126 @@ export class PourCan {
       this.scene.time.delayedCall(700, () => st.destroy());
       this.stream = null;
     }
+  }
+}
+
+/**
+ * A close-up for pouring water from a bottle into a cup (J3, D3). Hold to pour,
+ * let go at the line. The water level is the cup_full picture revealed from the
+ * bottom up over cup_empty; the fill line is interface chrome drawn in code.
+ */
+export class CupPour {
+  readonly root: Phaser.GameObjects.Container;
+  /** 0 empty to 1 full. */
+  fill = 0;
+  private cup: Phaser.GameObjects.Image;
+  private water: Phaser.GameObjects.Image;
+  private bottle: Phaser.GameObjects.Image;
+  private line: Phaser.GameObjects.Graphics;
+  private stream: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
+  private pouring = false;
+  private lastSound = 0;
+  // Measured on cup_full: the water reaches from y 0.97 (the bottom) to 0.13 (the brim).
+  private static readonly BOTTOM = 0.97;
+  private static readonly BRIM = 0.13;
+
+  /** target: the fill line (0 to 1); x, y: the center of the cup. */
+  constructor(private scene: Phaser.Scene, x: number, y: number, cupH: number, readonly target: number, private dim: Phaser.GameObjects.Rectangle) {
+    this.cup = scene.add.image(x, y, 'cup_empty');
+    fitHeight(this.cup, cupH);
+    this.water = scene.add.image(x, y, 'cup_full');
+    fitHeight(this.water, cupH);
+    this.bottle = scene.add.image(x + cupH * 0.75, y - cupH * 0.55, 'water_bottle');
+    fitHeight(this.bottle, cupH * 1.3);
+    this.line = scene.add.graphics();
+    this.drawLine();
+    this.root = scene.add.container(0, 0, [this.cup, this.water, this.line, this.bottle]).setDepth(86).setAlpha(0);
+    this.setLevel(0);
+    scene.tweens.add({ targets: this.root, alpha: 1, duration: 400 });
+    scene.tweens.add({ targets: this.dim, fillAlpha: 0.45, duration: 400 });
+  }
+
+  /** Where the water level is, in world y, for a fill of f. */
+  private levelY(f: number): number {
+    const h = this.cup.frame.height * this.cup.scale;
+    const top = this.cup.y - h / 2;
+    return top + h * (CupPour.BOTTOM - f * (CupPour.BOTTOM - CupPour.BRIM));
+  }
+
+  private drawLine(): void {
+    const w = this.cup.frame.width * this.cup.scale;
+    const y = this.levelY(this.target);
+    this.line.clear();
+    this.line.lineStyle(4, 0x4a2c17, 0.85);
+    for (let x = this.cup.x - w * 0.42; x < this.cup.x + w * 0.42; x += 16) this.line.lineBetween(x, y, Math.min(x + 9, this.cup.x + w * 0.42), y);
+  }
+
+  private setLevel(f: number): void {
+    this.fill = f;
+    const fh = this.water.frame.height;
+    const top = fh * (CupPour.BOTTOM - f * (CupPour.BOTTOM - CupPour.BRIM));
+    this.water.setCrop(0, top, this.water.frame.width, fh - top);
+  }
+
+  /** Is the point on the bottle or the cup (he may hold either)? */
+  hit(x: number, y: number): boolean {
+    const near = (img: Phaser.GameObjects.Image) => {
+      const w = img.frame.width * img.scaleX, h = img.frame.height * img.scaleY;
+      return Math.abs(x - img.x) < w / 2 + 30 && Math.abs(y - img.y) < h / 2 + 30;
+    };
+    return near(this.bottle) || near(this.cup);
+  }
+
+  press(): void {
+    if (this.pouring) return;
+    this.pouring = true;
+    this.scene.tweens.killTweensOf(this.bottle);
+    this.scene.tweens.add({ targets: this.bottle, angle: -112, x: this.cup.x + 40, y: this.cup.y - this.cupH() * 0.85, duration: 260, ease: 'Sine.easeOut' });
+    this.scene.time.delayedCall(240, () => {
+      if (!this.pouring) return;
+      this.stream?.destroy();
+      this.stream = waterStream(this.scene, this.cup.x + 6, this.cup.y - this.cupH() * 0.62, 87);
+    });
+  }
+
+  private cupH(): number {
+    return this.cup.frame.height * this.cup.scale;
+  }
+
+  /** Stop pouring: the bottle stands up again. */
+  release(): void {
+    if (!this.pouring) return;
+    this.pouring = false;
+    this.scene.tweens.killTweensOf(this.bottle);
+    this.scene.tweens.add({ targets: this.bottle, angle: 0, x: this.cup.x + this.cupH() * 0.75, y: this.cup.y - this.cupH() * 0.55, duration: 260, ease: 'Sine.easeOut' });
+    if (this.stream) {
+      const st = this.stream;
+      st.emitting = false;
+      this.scene.time.delayedCall(600, () => st.destroy());
+      this.stream = null;
+    }
+  }
+
+  get isPouring(): boolean {
+    return this.pouring;
+  }
+
+  /** Call every frame. Returns true when the cup has just run over the brim. */
+  update(dt: number, msToFill: number): boolean {
+    if (!this.pouring) return false;
+    this.setLevel(Math.min(1, this.fill + dt / msToFill));
+    if (this.scene.time.now - this.lastSound > 650) {
+      this.lastSound = this.scene.time.now;
+      sfx('pour', { volume: 0.5 });
+    }
+    return this.fill >= 1;
+  }
+
+  close(): Promise<void> {
+    this.release();
+    return new Promise((res) => {
+      this.scene.tweens.add({ targets: this.dim, fillAlpha: 0, duration: 400 });
+      this.scene.tweens.add({ targets: this.root, alpha: 0, duration: 400, onComplete: () => { this.root.destroy(); res(); } });
+    });
   }
 }

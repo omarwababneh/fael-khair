@@ -10,6 +10,8 @@ const SCENES: Record<string, string> = {
   ummqais: 'ummqais', u2: 'u2', u3: 'u3', 'ummqais-dusk': 'ummqais-dusk',
   amman: 'amman', a2: 'a2', a3: 'a3', 'amman-morning': 'amman-morning',
   irbid: 'irbid', i2: 'i2', i3: 'i3', wadirum: 'wadirum',
+  jerash: 'jerash', j2: 'j2', j3: 'j3', 'jerash-morning': 'jerash-morning',
+  deadsea: 'deadsea', d2: 'd2', d3: 'd3', 'deadsea-tap': 'deadsea-tap',
 };
 
 export class BootScene extends Phaser.Scene {
