@@ -339,5 +339,20 @@
     ],
     "kind": "direct",
     "approval_status": "pending"
+  },
+  {
+    "source_id": "father_u2",
+    "reference": "The father's own words (not a quoted hadith or ayah)",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "The father's own words, reviewed together with the religious texts. Approve the line as written, or change it.",
+    "child_paraphrase_tts": "نحن زرعناها وسقيناها، والله هو الذي أنبتها. الحمد لله.",
+    "child_paraphrase_script": "إحنا زرعناها وسقيناها، والله هو اللي أنبتها. الحمد لله.",
+    "fictional_adaptation": "U2: after the three saplings are planted and watered, the father says who makes them grow.",
+    "used_in": [
+      "U2"
+    ],
+    "kind": "father_own_words",
+    "approval_status": "pending"
   }
 ]

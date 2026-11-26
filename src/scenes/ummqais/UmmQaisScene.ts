@@ -9,16 +9,18 @@ import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
 // Umm Qais: the thirsty dog (value: mercy to animals; source bukhari_2363).
-// The boy stands beside the well and never leans over it. The rope is part of
-// the boy_pull art; the handle he drags is a glow ring (interface chrome).
-// Positions are in the 390 x 844 design frame; tune them once the art arrives.
+// The boy pulls the rope standing back from the well and never leans over it.
+// The rope is part of the boy_pull art; the handle he drags is a glow ring
+// (interface chrome).
 
-// Measured on the delivered bg_ummqais_well (design frame): the well's crossbar is
-// centred at x = 250, y = 385; its mouth's back rim is at y = 470; the trough's
-// basin is at the far left, its water line about (62, 521).
-const WELL = { x: 250, mouth: 470, bottomY: 560, topY: 426 };
-const HANDLE = { x: 318, top: 566, bottom: 676 };
-const BOY = { x: 340, y: 690, h: 150 };
+// Measured on bg_ummqais_well (world = picture coordinates): the crossbar is
+// centred at x = 250, y = 390; an iron safety grille covers the well, with a
+// small bucket hatch in the middle (x 228 to 272, its opening at y = 500), so
+// the bucket (42 wide) is seen only above the hatch. The trough's basin is at
+// the far left, its water line about (62, 521).
+const WELL = { x: 250, mouth: 500, bottomY: 572, topY: 426 };
+const BOY = { x: 360, y: 694, h: 150 }; // a step back from the well's rim (it ends at x = 335)
+const HANDLE = { x: BOY.x - 22, top: 566, bottom: 676 };
 const TROUGH = { x: 62, y: 521, w: 96 };
 const DOG = { x: 196, y: 632, h: 100 };
 const POUR_SPOT = { x: TROUGH.x + 40, y: TROUGH.y - 60 };
@@ -395,7 +397,7 @@ export class UmmQaisScene extends BaseScene {
     this.setIdle(null);
     this.handle.setVisible(false);
     // U1 safeguard: he pours and steps back. He does not pet or go near the dog.
-    this.tweens.add({ targets: this.boy, x: BOY.x + 18, duration: 600, ease: 'Sine.easeInOut' });
+    this.tweens.add({ targets: this.boy, x: BOY.x + 12, duration: 600, ease: 'Sine.easeInOut' });
     await Voice.say('uq_stepback');
     if (!this.alive) return;
     // The dog goes to the trough and drinks.

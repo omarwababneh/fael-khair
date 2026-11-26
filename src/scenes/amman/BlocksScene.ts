@@ -21,7 +21,7 @@ import { breathe, pose } from '../kit';
 const FLOOR = 700; // on the rug of bg_amman_home
 const BOY = { x: 120, h: 150 };
 const TOWER_X = 236;
-const BLOCK_H = BOY.h * 0.12; // art checklist
+const BLOCK_H = BOY.h * 0.2; // owner: 0.2 of the boy, so each block reads clearly (DECISIONS 116)
 const SISTER_H = BOY.h * 0.75;
 const COLORS = [0xf2a65a, 0x7cc0e8, 0xf06f6f, 0x9ad17a, 0xf5d36a, 0xc59be0, 0xf2a65a, 0x7cc0e8, 0xf06f6f, 0x9ad17a];
 const BREATH_MS = 2400; // to breathe in fully

@@ -81,7 +81,7 @@ export class OliveScene extends BaseScene {
     ui.setPill('أُمّ قَيْس');
     ui.setHome(() => this.goTo('map'));
     ui.clearBubble();
-    music.play('ummqais');
+    music.play('ummqais', { natureOnly: this.quiet }); // a quiet deed has no music
 
     const bg = this.addCover('bg_ummqais_grove');
     this.tweens.add({ targets: bg, scale: bg.scale * 1.01, duration: 9000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });

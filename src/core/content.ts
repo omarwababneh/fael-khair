@@ -6,8 +6,13 @@ interface Paraphrase {
   child_paraphrase_tts: string | null;
   child_paraphrase_script: string | null;
 }
-interface RegistryEntry extends Paraphrase {
+export interface RegistryEntry extends Paraphrase {
   source_id: string;
+  reference: string;
+  used_in: string[];
+  /** direct, application (or one per mission), or father_own_words: a line of
+   *  the father's own that is reviewed together with the religious texts. */
+  kind: string | Record<string, string>;
   tts?: boolean;
   /** One source used by several missions keeps one paraphrase per part (bukhari_2989). */
   parts?: Record<string, Paraphrase>;

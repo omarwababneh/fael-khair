@@ -131,7 +131,7 @@ They stay as they are and become the first mission of their place, with the safe
 - **Value:** mercy to animals. **Source:** `bukhari_2363`.
 - **Place:** the old hilltop village of Umm Qais: black basalt columns, a stone well, a wide view over the valley and the lake far below.
 - **Situation:** a stray dog pants beside an empty stone trough.
-- **Play:** a rope-and-bucket pull. The boy stands beside the well and never leans over it.
+- **Play:** a rope-and-bucket pull. The well has an iron safety grille with a small bucket hatch in the middle; the bucket passes only through the hatch. The boy pulls the rope standing a step back from the well and never leans over it.
   - Drag the rope handle downward in steady strokes to raise the bucket.
   - Pull too fast and water sloshes out (the bucket's water level visibly drops, with a splash sound). Steady pulls keep it full.
   - When the bucket reaches the top, drag it to the trough and tilt it by dragging downward to pour.
@@ -426,10 +426,10 @@ Backgrounds are portrait, at least 1024 x 1536 pixels, with the important conten
 | `food_olives` | a small bowl of olives. | existing |
 | `food_tomatoes` | a few red tomatoes. | existing |
 | `cart_empty` | the same small wooden two-wheeled cart as in elder_cart, empty, without the donkey. Side view. | 1 |
-| `pouch_blue` | the same small cloth pouch in blue, with a blue tie-string and a yellow star patch. | 1 |
-| `pouch_red` | a small cloth pouch, red, tied at the top with a red tie-string, a small yellow star patch sewn on the front. | 1 |
-| `pouch_red_bluestring` | the same red cloth pouch with the yellow star patch, but tied with a blue tie-string instead of a red one. | 1 |
-| `pouch_red_moon` | the same red cloth pouch with a red tie-string, but a small white moon patch instead of the star. | 1 |
+| `pouch_blue` | the same small cloth pouch in blue, with a blue tie-string and a small embroidered yellow flower. | 1 |
+| `pouch_red` | a small cloth pouch, red, tied at the top with a red tie-string, a small yellow flower embroidered on the front. | 1 |
+| `pouch_red_bluestring` | the same red cloth pouch with the embroidered yellow flower, but tied with a blue tie-string instead of a red one. | 1 |
+| `pouch_red_moon` | the same red cloth pouch with a red tie-string, but a small embroidered green leaf instead of the flower (the key keeps its first-draft name). | 1 |
 | `sack_big` | a big, heavy, bulging burlap sack tied at the top. | 1 |
 | `sack_small` | a small, light burlap sack tied at the top. | 1 |
 | `basket_olives` | the woven basket (same as basket_empty) full of green and black olives. | 2 |
@@ -535,7 +535,7 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `map_deadsea` | tap Dead Sea | هذا البحر الميت، أخفض مكان على الأرض. | هاد البحر الميت، أوطى مكان عالأرض. |
 | `map_aqaba` | tap Aqaba | هذه العقبة، على البحر الأحمر. | هاي العقبة، عالبحر الأحمر. |
 | `map_wadirum` | tap Wadi Rum | هذا وادي رم. تعال نشاهد النجوم. | هاد وادي رم. تعال نتفرّج عالنجوم. |
-| `petra_open` | Petra start | الطريق مغلق، والعمّ لا يستطيع المرور. هل تساعده؟ | الطريق مسكّرة وعمّو مش قادر يمرق. بتساعده؟ |
+| `petra_open` | Petra start | الطريق مغلق بالحجارة، والعمّ يريد أن يمرّ بعربته. هل تساعده؟ | الطريق مسكّرة بالحجار، وعمّو بدّه يمرق بعربيّته. بتساعده؟ |
 | `petra_hint` | idle | اسحب الحجر إلى جانب الطريق. | اسحب الحجر عَ جنب الطريق. |
 | `petra_thorn` | thorn touched | انتبه للشوك! أمسك الغصن من طرفه. | دير بالك من الشوك! امسك الغصن من طرفه. |
 | `petra_clear` | path clear | أصبح الطريق آمناً للجميع. | هيك صارت الطريق آمنة للكل. |
@@ -554,7 +554,7 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `am_heart` | cloud appears | قلبك ليس مرتاحاً. الصدق يريح القلب. | قلبك مش مرتاح. الصدق بريّح القلب. |
 | `am_brave` | after telling | قلتَ الحقيقة. هذا يحتاج إلى شجاعة. | حكيت الحقيقة. هاي بدها شجاعة. |
 | `am_hadith` R | ending | registry `muslim_2607c` | registry `muslim_2607c` |
-| `ir_open` | Irbid start | جارتنا متعبة ولا تستطيع الذهاب إلى السوق. هيّا نجهّز لها سلّة. | جارتنا تعبانة ومش قادرة تروح عالسوق. يلّا نجهّزلها سلّة. |
+| `ir_open` | Irbid start | جارتنا متعبة هذه الأيام وترتاح في البيت. هيّا نجهّز لها سلّة. | جارتنا تعبانة هالأيام وبترتاح بالبيت. يلّا نجهّزلها سلّة. |
 | `ir_pack` | idle, packing | ضع الطعام في السلّة. | حطّ الأكل بالسلّة. |
 | `ir_sneak` | sneak begins | امشِ بهدوء، وقِف عندما ينظر أحد. | امشي عَ رواق، ووقّف لمّا حدا يطّلع. |
 | `ir_knock` | at the door | ضع السلّة، اطرق الباب، واختبئ! | حطّ السلّة، دقّ الباب، وتخبّى! |
@@ -569,14 +569,14 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `p2_hint` | idle, pouch in the sand | اضغط على الكيس. | اكبس عالكيس. |
 | `p2_look` | close-up of the pouch | لا نفتحه. ننظر إلى رباطه وعلامته. | ما بنفتحه. بنطّلع على رباطه وعلامته. |
 | `p2_string` | taps the tie-string | رباط أحمر. | رباط أحمر. |
-| `p2_patch` | taps the patch | وعليه نجمة صفراء. | وعليه نجمة صفرا. |
+| `p2_patch` | taps the flower | وعليه وردة صفراء. | وعليه وردة صفرا. |
 | `p2_guard` | after looking | نعطيه لحارس المكان، وننتظر صاحبه عنده. | بنعطيه لحارس المكان، وبنستنّى صاحبه عنده. |
 | `p2_guard_wait` | guard, boy beside him | لننتظر صاحبه هنا معاً. | خلّينا نستنّى صاحبه هون سوا. |
 | `p2_match` | travelers arrive | لمن هذا الكيس؟ انظر إلى الصور. | لمين هالكيس؟ طلّع عالصور. |
 | `p2_notmine` | wrong traveler | لا، كيسي ليس هذا. | لا، كيسي مش هاد. |
 | `p2_relief` | right traveler | الحمد لله! هذا ثمن الماء لأولادي. | الحمد لله! هاد حقّ الميّ لولادي. |
 | `p2_found_other` | guard finds the other pouch | وهذا كيسك، وجدتُه هنا. | وهاد كيسك، لقيته هون. |
-| `p2_end` | they walk on | عاد الكيس إلى صاحبه، وسيشرب أولاده الماء. | رجع الكيس لصاحبه، وولاده رح يشربوا ميّ. |
+| `p2_end` | they walk on | عاد الكيس إلى صاحبه، وأكمل طريقه مع أولاده. | رجع الكيس لصاحبه، وكمّل طريقه مع ولاده. |
 | `p2_hadith` R | P2 ending | registry `bukhari_2427` | registry `bukhari_2427` |
 | `p3_open` | P3 start | بسم الله. سقطت أكياس العمّ عن عربته. هيّا نساعده. | بسم الله. وقعت أكياس عمّو عن عربيّته. يلّا نساعده. |
 | `p3_big` | old man lifts the big sack | الكيس الكبير ثقيل، أنا أرفعه. | الكيس الكبير تقيل، أنا بشيله. |
@@ -599,7 +599,7 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `u2_press` | sapling in | اضغط التراب حولها. | اكبس التراب حواليها. |
 | `u2_water` | soil pressed | اسقها بالماء. | اسقيها ميّ. |
 | `u2_wait` | the seasons begin | والآن ننتظر. الشجر يحتاج إلى وقت. | وهلأ بنستنّى. الشجر بدّه وقت. |
-| `u2_trust` | the trees have grown (MISSIONS_V2 exact script) | نحن زرعناها وسقيناها، والله هو الذي أنبتها. الحمد لله. | إحنا زرعناها وسقيناها، والله هو اللي أنبتها. الحمد لله. |
+| `u2_trust` R | the trees have grown (MISSIONS_V2 exact script; the father's own words, registry `father_u2` so it is reviewed with the religious texts) | نحن زرعناها وسقيناها، والله هو الذي أنبتها. الحمد لله. | إحنا زرعناها وسقيناها، والله هو اللي أنبتها. الحمد لله. |
 | `u2_end` | birds and the stranger | صار هنا ظلّ للناس وطعام للطيور. | صار هون فيّ للناس وأكل للطيور. |
 | `qdu_open` | Umm Qais quiet deed start | بسم الله. أشجار الجار عطشى، ولا أحد هنا. | بسم الله. شجرات الجار عطشانين، وما في حدا هون. |
 | `qdu_end` | evening | في المساء، وقفت الأشجار من جديد. | بالمسا، وقفوا الشجرات من جديد. |
@@ -722,6 +722,7 @@ Add two fields to every entry, old and new: `used_in` (list of mission ids) and 
 | `quran_17_34` | Quran, Al-Isra 17:34 | Q3 | direct | أمرنا الله أن نوفي بالعهد. |
 | `quran_2_215` | Quran, Al-Baqarah 2:215 | Wadi Rum closing line | direct | (the closing line in section 7) |
 | `quran_3_190` | Quran, Al 'Imran 3:190 | Wadi Rum ayah | direct | not spoken synthetically |
+| `father_u2` | The father's own words (not a quoted text) | U2 | father_own_words | نحن زرعناها وسقيناها، والله هو الذي أنبتها. الحمد لله. |
 
 `quran_14_7`: the paraphrase speaks only of thanking. It leaves out the promise of increase on purpose, so a child does not hear gratitude as a way to get more things. The owner may change this at review.
 

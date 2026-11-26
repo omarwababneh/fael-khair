@@ -88,7 +88,7 @@ Safeguard to add: the obstacles are loose stones and fallen branches only. He ne
 
 **P2. The lost pouch.** Value: trust (amanah), returning what is lost to its true owner. Source: `bukhari_2427`.
 - Place: the Treasury plaza (`bg_petra_treasury`).
-- Play: he spots a small cloth pouch in the sand and picks it up. He taps it to look closely: a red tie-string and a star patch. He does not open it and keep anything. He carries it to the site guard, who stands in plain view. Two travelers come. Each one's thought bubble shows a picture of the pouch he lost. The boy drags the pouch to the traveler whose picture matches. The first easy round differs by color; replays differ by the string or the patch.
+- Play: he spots a small cloth pouch in the sand and picks it up. He taps it to look closely: a red tie-string and a small embroidered yellow flower. He does not open it and keep anything. He carries it to the site guard, who stands in plain view. Two travelers come. Each one's thought bubble shows a picture of the pouch he lost. The boy drags the pouch to the traveler whose picture matches. The first easy round differs by color; replays differ by the string, or by a green leaf in place of the flower.
 - The other traveler is not a liar. He lost a different pouch, and the guard finds it a moment later.
 - Outcome: the traveler's relief; his water money is back; he and his children ride on.
 - Safeguards: the trusted adult (the guard) is there for the whole return. The boy never walks off with a stranger.
@@ -167,7 +167,7 @@ No change to the scene. The sentence about good and bad secrets goes in the pare
 - Place: new `bg_jerash_plaza` (the Oval Plaza: a wide paved oval ringed by tall columns).
 - Play: litter is scattered after a festival. He drags each piece to the bin with the matching picture: bottles, paper, the rest. A breeze moves the paper later on. One item glints: broken glass. If he reaches for it, it does not lift, and the father says this one is for a grown-up. He taps the site guard, who sweeps it up.
 - Outcome: visitors walk the clean plaza; a small child runs across it safely.
-- Safeguards: safe litter only; the hazard is reported, never touched.
+- Safeguards: safe litter only; the hazard is reported, never touched. He never picks up glass by hand, not even to carry it to the guard: the glass cannot be lifted or dragged at all, and the guard sweeps it up with his own broom and dustpan.
 - Suggested art: `litter_bottle`, `litter_can`, `litter_paper`, `litter_peel`, `glass_broken`, `bin_plastic`, `bin_paper`, `bin_general` (pictures on the bins, no words), `guard_sweep`. Reuse `guard_stand`, `boy_lift`.
 
 **J2. The lost little girl.** Value: helping someone in distress. Source: `muslim_2699a`.

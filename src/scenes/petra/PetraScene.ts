@@ -116,7 +116,7 @@ export class PetraScene extends BaseScene {
     ui.setPill('البَتْرا');
     ui.setHome(() => this.goTo('map'));
     ui.clearBubble();
-    music.play('petra');
+    music.play('petra', { natureOnly: this.quiet }); // a quiet deed has no music
 
     const bg = this.addCover('bg_petra_siq');
     // A very slow breath on the canyon so the frame is never perfectly still.

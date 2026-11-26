@@ -57,7 +57,7 @@ export class MorningScene extends BaseScene {
     ui.setPill('عَمّان');
     ui.setHome(() => this.goTo('map'));
     ui.clearBubble();
-    music.play('amman');
+    music.play('amman', { natureOnly: true }); // a quiet deed has no music
 
     this.addCover('bg_amman_home');
     motes(this, { x: 20, y: 160, w: 350, h: 480 }, 40, 0xdfe6ff);
