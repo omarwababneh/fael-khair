@@ -19,7 +19,7 @@ import { breathe } from '../kit';
 // on the viewpoint: no floating, no swimming. The lines thank; they never bargain.
 //
 // The sun in bg_deadsea_shore sits at the picture's far left, outside the
-// portrait frame on a phone, so the things to tap are the sea (with its
+// portrait frame on a tall phone, so the things to tap are the sea (with its
 // mountains), the water, the bread, his own hands and Baba (DECISIONS.md).
 
 // Measured on bg_deadsea_shore (world units): the paved path starts at y = 562;
