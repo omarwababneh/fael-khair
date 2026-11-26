@@ -87,6 +87,8 @@ export class BakeryScene extends BaseScene {
     // The busy baker stands behind the counter: only what is above it shows.
     this.baker = this.add.image(BAKER.x, BAKER.foot, 'baker_busy').setOrigin(0.5, 1).setDepth(10);
     this.cropBaker('baker_busy');
+    // He is never perfectly still: a slow sway as he works.
+    this.tweens.add({ targets: this.baker, angle: { from: -1, to: 1 }, duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     this.boy = this.add.image(BOY.x, BOY.foot, 'boy_idle').setOrigin(0.5, 1).setDepth(30);
     fitHeight(this.boy, BOY.h);
     breathe(this, this.boy);
@@ -157,7 +159,7 @@ export class BakeryScene extends BaseScene {
   private async pay(): Promise<void> {
     this.state = 'intro';
     this.setIdle(null);
-    sfx('pop');
+    sfx('pop', { volume: 0.5 });
     this.coins.forEach((c, i) => {
       c.where = 'tray';
       this.tweens.add({ targets: c.img, x: TRAY.x - 60 + i * 26, y: TRAY.y + 4, duration: 420, delay: i * 90, ease: 'Sine.easeInOut' });
@@ -286,9 +288,12 @@ export class BakeryScene extends BaseScene {
     // The baker's surprise and warm thanks.
     this.cropBaker('baker_smile');
     this.tweens.add({ targets: this.baker, y: BAKER.foot - 4, duration: 200, yoyo: true });
-    await Voice.say('i2_baker');
+    // The camera moves out while he thanks him.
+    const thanked = Voice.say('i2_baker');
+    await this.wait(1200);
     if (!this.alive) return;
     await this.endView();
+    await thanked;
     if (!this.alive) return;
     pose(this, this.boy, 'boy_happy', BOY.h);
     // Closing time: the light turns to evening, and his tray is right.
@@ -301,7 +306,7 @@ export class BakeryScene extends BaseScene {
     this.tweens.add({ targets: this.baker, angle: { from: -3, to: 3 }, duration: 300, yoyo: true, repeat: 3 });
     sfx('knock', { volume: 0.3 });
     completeMission('irbid');
-    await this.wait(1400);
+    await this.wait(600);
     if (!this.alive) return;
     await Voice.say('i2_end');
     if (!this.alive) return;

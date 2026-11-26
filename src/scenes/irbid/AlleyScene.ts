@@ -7,7 +7,7 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
-import { breathe, pose, walkTo } from '../kit';
+import { breathe, pose, stopBreathing, walkTo } from '../kit';
 
 // I3. Irbid: the new boy (value: a kind word; including the one left out;
 // source bukhari_2989, part "good_word"). MISSIONS_V2.md section 5.
@@ -37,6 +37,8 @@ export class AlleyScene extends BaseScene {
   private noticeAfter = 6;
   private newSpot = { x: 340, y: 592 };
   private dragBoy = -1;
+  private lastStepX = 0;
+  private stepFrame = false;
   private removeAction: (() => void) | null = null;
   private hint!: HintHand;
   private lookSaid = false;
@@ -157,6 +159,8 @@ export class AlleyScene extends BaseScene {
       // Grab the boy to walk him over to someone.
       if (Math.abs(x - this.boy.x) < 40 && y > this.boy.y - BOY_H && y < this.boy.y + 10) {
         this.dragBoy = p.id;
+        this.lastStepX = this.boy.x;
+        stopBreathing(this, this.boy);
         return;
       }
       const w = this.who(x, y);
@@ -169,12 +173,23 @@ export class AlleyScene extends BaseScene {
 
   private move(p: Phaser.Input.Pointer): void {
     if (p.id !== this.dragBoy) return;
-    this.boy.x = Phaser.Math.Clamp(p.worldX, 40, 360);
+    const x = Phaser.Math.Clamp(p.worldX, 40, 360);
+    // He walks while he is drawn along (the two walking pictures, every 14 points).
+    if (Math.abs(x - this.lastStepX) > 14) {
+      this.stepFrame = !this.stepFrame;
+      this.lastStepX = x;
+      this.boy.setTexture(this.stepFrame ? 'boy_walk_a' : 'boy_walk_b').setFlipX(x < this.boy.x);
+      fitHeight(this.boy, BOY_H);
+      sfx('step', { volume: 0.3 });
+    }
+    this.boy.x = x;
   }
 
   private up(p: Phaser.Input.Pointer): void {
     if (p.id !== this.dragBoy) return;
     this.dragBoy = -1;
+    this.boy.setFlipX(false);
+    pose(this, this.boy, 'boy_idle', BOY_H);
     // Close enough to the new boy: he walks over to him.
     if (Math.abs(this.boy.x - this.newSpot.x) < 90) void this.goToNewBoy();
     else this.tweens.add({ targets: this.boy, x: SPOT.boy.x, duration: 300, ease: 'Back.easeOut' });
@@ -204,7 +219,7 @@ export class AlleyScene extends BaseScene {
   private async goToNewBoy(): Promise<void> {
     this.state = 'walk';
     this.setIdle(null);
-    if (this.ballAt === 'boy') this.ball.setVisible(false);
+    if (this.ballAt === 'boy') this.tweens.add({ targets: this.ball, alpha: 0, duration: 250, onComplete: () => this.ball.setVisible(false).setAlpha(1) });
     const to = { x: this.newSpot.x - 58, y: this.newSpot.y + 6 };
     await walkTo(this, this.boy, to, BOY_H * DEPTH(to.y));
     if (!this.alive) return;
@@ -227,17 +242,19 @@ export class AlleyScene extends BaseScene {
     // His face: he joins in.
     const nb = this.people.new;
     pose(this, nb, 'newboy_happy', BOY_H * DEPTH(nb.y));
-    sfx('pop', { volume: 0.5 });
+    // No sound for his yes: the kindness is the point, not a reward.
     await this.wait(700);
     if (!this.alive) return;
     const join = { x: 344, y: 712 };
     this.tweens.killTweensOf(nb);
     this.tweens.add({ targets: nb, x: join.x, y: join.y, duration: 900, ease: 'Sine.easeInOut', onUpdate: () => fitHeight(nb, BOY_H * DEPTH(nb.y)), onComplete: () => fitHeight(nb, BOY_H) });
+    this.tweens.add({ targets: nb, angle: { from: -2, to: 2 }, duration: 220, yoyo: true, repeat: 1, onComplete: () => nb.setAngle(0) }); // a little bob as he comes
     await walkTo(this, this.boy, SPOT.boy, BOY_H);
     if (!this.alive) return;
     pose(this, this.boy, 'boy_idle', BOY_H);
     breathe(this, nb);
-    this.ball.setPosition(SPOT.boy.x + 26, SPOT.boy.y).setVisible(true);
+    this.ball.setPosition(SPOT.boy.x + 26, SPOT.boy.y).setVisible(true).setAlpha(0);
+    this.tweens.add({ targets: this.ball, alpha: 1, duration: 250 });
     this.ballAt = 'boy';
     // Four now: the passing gets livelier.
     for (const [from, to] of [['boy', 'a'], ['a', 'b'], ['b', 'new'], ['new', 'boy']] as Array<[Who, Who]>) {

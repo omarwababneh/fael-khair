@@ -106,9 +106,9 @@ Shared rules: every mission opens with one father voice line that sets the situa
 | D1 | The dripping taps | Dead Sea | not wasting water | `quran_7_31` | built (wave 3) |
 | D2 | Seeing the blessings | Dead Sea | gratitude | `quran_14_7` | built (wave 3) |
 | D3 | Walking with Grandfather | Dead Sea | honoring the elderly | `tirmidhi_1920` | built (wave 3) |
-| Q1 | The turtle and the plastic | Aqaba | mercy to animals; keeping harm out of their home | `bukhari_2363` | wave 4 |
-| Q2 | The honest scale | Aqaba | honest weight | `quran_55_9` | wave 4 |
-| Q3 | The sandcastle promise | Aqaba | keeping a promise | `quran_17_34` | wave 4 |
+| Q1 | The turtle and the plastic | Aqaba | mercy to animals; keeping harm out of their home | `bukhari_2363` | built (wave 4) |
+| Q2 | The honest scale | Aqaba | honest weight | `quran_55_9` | built (wave 4) |
+| Q3 | The sandcastle promise | Aqaba | keeping a promise | `quran_17_34` | built (wave 4) |
 
 ### 4.2 The four built missions
 They stay as they are and become the first mission of their place, with the safeguards `MISSIONS_V2.md` adds.
@@ -707,6 +707,36 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `d1_hadith` R | ending | registry `quran_7_31` | registry `quran_7_31` |
 | `d2_hadith` R | ending | registry `quran_14_7` | registry `quran_14_7` |
 | `d3_hadith` R | ending | registry `tirmidhi_1920` | registry `tirmidhi_1920` |
+| `q1_open` | Q1 start | بسم الله. هناك سلحفاة عالقة في كيس بلاستيك! | بسم الله. في سلحفاة علقانة بكيس نايلون! |
+| `q1_bell` | ring the bell | لا نلمسها. اضغط الجرس، فيأتي حارس البحر. | ما بنلمسها. اكبس الجرس، وبيجي حارس البحر. |
+| `q1_touch` | he touches the turtle | هذه لحارس البحر. هو يعرف كيف يساعدها. | هاي لحارس البحر. هو بيعرف كيف يساعدها. |
+| `q1_ranger` | the ranger | شكراً لأنك ناديتني. أمسك الدلو من فضلك. | يسلموا إنك ناديتني. امسك الدلو لو سمحت. |
+| `q1_free` | the turtle is free | الحمد لله، عادت السلحفاة إلى البحر. | الحمد لله، رجعت السلحفاة عالبحر. |
+| `q1_clean` | clear the sand | لنجمع البلاستيك عن الرمل، كي لا يؤذي أحداً. | خلّينا نلمّ البلاستيك عن الرمل، عشان ما يأذي حدا. |
+| `q1_end` | the turtle swims out | صار الشاطئ نظيفاً، والماء صافياً للسلاحف. | صار الشط نظيف، والميّ صافية للسلاحف. |
+| `qdq_open` | Aqaba quiet deed start | بسم الله. الصباح باكر، وهناك بلاستيك على الشاطئ. | بسم الله. الصبح بكّير، وفي بلاستيك عالشط. |
+| `qdq_end` | a turtle crosses the sand | عبرت سلحفاة الرمل النظيف إلى البحر. | مرقت سلحفاة عالرمل النظيف للبحر. |
+| `q2_open` | Q2 start (the fisherman) | بسم الله. ساعدني نزن للزبونة سمكاً بوزن هذه الحديدة. | بسم الله. ساعدني نوزن للزبونة سمك بوزن هالحديدة. |
+| `q2_hint` | how to weigh | ضع سمكاً في الكفة الأخرى حتى يستوي الميزان. | حطّ سمك بالكفّة الثانية لحد ما يستوي الميزان. |
+| `q2_heavy` | too much fish | مالت كفة السمك. اضغط على الكفة لتزيل سمكة. | مالت كفّة السمك. اكبس عالكفّة لتشيل سمكة. |
+| `q2_small` | one short | جرّب سمكة صغيرة للوزن الدقيق. | جرّب سمكة زغيرة للوزن الدقيق. |
+| `q2_check` | the customer checks | مستوٍ تماماً، شكراً لك! | مستوي تمام، يسلموا إيديك! |
+| `q2_end` | she goes home | أخذت عشاءها لعائلتها، والوزن عادل. | أخدت عشاها لأهلها، والوزن عادل. |
+| `q3_open` | Q3 start | بسم الله. وعدت أختك أن تبني معها قلعة رمل. | بسم الله. وعدت أختك تبني معها قلعة رمل. |
+| `q3_friends` | the friends call | تعال نلعب بالكرة! | تعال نلعب طابة! |
+| `q3_pass` | pass the ball | مرّر الكرة لصديقك. | مرّر الطابة لصاحبك. |
+| `q3_sister_wait` | his sister waits | انظر، أختك تنتظر مع دلوها. | شوف، أختك مستنّية مع دلوها. |
+| `q3_ask` | the boy asks her | نبني بعد اللعبة، اتفقنا؟ | بنبني بعد اللعبة، ماشي؟ |
+| `q3_yes` | the sister | حسناً، بعد اللعبة! | ماشي، بعد اللعبة! |
+| `q3_back` | back to her | هيّا نعود إلى أختك. | يلّا نرجع لأختك. |
+| `q3_fill` | fill the bucket | اضغط على الدلو لتملأه بالرمل. | اكبس عالدلو عشان تعبّيه رمل. |
+| `q3_flip` | flip it | اقلب الدلو: اسحب إلى الأسفل. | اقلب الدلو: اسحب لتحت. |
+| `q3_shells` | the shells | ضع الأصداف فوق البرج. | حطّ الصدف فوق البرج. |
+| `q3_wave` | a wave takes the tower | أخذت الموجة البرج! نبني أعلى على الرمل. | أخدت الموجة البرج! بنبني فوق عالرمل. |
+| `q3_end` | the castle | صارت القلعة جاهزة، وأختك فرحة. | صارت القلعة جاهزة، وأختك فرحانة. |
+| `q1_hadith` R | ending | registry `bukhari_2363` | registry `bukhari_2363` |
+| `q2_hadith` R | ending | registry `quran_55_9` | registry `quran_55_9` |
+| `q3_hadith` R | ending | registry `quran_17_34` | registry `quran_17_34` |
 
 ### 7.3 Music
 Copied word for word from `MISSIONS_V2.md` section 9 (its point 9 is carried out by this section):
@@ -849,7 +879,7 @@ Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما 
   - Pause all sound when the app goes to the background.
 - **Storage:** only what section 2 allows (the parents' sound settings and one rotation number per place), in `localStorage`, wrapped in try/catch.
 - **Performance:** steady 60 frames per second on an iPhone from the last five years. Total download under 25 MB.
-- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Version 2 adds `p2`, `p3`, `petra-dawn`, `u2`, `u3`, `ummqais-dusk`, `a2`, `a3`, `amman-morning`, `i2`, `i3`, `jerash`, `j2`, `j3`, `jerash-morning`, `deadsea`, `d2`, `d3` and `deadsea-tap` (the quiet deeds are `petra-dawn`, `ummqais-dusk`, `amman-morning`, `jerash-morning`, `deadsea-tap`; Irbid's is `irbid`); add `&lap=1` to play a later lap. Debug runs never move a rotation. Remove nothing from production; it is harmless.
+- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Version 2 adds `p2`, `p3`, `petra-dawn`, `u2`, `u3`, `ummqais-dusk`, `a2`, `a3`, `amman-morning`, `i2`, `i3`, `jerash`, `j2`, `j3`, `jerash-morning`, `deadsea`, `d2`, `d3`, `deadsea-tap`, `aqaba`, `q2`, `q3` and `aqaba-sunrise` (the quiet deeds are `petra-dawn`, `ummqais-dusk`, `amman-morning`, `jerash-morning`, `deadsea-tap`, `aqaba-sunrise`; Irbid's is `irbid`); add `&lap=1` to play a later lap. Debug runs never move a rotation. Remove nothing from production; it is harmless.
 
 ### Repository layout
 

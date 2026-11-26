@@ -60,6 +60,7 @@ export class PlazaScene extends BaseScene {
   private glass: Phaser.GameObjects.Image | null = null;
   private glassSeen = false;
   private swept = false;
+  private sweeping = false;
   private litter: Litter[] = [];
   private bins: Bin[] = [];
   private held: Litter | null = null;
@@ -84,6 +85,7 @@ export class PlazaScene extends BaseScene {
     this.wrongSaid = 0;
     this.breezeDone = false;
     this.glassSeen = false;
+    this.sweeping = false;
     this.swept = this.quiet; // the quiet deed has no glass
     this.guard = this.guardRing = this.glass = this.dawn = null;
     this.hint = new HintHand(this);
@@ -174,7 +176,7 @@ export class PlazaScene extends BaseScene {
     this.hint.clear();
     const x = p.worldX, y = p.worldY;
     // The guard: he comes to sweep the glass.
-    if (this.guard && !this.swept && this.guard.getBounds().contains(x, y)) {
+    if (this.guard && !this.swept && !this.sweeping && this.guard.getBounds().contains(x, y)) {
       void this.callGuard();
       return;
     }
@@ -186,7 +188,7 @@ export class PlazaScene extends BaseScene {
       const d = Phaser.Math.Distance.Between(x, y, l.img.x, l.img.y);
       if (d < bestD) { bestD = d; best = l; }
     }
-    const glassD = this.glass && !this.swept ? Phaser.Math.Distance.Between(x, y, this.glass.x, this.glass.y) : Infinity;
+    const glassD = this.glass && !this.swept && !this.sweeping ? Phaser.Math.Distance.Between(x, y, this.glass.x, this.glass.y) : Infinity;
     if (glassD < HIT && glassD <= bestD) {
       void this.touchGlass();
       return;
@@ -224,6 +226,7 @@ export class PlazaScene extends BaseScene {
       // Dropped on the paving: it stays where he left it.
       const y = Phaser.Math.Clamp(l.img.y, 548, 694);
       l.home = { x: l.img.x, y };
+      sfx('thud', { weight: 0.1, volume: 0.4 });
       this.tweens.add({ targets: l.img, y, scale: l.img.scale / 1.15, duration: 200, onComplete: () => l.img.setDepth(30 + y / 100) });
     }
     this.kickIdle();
@@ -239,7 +242,9 @@ export class PlazaScene extends BaseScene {
     this.tweens.add({ targets: bin.img, scaleY: { from: bin.img.scaleY * 0.94, to: bin.img.scaleY }, duration: 260, delay: 300, ease: 'Back.easeOut' });
     sfx('thud', { weight: 0.1, volume: 0.5 });
     // A finished step chimes, except in a quiet deed, which has no chime at all.
-    if (!this.quiet) this.time.delayedCall(260, () => sfx('chime', { volume: 0.4 }));
+    // Not on the step that finishes the deed (not on the step that finishes the deed: that would be a reward sting).
+    const last = this.swept && this.litter.every((x) => x.binned);
+    if (!this.quiet && !last) this.time.delayedCall(260, () => sfx('chime', { volume: 0.4 }));
     const left = this.litter.filter((x) => !x.binned).length;
     if (!this.quiet && !this.breezeDone && this.litter.length - left >= 2) this.breeze();
     this.checkDone();
@@ -273,9 +278,9 @@ export class PlazaScene extends BaseScene {
       this.glassSeen = true;
       await Voice.say('j1_glass');
       // He may already have called the guard while the father spoke.
-      if (!this.alive || this.swept || this.state !== 'play') return;
+      if (!this.alive || this.swept || this.sweeping || this.state !== 'play') return;
     }
-    if (this.guard && !this.guardRing) this.guardRing = glowRing(this, this.guard.x, this.guard.y - this.guard.displayHeight * 0.55, 46, 24);
+    if (this.guard && !this.guardRing && !this.sweeping && !this.swept) this.guardRing = glowRing(this, this.guard.x, this.guard.y - this.guard.displayHeight * 0.55, 46, 24);
     await Voice.say('j1_tell');
   }
 
@@ -283,8 +288,8 @@ export class PlazaScene extends BaseScene {
     const guard = this.guard;
     const glass = this.glass;
     if (!guard || !glass) return;
-    this.state = 'sweep';
-    this.setIdle(null);
+    // He can go on clearing litter while the guard sweeps.
+    this.sweeping = true;
     this.guardRing?.destroy();
     this.guardRing = null;
     pose(this, this.boy, 'boy_idle', BOY.h);
@@ -312,11 +317,10 @@ export class PlazaScene extends BaseScene {
     }
     glass.setVisible(false);
     this.swept = true;
+    this.sweeping = false;
     guard.setTexture('guard_stand');
     fitHeight(guard, h);
     breathe(this, guard);
-    this.state = 'play';
-    this.setIdle(() => this.showHint());
     this.checkDone();
   }
 
@@ -388,7 +392,7 @@ export class PlazaScene extends BaseScene {
     if (l) {
       const bin = this.bins.find((b) => b.kind === l.kind) as Bin;
       this.hint.show('drag', { x: l.img.x, y: l.img.y }, { x: bin.x, y: BIN_FOOT - BIN_H / 2 }, again);
-    } else if (this.guard && !this.swept) {
+    } else if (this.guard && !this.swept && !this.sweeping) {
       this.hint.show('tap', { x: this.guard.x, y: this.guard.y - this.guard.displayHeight * 0.5 }, undefined, again);
     } else again();
   }

@@ -7,6 +7,7 @@ import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
+import { breathe, stopBreathing } from '../kit';
 
 // Amman: the broken jar (value: truthfulness, then repair without shame;
 // source muslim_2607c). The accident happens inside play, not through a bad
@@ -329,16 +330,20 @@ export class AmmanScene extends BaseScene {
     this.mama = this.add.image(view().x - 70, FLOOR, 'mama_stand').setOrigin(0.5, 1).setDepth(28);
     fitHeight(this.mama, MAMA.h);
     sfx('door', { volume: 0.5 });
-    this.tweens.add({ targets: this.mama, x: MAMA.x, duration: 1200, ease: 'Sine.easeOut' });
+    const m = this.mama;
+    this.tweens.add({ targets: m, angle: { from: -2, to: 2 }, duration: 240, yoyo: true, repeat: 2, onComplete: () => m.setAngle(0) }); // she walks in
+    this.tweens.add({ targets: m, x: MAMA.x, duration: 1200, ease: 'Sine.easeOut', onComplete: () => this.alive && breathe(this, m) });
     for (let i = 0; i < 4; i++) this.time.delayedCall(i * 280, () => this.alive && sfx('step', { volume: 0.4 }));
   }
 
   /** Mama kneels to his height and thanks him calmly. Then they clean up together. */
   private async mamaThanks(): Promise<void> {
     if (!this.mama) return;
-    this.mama.setTexture('mama_kneel');
-    fitHeight(this.mama, MAMA.kneelH);
-    this.tweens.add({ targets: this.mama, scaleY: { from: this.mama.scaleY * 0.92, to: this.mama.scaleY }, duration: 400, ease: 'Back.easeOut' });
+    const m = this.mama;
+    this.tweens.killTweensOf(m);
+    m.setAngle(0).setTexture('mama_kneel');
+    fitHeight(m, MAMA.kneelH);
+    this.tweens.add({ targets: m, scaleY: { from: m.scaleY * 0.92, to: m.scaleY }, duration: 400, ease: 'Back.easeOut', onComplete: () => this.alive && breathe(this, m) });
     await Voice.say('am_mama_thanks');
     if (!this.alive) return;
     void this.startSweep();
@@ -353,7 +358,8 @@ export class AmmanScene extends BaseScene {
   private async startSweep(): Promise<void> {
     this.state = 'talk';
     const big = [this.shards[0], this.shards[2]];
-    const said = Voice.say('am_mama_sharp');
+    // He can sweep while Mama speaks; the father's بسم الله follows her line.
+    void Voice.say('am_mama_sharp').then((ended) => { if (ended && this.alive) void Voice.say('bismillah'); });
     await this.wait(600);
     if (!this.alive || !this.mama) return;
     for (const [i, s] of big.entries()) {
@@ -368,10 +374,6 @@ export class AmmanScene extends BaseScene {
       fitHeight(img, 44); // he sweeps them: at least 44 points tall
       this.shards.push({ img, done: false });
     }
-    await said;
-    if (!this.alive) return;
-    await Voice.say('bismillah');
-    if (!this.alive) return;
     this.state = 'sweep';
     this.pose('boy_sweep');
     this.dustpan = this.add.image(DUSTPAN.x, DUSTPAN.y, 'dustpan').setOrigin(0.5, 1).setDepth(21).setAlpha(0);
@@ -404,7 +406,8 @@ export class AmmanScene extends BaseScene {
   private intoPan(s: Shard): void {
     s.done = true;
     this.tweens.add({ targets: s.img, x: DUSTPAN.x, y: DUSTPAN.y - 12, scale: s.img.scale * 0.6, alpha: 0, duration: 260, delay: 160 });
-    this.time.delayedCall(420, () => this.alive && sfx('chime', { volume: 0.4 }));
+    // Not on the last piece (not on the step that finishes the deed: that would be a reward sting).
+    if (!this.shards.every((x) => x.done)) this.time.delayedCall(420, () => this.alive && sfx('chime', { volume: 0.4 }));
   }
 
   private startWipe(): void {
@@ -448,9 +451,11 @@ export class AmmanScene extends BaseScene {
     // Mama hugs him.
     this.pose('boy_happy');
     this.tweens.add({ targets: this.boy, x: MAMA.x + 34, duration: 700, ease: 'Sine.easeInOut' });
+    this.tweens.add({ targets: this.boy, y: this.boy.y - 5, duration: 175, yoyo: true, repeat: 1 }); // little steps
     await this.wait(750);
     if (!this.alive) return;
-    this.tweens.add({ targets: [this.boy, this.mama], scaleX: '*=1.04', scaleY: '*=1.04', duration: 500, yoyo: true, ease: 'Sine.easeInOut' });
+    stopBreathing(this, this.mama); // the hug's squeeze, then she breathes again
+    this.tweens.add({ targets: [this.boy, this.mama], scaleX: '*=1.04', scaleY: '*=1.04', duration: 500, yoyo: true, ease: 'Sine.easeInOut', onComplete: () => this.alive && this.mama && breathe(this, this.mama) });
     await this.wait(1200);
     if (!this.alive) return;
     await Voice.say('am_brave');

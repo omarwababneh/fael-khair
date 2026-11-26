@@ -191,7 +191,7 @@ export class PouchScene extends BaseScene {
         this.pouch.setDepth(70);
         this.tweens.killTweensOf(this.pouch);
         this.tweens.add({ targets: this.pouch, scale: this.pouch.scale * 1.25, duration: 160, ease: 'Back.easeOut' });
-        sfx('grab');
+        sfx('grab', { volume: 0.6 });
       }
     }
   }
@@ -236,14 +236,14 @@ export class PouchScene extends BaseScene {
     this.setIdle(null);
     this.pouchRing?.destroy();
     this.pouchRing = null;
-    sfx('pop');
+    sfx('pop', { volume: 0.5 });
     const side = this.boy.x < this.pouch.x ? -1 : 1;
     await this.walkTo(this.pouch.x + side * 34);
     if (!this.alive) return;
     this.setPose('boy_kneel', BOY_H * 0.62);
     this.boy.setFlipX(side > 0);
     dustPuff(this, this.pouch.x, this.pouch.y - 4, 6, 0xd9b98a, 33);
-    sfx('grab');
+    sfx('grab', { volume: 0.6 });
     await this.wait(500);
     if (!this.alive) return;
     this.openCloseUp();
@@ -289,7 +289,7 @@ export class PouchScene extends BaseScene {
       const ring = r;
       const kind = ring.getData('kind') as 'knot' | 'flower';
       this.seen[kind] = true;
-      sfx('pop');
+      sfx('pop', { volume: 0.5 });
       this.tweens.add({ targets: ring, scale: ring.scale * 1.5, alpha: 0, duration: 500, onComplete: () => ring.setVisible(false) });
       // Close the view only after the last detail's line has finished.
       const n = ++this.detailSay;
@@ -327,7 +327,7 @@ export class PouchScene extends BaseScene {
     this.setIdle(null);
     this.guardRing?.destroy();
     this.guardRing = null;
-    sfx('pop');
+    sfx('pop', { volume: 0.5 });
     this.pouch.setVisible(false);
     await this.walkTo(BESIDE_GUARD);
     if (!this.alive) return;
@@ -364,10 +364,11 @@ export class PouchScene extends BaseScene {
     })));
     steps.remove();
     if (!this.alive) return;
+    for (const t of ts) this.breathe(t.img); // never perfectly still once they stand
     for (const t of ts) this.tweens.add({ targets: t.bubble, alpha: 1, scale: { from: 0.4, to: 1 }, duration: 450, ease: 'Back.easeOut' });
-    sfx('pop', { volume: 0.6 });
-    await Voice.say('p2_match');
-    if (!this.alive) return;
+    sfx('pop', { volume: 0.5 });
+    // He can give it while the father speaks.
+    void Voice.say('p2_match');
     this.state = 'give';
     this.setIdle(() => {
       const owner = this.travelers.find((t) => t.owner);
@@ -410,13 +411,15 @@ export class PouchScene extends BaseScene {
       targets: this.pouch, x: t.x + (t.x < 195 ? 14 : -14), y: GROUND - TRAVELER_H * 0.48, scale: this.pouchScale(), duration: 360, ease: 'Sine.easeOut',
       onComplete: () => this.pouch.setVisible(false),
     });
-    sfx('grab');
+    sfx('grab', { volume: 0.6 });
     this.setPose('boy_idle');
     await this.wait(380);
     if (!this.alive) return;
     // Relief: the worried traveler becomes the happy one, his water money back.
+    this.tweens.killTweensOf(t.img);
     t.img.setTexture('traveler_happy');
     fitHeight(t.img, TRAVELER_H);
+    this.breathe(t.img);
     t.img.setFlipX(t.x > 195); // traveler_happy faces right
     this.tweens.add({ targets: t.bubble, alpha: 0, scale: 0.5, duration: 300 });
     this.tweens.add({ targets: t.img, y: GROUND - 8, duration: 200, yoyo: true, ease: 'Sine.easeOut' });
@@ -442,7 +445,9 @@ export class PouchScene extends BaseScene {
     if (!this.alive) return;
     this.tweens.add({ targets: found, x: other.x + (other.x < 195 ? 14 : -14), y: GROUND - TRAVELER_H * 0.48, angle: 0, duration: 700, ease: 'Sine.easeInOut', onComplete: () => found.setVisible(false) });
     this.tweens.add({ targets: other.bubble, alpha: 0, scale: 0.5, duration: 300, delay: 600 });
-    await Voice.say('p2_found_other');
+    // His line plays while he turns to go: no wait with nothing happening.
+    void Voice.say('p2_found_other');
+    await this.wait(900);
     if (!this.alive) return;
     // He thanks the guard with a nod and goes on his way.
     const outX = other.x < 195 ? view().x - 80 : view().right + 80;
@@ -473,7 +478,7 @@ export class PouchScene extends BaseScene {
       this.tweens.add({ targets: img, x: out + (img === girl ? (fromRight ? 30 : -30) : 0), duration: 3200, ease: 'Sine.easeIn' });
     }
     this.setPose('boy_happy');
-    await Promise.all([said, this.wait(3300)]);
+    await Promise.all([said, this.wait(1800)]);
     if (!this.alive) return;
     await this.finishAdventure('petra', 'p2_hadith');
   }

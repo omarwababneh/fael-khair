@@ -18,9 +18,9 @@ Every change merged into the project publishes itself in about 2 minutes. The re
 ## How a day goes (8 to 10 minutes)
 
 1. The start screen: tap **يَلّا**.
-2. The map: tap a place to play its mission. Each place plays one mission a day and takes its turn through its three missions (Petra, Umm Qais, Amman, Jerash, the Dead Sea; Irbid has two ordinary ones plus the secret basket). The first time round each mission is a little easier. Aqaba comes in the next wave. A place already played today, or one not built yet (Aqaba), just says its name.
+2. The map: tap a place to play its mission. Each place plays one mission a day and takes its turn through its three missions (Petra, Umm Qais, Amman, Jerash, the Dead Sea, Aqaba; Irbid has two ordinary ones plus the secret basket). The first time round each mission is a little easier. A place already played today just says its name.
 3. After each mission the sun moves a step toward sunset. That is the only sign of progress.
-4. **The fourth mission of every day is a quiet good deed** that nobody sees or thanks: in Petra the boy clears the Siq at dawn; in Umm Qais he waters a neighbor's wilting trees; in Amman he waters Mama's mint and folds the blanket before she wakes; in Irbid he leaves the secret basket; in Jerash he clears the empty plaza early in the morning; at the Dead Sea he turns off a dripping tap with nobody around.
+4. **The fourth mission of every day is a quiet good deed** that nobody sees or thanks: in Petra the boy clears the Siq at dawn; in Umm Qais he waters a neighbor's wilting trees; in Amman he waters Mama's mint and folds the blanket before she wakes; in Irbid he leaves the secret basket; in Jerash he clears the empty plaza early in the morning; at the Dead Sea he turns off a dripping tap with nobody around; in Aqaba he clears the plastic from the empty beach at sunrise.
 5. After four missions, the map turns to dusk and **وادي رَمّ** glows. Tapping it opens the night ending: stars, then the father's closing line, then the ayah in still text, then the goodnight line and the button **خلصنا لليوم**.
 6. Starting again begins a fresh day. Nothing is lost by closing the game at any point.
 
@@ -32,7 +32,7 @@ Press and hold the small lock at the top left of the map for **3 seconds**. Insi
 - **سرعة الصوت:** slower, normal or faster speech. Tap one to hear a sample.
 - **The phone's Arabic voice:** which one the phone has, or that it has none. A higher-quality "Enhanced" or "Premium" Arabic voice can be downloaded free in the iPhone's settings (look under Accessibility, then Spoken Content, then Voices, then Arabic), and the game will use it.
 - **اختبار الصوت (voice test):** whether the phone can speak, how many voices it shows the game, the Arabic voice names, and how the game speaks right now. Tap **جرّب الصوت**: it speaks one line and shows what happened (started, ended, or the error). If it says it started and ended but you heard nothing, set **الصوت مع زر الصامت** to **مطفي** and try again; that setting is remembered.
-- **أسئلة للحديث مع ابنك:** three questions for each place, to talk through together.
+- **أسئلة للحديث مع ابنك:** three questions for every mission, grouped by place, to talk through together. The third one always points to real life.
 - **فكرة لليوم:** one small act of kindness to try. It is never tracked or checked.
 - **دليل التسجيل:** the recording guide (see below).
 - **مراجعة النصوص الدينية:** every text still waiting for your review, with its source in Arabic, where it is used, and the words the game says.

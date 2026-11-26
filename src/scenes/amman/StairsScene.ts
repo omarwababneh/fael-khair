@@ -134,7 +134,7 @@ export class StairsScene extends BaseScene {
   private async offer(): Promise<void> {
     this.state = 'intro';
     this.setIdle(null);
-    sfx('pop');
+    sfx('pop', { volume: 0.5 });
     // He takes the two light bags; the heavy one stays with Mama.
     for (const b of this.bags) this.tweens.add({ targets: b, x: this.boy.x, y: this.boy.y - BOY_H * 0.35, alpha: 0, duration: 400 });
     await this.wait(420);
@@ -143,6 +143,7 @@ export class StairsScene extends BaseScene {
     sfx('rustle', { volume: 0.6 });
     await this.wait(300);
     if (!this.alive) return;
+    this.tweens.add({ targets: this.boy, y: this.boy.y - 4, duration: 90, yoyo: true, repeat: 1 }); // a step
     await new Promise<void>((res) => this.tweens.add({ targets: this.boy, x: START.x, duration: 350, onComplete: () => res() }));
     if (!this.alive) return;
     await Voice.say('a3_climb');
@@ -222,29 +223,29 @@ export class StairsScene extends BaseScene {
   /** Move Mama, resizing her for the distance (her breathing pauses meanwhile). */
   private moveMama(x: number, y: number, ms: number): Promise<void> {
     stopBreathing(this, this.mama);
+    // A gentle sway as she climbs.
+    const sway = this.tweens.add({ targets: this.mama, angle: { from: -2, to: 2 }, duration: 280, yoyo: true, repeat: -1 });
     return new Promise((res) => this.tweens.add({
       targets: this.mama, x, y, duration: ms, ease: 'Sine.easeInOut',
       onUpdate: () => fitHeight(this.mama, MAMA_H * depthScale(this.mama.y)),
-      onComplete: () => { fitHeight(this.mama, MAMA_H * depthScale(this.mama.y)); breathe(this, this.mama); res(); },
+      onComplete: () => { sway.stop(); this.mama.setAngle(0); fitHeight(this.mama, MAMA_H * depthScale(this.mama.y)); breathe(this, this.mama); res(); },
     }));
   }
 
   private async rest(): Promise<void> {
     this.state = 'rest';
     this.setIdle(null);
-    this.rings?.left.setVisible(false);
-    this.rings?.right.setVisible(false);
+    for (const r of [this.rings?.left, this.rings?.right]) if (r) this.tweens.add({ targets: r, alpha: 0, duration: 250, onComplete: () => r.setVisible(false).setAlpha(1) });
     await Voice.say('a3_rest');
     if (!this.alive) return;
     // Mama catches up on the landing.
     const s = this.steps[this.landingAt - 1];
     await this.moveMama(s.x - 40, s.y, 1200);
     if (!this.alive) return;
-    await this.wait(900);
+    await this.wait(500);
     if (!this.alive) return;
     this.state = 'climb';
-    this.rings?.left.setVisible(true);
-    this.rings?.right.setVisible(true);
+    for (const r of [this.rings?.left, this.rings?.right]) if (r) { r.setVisible(true).setAlpha(0); this.tweens.add({ targets: r, alpha: 1, duration: 250 }); }
     this.updateRings();
     this.setIdle(() => this.showHint());
   }

@@ -281,7 +281,8 @@ export class UmmQaisScene extends BaseScene {
     this.pointerId = -1;
     this.levelAtTop = this.level;
     this.pose('boy_idle');
-    this.handle.disableInteractive().setVisible(false);
+    this.handle.disableInteractive();
+    this.tweens.add({ targets: this.handle, alpha: 0, duration: 250, onComplete: () => this.handle.setVisible(false).setAlpha(1) });
     this.bucket.clearMask();
     this.tweens.killTweensOf(this.bucket);
     this.bucket.setAngle(0);
@@ -307,7 +308,7 @@ export class UmmQaisScene extends BaseScene {
       this.target.set(this.bucket.x, this.bucket.y);
       this.bucket.setDepth(60);
       this.tweens.add({ targets: this.bucket, scaleX: { from: 1.15, to: 1.04 }, scaleY: { from: 0.88, to: 1.04 }, duration: 220, ease: 'Back.easeOut' });
-      sfx('grab');
+      sfx('grab', { volume: 0.6 });
       if (this.level > 0.3) droplets(this, this.bucket.x, this.bucket.y - 28, 4, 61);
     } else if (this.state === 'pour') {
       this.dragging = 'tilt';
@@ -352,7 +353,8 @@ export class UmmQaisScene extends BaseScene {
       this.stream = null;
     }
     this.bucket.disableInteractive();
-    sfx('chime', { volume: 0.55 });
+    // A finished step chimes, but not the one that fills the trough (not on the step that finishes the deed: that would be a reward sting).
+    if (this.fill < 0.98) sfx('chime', { volume: 0.55 });
     if (this.fill >= 0.98) {
       this.fill = 1;
       this.drawWater();
@@ -398,7 +400,10 @@ export class UmmQaisScene extends BaseScene {
     this.handle.setVisible(false);
     // U1 safeguard: he pours and steps back. He does not pet or go near the dog.
     this.tweens.add({ targets: this.boy, x: BOY.x + 8, duration: 600, ease: 'Sine.easeInOut' });
-    await Voice.say('uq_stepback');
+    this.tweens.add({ targets: this.boy, y: this.boy.y - 4, duration: 150, yoyo: true, repeat: 1 }); // a small step
+    // The dog comes while the father speaks.
+    void Voice.say('uq_stepback');
+    await this.wait(700);
     if (!this.alive) return;
     // The dog goes to the trough and drinks.
     // It walks back to the trough's right end (smaller: it is farther away) and
@@ -408,7 +413,8 @@ export class UmmQaisScene extends BaseScene {
     await this.wait(1300);
     if (!this.alive) return;
     this.tweens.killTweensOf(this.dog);
-    this.dog.setScale(1);
+    // It stays the size it walked to (farther away): no jump back to full size.
+    this.dog.setScale(0.75);
     this.dogImg.setTexture('dog_drinking');
     fitHeight(this.dogImg, DOG.h * 0.9);
     for (let i = 0; i < 4; i++) {
@@ -434,7 +440,7 @@ export class UmmQaisScene extends BaseScene {
     this.tweens.add({ targets: this.dog, x: view().x - 80, y: 470, scale: 0.6, duration: 3600, ease: 'Sine.easeIn' });
     this.tweens.add({ targets: this.dogImg, y: { from: 0, to: -6 }, duration: 180, yoyo: true, repeat: 9 });
     for (let i = 0; i < 6; i++) this.time.delayedCall(i * 500, () => this.alive && sfx('step', { volume: 0.35 }));
-    await this.wait(3800);
+    await this.wait(1500);
     if (!this.alive) return;
     await this.finishAdventure('ummqais', 'uq_hadith');
   }

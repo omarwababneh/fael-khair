@@ -166,7 +166,8 @@ export class BlocksScene extends BaseScene {
           this.tower.push(b);
           sfx('knock', { volume: 0.6 });
           this.tweens.add({ targets: b, scaleY: { from: b.scaleY * 0.85, to: b.scaleY }, duration: 200, ease: 'Back.easeOut' });
-          sfx('chime', { volume: 0.3 }); // a finished step
+          // A finished step chimes, but not the block that completes the rebuilt tower (not on the step that finishes the deed: that would be a reward sting).
+          if (!(this.state === 'rebuild' && this.tower.length >= this.firstHeight + 2)) sfx('chime', { volume: 0.3 });
           this.afterLanding();
         } else {
           // Too far out: it slips off and he simply tries again.
@@ -282,10 +283,11 @@ export class BlocksScene extends BaseScene {
     if (this.sister) {
       pose(this, this.sister, 'sister_happy', SISTER_H);
       this.tweens.add({ targets: this.sister, x: TOWER_X + 70, duration: 500 });
+      this.tweens.add({ targets: this.sister, y: FLOOR - 5, duration: 125, yoyo: true, repeat: 1 }); // little steps
     }
     pose(this, this.boy, 'boy_happy', BOY.h);
-    await Voice.say('a2_together');
-    if (!this.alive) return;
+    // They start building while she says it.
+    void Voice.say('a2_together');
     this.state = 'rebuild';
     this.nextBlock(this.sisterHands());
     this.setIdle(() => this.showHint());

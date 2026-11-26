@@ -243,7 +243,8 @@ export class OliveScene extends BaseScene {
       if (this.spots.every((x) => x.pour.done)) void this.duskLeave();
       return;
     }
-    sfx('chime', { volume: 0.4 });
+    // A finished step chimes, but not the last sapling (not on the step that finishes the deed: that would be a reward sting).
+    if (this.cur < 2) sfx('chime', { volume: 0.4 });
     if (s !== this.spots[this.cur]) return;
     this.state = 'busy';
     if (this.cur < 2) this.time.delayedCall(500, () => this.alive && this.beginSpot(this.cur + 1));
@@ -253,7 +254,7 @@ export class OliveScene extends BaseScene {
   /** The seasons pass in front of him: the trees grow, slowly. */
   private async seasons(): Promise<void> {
     this.setIdle(null);
-    this.can.img.setVisible(false);
+    this.tweens.add({ targets: this.can.img, alpha: 0, duration: 400, onComplete: () => this.can.img.setVisible(false).setAlpha(1) });
     await walkTo(this, this.boy, { x: 352, y: GROUND + 18 }, BOY_H);
     if (!this.alive) return;
     pose(this, this.boy, 'boy_idle', BOY_H);
@@ -276,25 +277,25 @@ export class OliveScene extends BaseScene {
     };
     // Sun.
     season(0xffd27a, 0.18);
-    await this.wait(2200);
+    await this.wait(1200);
     // Rain: the trees grow.
     season(0x6b8bb8, 0.28);
     const rain = fall(0x9fd0f0, 520, 0.18);
     this.time.addEvent({ delay: 400, repeat: 5, callback: () => sfx('splash', { volume: 0.15 }) });
-    await this.wait(1000);
+    await this.wait(700);
     grow('olive_young', H.young);
-    await this.wait(1600);
+    await this.wait(1000);
     rain.emitting = false;
     // A dusting of snow.
     season(0xe8eef8, 0.32);
     const snow = fall(0xffffff, 70, 0.3);
-    await this.wait(2400);
+    await this.wait(1300);
     snow.emitting = false;
     // Spring: full grown, with fruit.
     season(0xc8f0a0, 0.14);
     grow('olive_tree_fruit', H.grown);
     sfx('birds', { volume: 0.7 });
-    await this.wait(2200);
+    await this.wait(1400);
     if (!this.alive) return;
     this.tweens.add({ targets: light, fillAlpha: 0, duration: 1200 });
     // Birds come and eat; a stranger rests in the shade.
@@ -302,14 +303,15 @@ export class OliveScene extends BaseScene {
       const b = this.add.image(s.x + (i ? -20 : 20), GROUND - BOY_H * H.grown * 0.62, 'birds_eating').setDepth(32).setAlpha(0);
       fitHeight(b, BOY_H * H.birds);
       this.tweens.add({ targets: b, alpha: 1, y: b.y + 6, duration: 600, delay: i * 500 });
+      this.tweens.add({ targets: b, angle: { from: -3, to: 3 }, duration: 500, yoyo: true, repeat: -1, delay: 700 + i * 500 }); // pecking
     }
     sfx('birds', { volume: 0.8 });
     const st = this.add.image(SPOTS[1] + 46, GROUND + 4, 'stranger_rest').setOrigin(0.5, 1).setDepth(33).setAlpha(0);
     fitHeight(st, BOY_H * H.stranger);
-    this.tweens.add({ targets: st, alpha: 1, duration: 900, delay: 900 });
+    this.tweens.add({ targets: st, alpha: 1, duration: 900, delay: 900, onComplete: () => this.alive && breathe(this, st) });
     // The consequence: long after the work, others enjoy it.
     completeMission('ummqais');
-    await this.wait(1600);
+    await this.wait(800);
     if (!this.alive) return;
     await Voice.say('u2_trust');
     if (!this.alive) return;
@@ -336,7 +338,7 @@ export class OliveScene extends BaseScene {
   private async duskLeave(): Promise<void> {
     this.state = 'end';
     this.setIdle(null);
-    this.can.img.setVisible(false);
+    this.tweens.add({ targets: this.can.img, alpha: 0, duration: 400, onComplete: () => this.can.img.setVisible(false).setAlpha(1) });
     await walkTo(this, this.boy, { x: view().x - 80 }, BOY_H);
     if (!this.alive) return;
     this.boy.setVisible(false);
@@ -366,14 +368,14 @@ export class OliveScene extends BaseScene {
     this.last.set(x, y);
     if (this.state === 'stone' && this.stone && Phaser.Math.Distance.Between(x, y, this.stone.x, this.stone.y) < 40) {
       this.drag = 'stone';
-      sfx('grab');
+      sfx('grab', { volume: 0.6 });
     } else if (this.state === 'dig') {
       this.drag = 'rub';
     } else if (this.state === 'plant' && this.lying && Phaser.Math.Distance.Between(x, y, this.lying.x, this.lying.y - 14) < 44) {
       this.drag = 'sapling';
       this.lying.setDepth(70);
       this.tweens.add({ targets: this.lying, angle: 0, duration: 200 });
-      sfx('grab');
+      sfx('grab', { volume: 0.6 });
     } else if (this.state === 'press') {
       const s = this.spots[this.cur];
       if (Math.abs(x - s.x) < 70 && Math.abs(y - GROUND) < 60) this.press();

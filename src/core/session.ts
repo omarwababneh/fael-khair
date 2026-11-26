@@ -36,7 +36,7 @@ const ROTATION: Record<Place, Array<MissionDef | null>> = {
   irbid: [{ id: 'I2', scene: 'i2' }, { id: 'I3', scene: 'i3' }],
   jerash: [{ id: 'J1', scene: 'jerash' }, { id: 'J2', scene: 'j2' }, { id: 'J3', scene: 'j3' }],
   deadsea: [{ id: 'D1', scene: 'deadsea' }, { id: 'D2', scene: 'd2' }, { id: 'D3', scene: 'd3' }],
-  aqaba: [null, null, null],
+  aqaba: [{ id: 'Q1', scene: 'aqaba' }, { id: 'Q2', scene: 'q2' }, { id: 'Q3', scene: 'q3' }],
 };
 
 // Each place's quiet deed (the fourth mission of the day). null: not built yet.
@@ -47,7 +47,7 @@ const QUIET: Record<Place, MissionDef | null> = {
   irbid: { id: 'I1', scene: 'irbid' },
   jerash: { id: 'QD-J', scene: 'jerash-morning' },
   deadsea: { id: 'QD-D', scene: 'deadsea-tap' },
-  aqaba: null,
+  aqaba: { id: 'QD-Q', scene: 'aqaba-sunrise' },
 };
 
 export const session = {
