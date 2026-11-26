@@ -122,7 +122,8 @@ export class OliveScene extends BaseScene {
   // ---------------------------------------------------------------- U2
 
   private async startPlanting(): Promise<void> {
-    this.open('u2_open');
+    // The opening, then what to do; the first spot does not say it again.
+    this.open('u2_open', 'u2_dig');
     this.beginSpot(0);
   }
 
@@ -153,8 +154,8 @@ export class OliveScene extends BaseScene {
     const s = this.spots[this.cur];
     this.ring?.destroy();
     this.ring = glowRing(this, s.x, GROUND - 6, 30, 20);
-    if (this.cur === 0) void Voice.say('u2_dig');
-    else if (this.cur === 1 && !this.said.hard) {
+    // The first spot's line follows the opening (see startPlanting).
+    if (this.cur === 1 && !this.said.hard) {
       this.said.hard = true;
       void Voice.say('u2_hard');
     }

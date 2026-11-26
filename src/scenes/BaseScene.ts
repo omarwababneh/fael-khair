@@ -169,8 +169,9 @@ export abstract class BaseScene extends Phaser.Scene {
    * do. Never awaited: he can act as soon as the scene is visible.
    */
   protected open(first: string, then?: string): void {
-    void Voice.say(first).then(() => {
-      if (this.alive && then && Voice.lastId === first) void Voice.say(then);
+    void Voice.say(first).then((ended) => {
+      // Only after the opening ended by itself (a replay or another line cancels it).
+      if (this.alive && then && ended) void Voice.say(then);
     });
   }
 

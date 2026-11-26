@@ -54,6 +54,8 @@ export const recordings = {
     return run<Blob>('readonly', (s) => s.get(id) as IDBRequest<Blob>);
   },
   async put(id: string, blob: Blob): Promise<boolean> {
+    // Ask the browser to keep this app's storage (so Safari does not clear the recordings).
+    try { void navigator.storage?.persist?.(); } catch { /* not supported */ }
     const ok = (await run('readwrite', (s) => s.put(blob, id))) !== null;
     if (ok) ids.add(id);
     for (const fn of listeners) fn();

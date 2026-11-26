@@ -111,13 +111,14 @@ export class IrbidScene extends BaseScene {
 
     let packSaid = false;
     // One opening line, then straight to what to do.
-    void Voice.say('ir_open').then(() => {
-      if (!this.alive || this.state !== 'pack' || packSaid) return;
+    void Voice.say('ir_open').then((ended) => {
+      if (!ended || !this.alive || this.state !== 'pack' || packSaid) return;
       packSaid = true;
       void Voice.say('ir_pack');
     });
     this.setIdle(() => {
-      if (this.state === 'pack' && !packSaid) {
+      // The hint's line never cuts off a line still being said.
+      if (this.state === 'pack' && !packSaid && !Voice.busy) {
         packSaid = true;
         void Voice.say('ir_pack');
       }

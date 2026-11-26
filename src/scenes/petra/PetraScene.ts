@@ -172,7 +172,7 @@ export class PetraScene extends BaseScene {
     // P1 safeguard: only loose stones and fallen branches; the carved rock is never touched.
     if (this.quiet) void Voice.say('qdp_open');
     // One opening line, then straight to what to do; the care line comes after his first stone.
-    else void Voice.say('petra_open').then(() => { if (this.alive && !this.finished && !this.placedOne) void Voice.say('petra_hint'); });
+    else void Voice.say('petra_open').then((ended) => { if (ended && this.alive && !this.finished && !this.placedOne) void Voice.say('petra_hint'); });
     this.resetIdle();
   }
 
@@ -481,7 +481,7 @@ export class PetraScene extends BaseScene {
       },
     }));
     this.hintCount++;
-    if (this.hintCount === 1 && o.kind === 'rock' && this.placedOne) void Voice.say('petra_hint');
+    if (this.hintCount === 1 && o.kind === 'rock' && this.placedOne && !Voice.busy) void Voice.say('petra_hint');
     else if (o.kind === 'branch' && !o.thornSaid) {
       o.thornSaid = true;
       void Voice.say('petra_thorn');

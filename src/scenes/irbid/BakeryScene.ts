@@ -33,7 +33,7 @@ const COIN_H = 32;
 const COIN_GAP = 34;
 // One row along the counter's front edge: the outlines for his change on the
 // left, his coins in the middle, and the change the baker hands back on the right.
-const SLOT_X = 80;
+const SLOT_X = 86;
 const PAID_X = 114;
 const BACK_X = 182;
 // The last view: a little closer than the whole shop, with everyone in it.
@@ -192,7 +192,7 @@ export class BakeryScene extends BaseScene {
     const change = this.round[0] - price;
     for (let i = 0; i < change; i++) {
       // Outlines on the left of the row.
-      const x = SLOT_X + i * COIN_GAP, y = COIN_Y - COIN_H / 2;
+      const x = SLOT_X + i * 32, y = COIN_Y - COIN_H / 2;
       this.slots.push({ x, y, ring: glowRing(this, x, y, COIN_H * 0.5, 39), coin: null });
     }
     this.state = 'change';
@@ -238,7 +238,8 @@ export class BakeryScene extends BaseScene {
     const free = this.slots.find((s) => !s.coin && Phaser.Math.Distance.Between(x, y, s.x, s.y + COIN_H / 2) < 28);
     const loose = this.coins.filter((k) => this.isMine(k) && k.where === 'hand' && k !== c).length;
     const emptySlots = this.slots.filter((s) => !s.coin).length;
-    const onTray = Math.abs(x - TRAY.x) < TRAY.w / 2 + 10 && Math.abs(y - TRAY.y) < 28;
+    // On the tray means lifted up onto it, above the coin row (a tap on a coin is not a choice).
+    const onTray = Math.abs(x - TRAY.x) < TRAY.w / 2 + 10 && y < COIN_Y - COIN_H * 0.6 && y > TRAY.y - 34;
     if (free) {
       free.coin = c;
       c.where = 'slot';
@@ -294,7 +295,7 @@ export class BakeryScene extends BaseScene {
     const eve = this.add.rectangle(PIC.x, PIC.y, PIC.w, PIC.h, 0xff9a4a, 0).setOrigin(0).setDepth(80);
     this.tweens.add({ targets: eve, fillAlpha: 0.22, duration: 2200 });
     // He takes the bread and turns toward home, still in view.
-    await walkTo(this, this.boy, { x: 70 }, BOY.h);
+    await walkTo(this, this.boy, { x: 80 }, BOY.h);
     if (!this.alive) return;
     pose(this, this.boy, 'boy_happy', BOY.h);
     this.tweens.add({ targets: this.baker, angle: { from: -3, to: 3 }, duration: 300, yoyo: true, repeat: 3 });

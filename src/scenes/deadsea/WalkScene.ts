@@ -360,7 +360,7 @@ export class WalkScene extends BaseScene {
     const handY = g.y - g.displayHeight + g.displayHeight * HAND.y;
     this.tweens.add({ targets: this.bag, alpha: 0, duration: 300 });
     // He stands beside Grandfather's knee, just behind his hand: the hand is drawn over his head.
-    this.boy.setDepth(30);
+    this.boy.setDepth(30.5); // in front of the bench, behind Grandfather (31)
     await new Promise<void>((res) => this.tweens.add({ targets: this.boy, x: handX + 6, y: handY + BOY.h - 4, duration: 600, ease: 'Sine.easeInOut', onComplete: () => res() }));
     if (!this.alive) return;
     pose(this, this.boy, 'boy_happy', BOY.h);

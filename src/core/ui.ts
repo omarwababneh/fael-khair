@@ -4,7 +4,21 @@ import parentsJson from '../../content/parents.json';
 import linesContent from '../../content/lines.json';
 import { getLine, registry, type Paraphrase } from './content';
 import { audio } from './audio';
+import { music } from './music';
 import { canRecord, recordings, startRecording } from './recordings';
+
+// The one recording in progress (only one at a time), so it can always be
+// stopped: on its own button, when the parents' corner closes, or when the app
+// goes to the background. The microphone is never left on.
+let stopActive: (() => Promise<void>) | null = null;
+let stopPlayback: (() => void) | null = null;
+export function stopRecorder(): Promise<void> {
+  stopPlayback?.();
+  stopPlayback = null;
+  return stopActive ? stopActive() : Promise.resolve();
+}
+window.addEventListener('pagehide', () => void stopRecorder());
+document.addEventListener('visibilitychange', () => { if (document.hidden) void stopRecorder(); });
 
 const parentsContent = parentsJson as {
   starters: Record<string, string[]>;
@@ -142,7 +156,9 @@ function parentSections(): HTMLElement[] {
       const words = t.child_paraphrase_script ?? t.child_paraphrase_tts;
       // An entry with no children's wording (the Wadi Rum ayah) is shown as its
       // exact text, which the owner pastes into original_arabic.
-      txt.textContent = words ?? 'هذه الآية تُعرض بنصّها كما هو، ولم يُضَف نصّها بعد.';
+      // An ayah is shown as its exact text (never paraphrased, never spoken by the phone).
+      const exact = (r as { original_arabic?: string }).original_arabic;
+      txt.textContent = words ?? (exact ? `تُعرض الآية كما هي: ${exact}` : 'هذه الآية تُعرض بنصّها كما هو، ولم يُضَف نصّها بعد.');
       if (part) {
         const label = el('span', 'fk-review-where');
         label.textContent = PART_AR[part] ?? part;
@@ -177,32 +193,50 @@ function recorder(id: string): HTMLElement {
   play.textContent = 'اسمع';
   del.textContent = 'احذف';
   let session: { stop: () => Promise<Blob | null> } | null = null;
+  let busy = false; // asking for the microphone, or saving: ignore taps meanwhile
   const refresh = () => {
     rec.textContent = session ? 'وقّف' : recordings.has(id) ? 'سجّل من جديد' : 'سجّل';
     rec.classList.toggle('is-recording', !!session);
+    rec.disabled = busy;
     play.hidden = del.hidden = !recordings.has(id) || !!session;
   };
+  /** Stop and keep the recording (or drop it if it is too short). */
+  const finish = async () => {
+    const s = session;
+    if (!s) return;
+    session = null;
+    stopActive = null;
+    busy = true;
+    refresh();
+    const blob = await s.stop();
+    music.duck(false);
+    if (blob && blob.size > 800) {
+      const ok = await recordings.put(id, blob);
+      status.textContent = ok ? 'انحفظ على هالجهاز.' : 'ما قدرت أحفظ التسجيل.';
+    } else status.textContent = 'التسجيل قصير كتير، جرّب مرة ثانية.';
+    // Recording can change the phone's audio mode; put it back.
+    audio.reapplySession();
+    busy = false;
+    refresh();
+  };
   rec.addEventListener('click', async () => {
-    if (session) {
-      const s = session;
-      session = null;
-      const blob = await s.stop();
-      if (blob && blob.size > 800) {
-        const ok = await recordings.put(id, blob);
-        status.textContent = ok ? 'انحفظ على هالجهاز.' : 'ما قدرت أحفظ التسجيل.';
-      } else status.textContent = 'التسجيل قصير كتير، جرّب مرة ثانية.';
-      // Recording can change the phone's audio mode; put it back.
-      audio.reapplySession();
-      refresh();
-      return;
-    }
+    if (busy) return;
+    if (session) return finish();
+    busy = true;
+    refresh();
+    await stopRecorder(); // only one recording at a time
     try {
       status.textContent = 'عم بسجّل…';
+      music.duck(true); // the music stays out of the recording
       session = await startRecording();
+      stopActive = finish;
     } catch (e) {
       session = null;
+      music.duck(false);
+      audio.reapplySession();
       status.textContent = `ما قدرت أفتح الميكروفون: ${(e as Error).name || e}`;
     }
+    busy = false;
     refresh();
   });
   play.addEventListener('click', async () => {
@@ -213,7 +247,8 @@ function recorder(id: string): HTMLElement {
       return;
     }
     status.textContent = '';
-    audio.playVoiceBuffer(buf);
+    stopPlayback?.(); // one at a time
+    stopPlayback = audio.playVoiceBuffer(buf).stop;
   });
   del.addEventListener('click', async () => {
     await recordings.remove(id);
@@ -511,6 +546,7 @@ class UI {
     const close = el('button', 'fk-close');
     close.textContent = 'رجوع';
     close.addEventListener('click', () => {
+      void stopRecorder(); // never leave the microphone on
       wrap.remove();
       opts.onClose();
     });

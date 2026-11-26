@@ -123,7 +123,7 @@ export class HarvestScene extends BaseScene {
     if (!this.alive) return;
     this.state = 'deal';
     this.setIdle(() => this.showHint());
-    void said.then(() => { if (this.alive && Voice.lastId === 'u3_open') void Voice.say('u3_deal'); });
+    void said.then((ended) => { if (this.alive && ended) void Voice.say('u3_deal'); });
   }
 
   // ---------------------------------------------------------------- input
