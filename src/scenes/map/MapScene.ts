@@ -167,8 +167,8 @@ export class MapScene extends BaseScene {
       if (step >= MISSIONS_PER_DAY) this.wadiRumGlows();
       return;
     }
-    // The fourth step follows the quiet deed, which has no chime at all.
-    if (step < MISSIONS_PER_DAY) sfx('chime', { volume: 0.5 });
+    // The sun moves with a soft breath of air, never a chime: a finished deed has no reward sound.
+    sfx('whoosh', { volume: 0.25 });
     if (step >= MISSIONS_PER_DAY) this.time.delayedCall(1500, () => this.alive && this.wadiRumGlows());
     this.tweens.add({ targets: this.sun, x: s.x, y: s.y, duration: 1500, ease: 'Sine.easeInOut' });
     this.tweens.addCounter({
@@ -234,7 +234,7 @@ export class MapScene extends BaseScene {
 
   private async tapPin(p: Pin, c: Phaser.GameObjects.Container, label: HTMLElement): Promise<void> {
     if (this.busy) return;
-    sfx('pop');
+    sfx('pop', { volume: 0.5 });
     this.tweens.add({ targets: c, scale: { from: 1.3, to: 1 }, duration: 450, ease: 'Back.easeOut' });
     this.tweens.add({ targets: c, y: { from: p.y - 14, to: p.y }, duration: 450, ease: 'Bounce.easeOut' });
     replay(label, 'is-bouncing');

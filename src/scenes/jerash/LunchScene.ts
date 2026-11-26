@@ -208,17 +208,17 @@ export class LunchScene extends BaseScene {
       this.tweens.add({ targets: h, x: h.x + side * 26, duration: 400, ease: 'Sine.easeOut' });
       return h;
     });
-    sfx('chime', { volume: 0.4 });
+    // No chime for the fair cut: fairness is the point, not a reward (as in U3).
     await this.wait(1300);
     if (!this.alive) return;
-    // The halves go down to the step; then the pour.
-    halves[0].destroy();
-    halves[1].destroy();
+    // The halves go down to the step (they travel there, not a jump); then the pour.
+    for (const h of halves) this.tweens.add({ targets: h, alpha: 0, scale: h.scale * 0.4, y: STEP_Y - 20, duration: 350, ease: 'Sine.easeIn', onComplete: () => h.destroy() });
     // His own half by his side; his friend's half, the one he hands over, at least 44 points tall.
-    const mine = this.add.image(BOY_X - 24, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(41);
+    const mine = this.add.image(BOY_X - 24, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(41).setAlpha(0);
     fitHeight(mine, 150 * 0.18);
-    const his = this.add.image(BOY_X + 48, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(42).setFlipX(true);
+    const his = this.add.image(BOY_X + 48, STEP_Y, 'sandwich_half').setOrigin(0.5, 1).setDepth(42).setFlipX(true).setAlpha(0);
     fitHeight(his, 44);
+    this.tweens.add({ targets: [mine, his], alpha: 1, y: { from: STEP_Y - 16, to: STEP_Y }, duration: 300, delay: 250, ease: 'Sine.easeOut' });
     this.gifts.push(his);
     this.openPour();
   }
@@ -253,7 +253,8 @@ export class LunchScene extends BaseScene {
     await this.pour?.close();
     this.pour = null;
     if (!this.alive) return;
-    const cup = this.add.image(BOY_X + 94, STEP_Y + 2, 'cup_full').setOrigin(0.5, 1).setDepth(42);
+    const cup = this.add.image(BOY_X + 94, STEP_Y + 2, 'cup_full').setOrigin(0.5, 1).setDepth(42).setAlpha(0);
+    this.tweens.add({ targets: cup, alpha: 1, y: { from: STEP_Y - 16, to: STEP_Y + 2 }, duration: 300, ease: 'Sine.easeOut' });
     fitHeight(cup, 44);
     this.gifts.push(cup);
     // He hands both over.
@@ -313,7 +314,10 @@ export class LunchScene extends BaseScene {
       this.held = null;
       this.dragId = -1;
       if (Math.abs(g.x - this.mate.x) < 50 && g.y > SEAT_FOOT - KID_H - 20) this.handOver(g);
-      else this.tweens.add({ targets: g, x: this.heldHome.x, y: this.heldHome.y, duration: 300, ease: 'Sine.easeOut', onComplete: () => g.setDepth(42) });
+      else {
+        sfx('slide', { volume: 0.4 });
+        this.tweens.add({ targets: g, x: this.heldHome.x, y: this.heldHome.y, duration: 300, ease: 'Sine.easeOut', onComplete: () => g.setDepth(42) });
+      }
     }
     this.kickIdle();
   }

@@ -100,7 +100,8 @@ export class TapsScene extends BaseScene {
 
     // The taps. The first one needs half a turn (an easy first win); later ones a full turn.
     const xs = this.quiet ? [196] : lap ? [96, 168, 240] : [124, 214];
-    xs.forEach((x, i) => this.addTap(x, this.quiet || i === 0 ? 180 : 360));
+    // (The quiet deed's one tap needs a full turn: a little more to do there.)
+    xs.forEach((x, i) => this.addTap(x, this.quiet ? 360 : i === 0 ? 180 : 360));
 
     if (!this.quiet) {
       // The leaking joint, low on the wall at the right, by the attendant.
@@ -181,7 +182,8 @@ export class TapsScene extends BaseScene {
         this.active = tap;
         this.turnId = p.id;
         this.lastAngle = Phaser.Math.Angle.Between(tap.cx, tap.cy, x, y);
-        if (tap.need > 180 && !this.stiffSaid) {
+        sfx('grab', { volume: 0.5 });
+        if (tap.need > 180 && !this.stiffSaid && !this.quiet) {
           this.stiffSaid = true;
           void Voice.say('d1_stiff');
         }
@@ -301,7 +303,9 @@ export class TapsScene extends BaseScene {
     await Voice.say('d1_fixed');
     if (!this.alive) return;
     // He goes back to his place.
-    this.tweens.add({ targets: a, x: home.x, duration: 1400, ease: 'Sine.easeInOut', onComplete: () => this.alive && breathe(this, a) });
+    const back = this.time.addEvent({ delay: 380, loop: true, callback: () => sfx('step', { volume: 0.3 }) });
+    const sway = this.tweens.add({ targets: a, angle: { from: -2, to: 2 }, duration: 260, yoyo: true, repeat: -1 });
+    this.tweens.add({ targets: a, x: home.x, duration: 1400, ease: 'Sine.easeInOut', onComplete: () => { back.remove(); sway.stop(); a.setAngle(0); if (this.alive) breathe(this, a); } });
     this.state = 'turn';
     this.setIdle(() => this.showHint());
     this.checkTurned();
@@ -321,6 +325,8 @@ export class TapsScene extends BaseScene {
     if (!this.alive) return;
     pose(this, this.boy, 'boy_idle', BOY.h);
     this.can = new PourCan(this, 150, 708, 150 * 0.3);
+    this.can.img.setAlpha(0);
+    this.tweens.add({ targets: this.can.img, alpha: 1, duration: 400 });
     await Voice.say('d1_plants');
     if (!this.alive) return;
     this.state = 'water';
@@ -335,7 +341,8 @@ export class TapsScene extends BaseScene {
     if (!plant) return;
     droplets(this, plant.img.x, PLANT_Y - 16, 6, 31);
     this.tweens.add({ targets: plant.img, alpha: 0.3, duration: 300, yoyo: true, onYoyo: () => { plant.img.setTexture('plant_fresh'); fitHeight(plant.img, PLANT_H); } });
-    sfx('chime', { volume: 0.4 });
+    // Not on the last plant (not on the step that finishes the deed: that would be a reward sting).
+    if (!this.plants.every((p) => p.pour.done)) sfx('chime', { volume: 0.4 });
     if (this.plants.every((p) => p.pour.done)) void this.ending();
   }
 

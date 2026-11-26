@@ -42,6 +42,7 @@ export class CardoScene extends BaseScene {
   private walkers: Walker[] = [];
   private queue: string[] = [];
   private notSaid = 0;
+  private clueSaying = false;
   private hint!: HintHand;
   private clue: Clue = 'scarf';
   private speed = 70;
@@ -56,6 +57,7 @@ export class CardoScene extends BaseScene {
     this.walkers = [];
     this.queue = [];
     this.notSaid = 0;
+    this.clueSaying = false;
     this.guideRing = null;
     this.hint = new HintHand(this);
     const lap = currentLap();
@@ -113,7 +115,8 @@ export class CardoScene extends BaseScene {
       if (hit.mother) void this.found(hit);
       else {
         this.tweens.add({ targets: hit.img, angle: { from: -3, to: 3 }, duration: 120, yoyo: true, repeat: 1, onComplete: () => hit.img.setAngle(0) });
-        if (this.notSaid++ < 2) void Voice.say('j2_notmom');
+        // Never over the clue: she says it only once, and he needs it.
+        if (!this.clueSaying && this.notSaid++ < 2) void Voice.say('j2_notmom');
       }
     }
   }
@@ -145,11 +148,14 @@ export class CardoScene extends BaseScene {
     pose(this, this.boy, 'boy_idle', BOY.h);
     await Voice.say('j2_guide');
     if (!this.alive) return;
-    await Voice.say(`j2_clue_${this.clue}`);
-    if (!this.alive) return;
+    // Visitors start to pass while she says what her mother wears (her mother comes later).
     this.state = 'look';
     this.setIdle(() => this.showHint(), 9000);
     this.nextWalker();
+    this.clueSaying = true;
+    await Voice.say(`j2_clue_${this.clue}`);
+    this.clueSaying = false;
+    if (!this.alive || this.state !== 'look') return;
     await Voice.say('j2_look');
   }
 
@@ -190,9 +196,8 @@ export class CardoScene extends BaseScene {
     w.bob.stop();
     w.img.setY(WALK_FOOT);
     sfx('pop', { volume: 0.5 });
-    await Voice.say('j2_call');
-    if (!this.alive) return;
-    // She hurries to them, coming forward along the street.
+    // The guide calls her as she turns and hurries to them, coming forward along the street.
+    const called = Voice.say('j2_call');
     const steps = this.time.addEvent({ delay: 300, loop: true, callback: () => sfx('step', { volume: 0.35 }) });
     this.tweens.add({ targets: w.img, angle: { from: -2, to: 2 }, duration: 200, yoyo: true, repeat: -1 });
     w.img.setDepth(63);
@@ -201,6 +206,7 @@ export class CardoScene extends BaseScene {
       duration: 1600, ease: 'Sine.easeInOut', onComplete: () => res(),
     }));
     steps.remove();
+    await called;
     if (!this.alive) return;
     // The hug: mother and daughter in one picture.
     this.tweens.killTweensOf(w.img);
@@ -208,13 +214,11 @@ export class CardoScene extends BaseScene {
     this.tweens.killTweensOf(this.girl);
     this.girl.setTexture('mother_hug').setX(GIRL.x + 22);
     fitHeight(this.girl, 150 * 0.95);
-    this.tweens.add({ targets: this.girl, scaleX: { from: this.girl.scaleX * 0.96, to: this.girl.scaleX }, duration: 400, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: this.girl, scaleX: { from: this.girl.scaleX * 0.96, to: this.girl.scaleX }, duration: 400, ease: 'Back.easeOut', onComplete: () => this.alive && breathe(this, this.girl, 0.02) });
     pose(this, this.boy, 'boy_happy', BOY.h);
     await this.wait(900);
     if (!this.alive) return;
     await Voice.say('j2_thanks');
-    if (!this.alive) return;
-    await this.wait(400);
     if (!this.alive) return;
     await Voice.say('j2_end');
     if (!this.alive) return;

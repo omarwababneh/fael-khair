@@ -161,7 +161,7 @@ export class BlessingsScene extends BaseScene {
         this.tweens.add({ targets: sp, alpha: 1, duration: 300, yoyo: true, onComplete: () => sp.destroy() });
       });
     }
-    sfx('twinkle', { volume: 0.3 });
+    // The sparkle is silent: no sound to crown the end of the deed.
     await this.wait(2200);
     if (!this.alive) return;
     await Voice.say('d2_end');

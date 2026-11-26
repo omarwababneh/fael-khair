@@ -28,6 +28,9 @@ import { LunchScene } from './scenes/jerash/LunchScene';
 import { DeadSeaTapScene, TapsScene } from './scenes/deadsea/TapsScene';
 import { BlessingsScene } from './scenes/deadsea/BlessingsScene';
 import { WalkScene } from './scenes/deadsea/WalkScene';
+import { AqabaSunriseScene, BeachScene } from './scenes/aqaba/BeachScene';
+import { HarborScene } from './scenes/aqaba/HarborScene';
+import { CastleScene } from './scenes/aqaba/CastleScene';
 
 // No page zoom, no pinch, no double-tap zoom, no long-press callouts, no pull-to-refresh.
 const block = (e: Event) => e.preventDefault();
@@ -58,7 +61,8 @@ async function boot(): Promise<void> {
     fps: { target: 60 },
     scene: [BootScene, StartScene, MapScene, PetraScene, PouchScene, CartScene, PetraDawnScene, UmmQaisScene, OliveScene, HarvestScene, UmmQaisDuskScene,
       AmmanScene, BlocksScene, StairsScene, MorningScene, IrbidScene, BakeryScene, AlleyScene,
-      PlazaScene, CardoScene, LunchScene, JerashMorningScene, TapsScene, BlessingsScene, WalkScene, DeadSeaTapScene, WadiRumScene],
+      PlazaScene, CardoScene, LunchScene, JerashMorningScene, TapsScene, BlessingsScene, WalkScene, DeadSeaTapScene,
+      BeachScene, HarborScene, CastleScene, AqabaSunriseScene, WadiRumScene],
   });
 
   let pending = 0;

@@ -8,7 +8,7 @@ import { ui } from '../../core/ui';
 import { PIC } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
-import { breathe, CupPour, pose } from '../kit';
+import { breathe, CupPour, pose, stopBreathing } from '../kit';
 
 // D3. The Dead Sea: walking with Grandfather (value: honoring the elderly;
 // source tirmidhi_1920). MISSIONS_V2.md section 5.
@@ -155,8 +155,17 @@ export class WalkScene extends BaseScene {
     const pairMoves = !blocker && this.pair.x < PAIR.stopX && this.boy.x - this.pair.x > MIN_AHEAD + 2;
     if (pairMoves) this.pair.x = Math.min(PAIR.stopX, this.pair.x + this.pairSpeed * s);
     if (this.pairBob) {
-      if (pairMoves && this.pairBob.isPaused()) this.pairBob.resume();
-      else if (!pairMoves && !this.pairBob.isPaused()) { this.pairBob.pause(); this.pair.y = PAIR.foot; }
+      if (pairMoves && this.pairBob.isPaused()) {
+        stopBreathing(this, this.pair);
+        fitHeight(this.pair, PAIR.h);
+        this.pairBob.resume();
+      }
+      else if (!pairMoves && !this.pairBob.isPaused()) {
+        // Waiting, they are never perfectly still.
+        this.pairBob.pause();
+        this.pair.y = PAIR.foot;
+        breathe(this, this.pair, 0.01);
+      }
     }
     if (blocker && !this.stoneSaid) {
       this.stoneSaid = true;
@@ -199,14 +208,14 @@ export class WalkScene extends BaseScene {
   private animateBoy(moves: boolean, dt: number): void {
     if (!moves) {
       if (this.boy.texture.key !== 'boy_idle') {
-        this.boy.setTexture('boy_idle');
-        fitHeight(this.boy, BOY.h);
+        pose(this, this.boy, 'boy_idle', BOY.h); // standing, he breathes
         if (!this.turning) this.boy.setFlipX(false);
       }
       return;
     }
     this.walkT += dt;
     if (this.walkT > 170 || this.boy.texture.key === 'boy_idle') {
+      if (this.boy.texture.key === 'boy_idle') stopBreathing(this, this.boy);
       this.walkT = 0;
       this.walkFrame ^= 1;
       this.boy.setTexture(this.walkFrame ? 'boy_walk_b' : 'boy_walk_a');
@@ -256,7 +265,10 @@ export class WalkScene extends BaseScene {
       this.cupId = -1;
       const c = this.cup;
       if (Math.abs(c.x - this.grandpa.x) < 56 && c.y > SEAT_Y - GRANDPA.h) void this.drink();
-      else this.tweens.add({ targets: c, x: this.cupHome.x, y: this.cupHome.y, duration: 300, onComplete: () => c.setDepth(62) });
+      else {
+        sfx('slide', { volume: 0.4 });
+        this.tweens.add({ targets: c, x: this.cupHome.x, y: this.cupHome.y, duration: 300, onComplete: () => c.setDepth(62) });
+      }
     }
     this.kickIdle();
   }
@@ -287,8 +299,7 @@ export class WalkScene extends BaseScene {
     sfx('thud', { weight: 0.1, volume: 0.5 });
     sfx('chime', { volume: 0.35 });
     this.tweens.killTweensOf(this.boy);
-    this.boy.setTexture('boy_idle');
-    fitHeight(this.boy, BOY.h);
+    pose(this, this.boy, 'boy_idle', BOY.h);
     this.moving = null;
   }
 
@@ -310,7 +321,11 @@ export class WalkScene extends BaseScene {
     this.grandpa = grandpa;
     // The boy comes to stand by Grandfather and sets the bag down.
     this.boy.setFlipX(false);
+    stopBreathing(this, this.boy);
+    let f = 0;
+    const frames = this.time.addEvent({ delay: 170, loop: true, callback: () => { f ^= 1; this.boy.setTexture(f ? 'boy_walk_b' : 'boy_walk_a'); fitHeight(this.boy, BOY.h); sfx('step', { volume: 0.35 }); } });
     await new Promise<void>((res) => this.tweens.add({ targets: this.boy, x: 330, duration: Math.max(300, Math.abs(330 - this.boy.x) * 9), onUpdate: () => this.placeBag(), onComplete: () => res() }));
+    frames.remove();
     if (!this.alive) return;
     pose(this, this.boy, 'boy_idle', BOY.h);
     this.tweens.add({ targets: this.bag, x: 356, y: BOY.foot - 24, duration: 300 });
@@ -361,12 +376,11 @@ export class WalkScene extends BaseScene {
     this.tweens.add({ targets: this.bag, alpha: 0, duration: 300 });
     // He stands beside Grandfather's knee, just behind his hand: the hand is drawn over his head.
     this.boy.setDepth(30.5); // in front of the bench, behind Grandfather (31)
+    this.tweens.add({ targets: this.boy, angle: { from: -2, to: 2 }, duration: 150, yoyo: true, repeat: 1, onComplete: () => this.boy.setAngle(0) }); // a step or two
     await new Promise<void>((res) => this.tweens.add({ targets: this.boy, x: handX + 6, y: handY + BOY.h - 4, duration: 600, ease: 'Sine.easeInOut', onComplete: () => res() }));
     if (!this.alive) return;
     pose(this, this.boy, 'boy_happy', BOY.h);
     await Voice.say('d3_grandpa');
-    if (!this.alive) return;
-    await this.wait(500);
     if (!this.alive) return;
     await Voice.say('d3_end');
     if (!this.alive) return;

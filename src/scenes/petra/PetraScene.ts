@@ -264,7 +264,7 @@ export class PetraScene extends BaseScene {
       duration: 220,
       ease: 'Back.easeOut',
     });
-    sfx('grab');
+    sfx('grab', { volume: 0.6 });
     dustPuff(this, o.img.x, o.img.y + 18, 5 + Math.round(o.weight * 6), 0xd9b98a, 19);
     this.pose('boy_lift');
     this.tweens.add({ targets: this.boy, x: BOY.x + 6, duration: 160, yoyo: true });
@@ -364,8 +364,9 @@ export class PetraScene extends BaseScene {
     });
     if (o.weight > 0.5) this.cameras.main.shake(160, 0.003 + o.weight * 0.004);
     this.tweens.add({ targets: nook.ring, alpha: 0, scale: nook.ring.scale * 1.6, duration: 500, onComplete: () => nook.ring.destroy() });
-    // A finished step chimes, except in a quiet deed, which has no chime at all.
-    if (!this.quiet) this.time.delayedCall(260, () => sfx('chime', { volume: 0.55 }));
+    // A finished step chimes, except in a quiet deed, which has no chime at all,
+    // and not on the last one (not on the step that finishes the deed: that would be a reward sting).
+    if (!this.quiet && this.obstacles.some((x) => !x.placed)) this.time.delayedCall(260, () => sfx('chime', { volume: 0.55 }));
     // After his first stone: we look after the old place (P1 safeguard).
     if (!this.placedOne && !this.quiet) this.time.delayedCall(500, () => this.alive && !this.finished && Voice.say('petra_care'));
     this.placedOne = true;
@@ -554,7 +555,10 @@ export class PetraScene extends BaseScene {
     bob.pause();
     creak.paused = true;
     elder.setAngle(0);
+    // He is never perfectly still while he speaks.
+    const talk = this.tweens.add({ targets: elder, scaleY: elder.scaleY * 1.015, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     await Promise.race([Voice.say('petra_elder'), this.wait(6000)]);
+    talk.stop();
     if (!this.alive) return;
 
     // He goes on his way; the camera rises slowly over the facade while birds cross the sky.
@@ -564,16 +568,15 @@ export class PetraScene extends BaseScene {
     const rise = Math.max(0, bgH - v.h - 20);
     this.tweens.add({ targets: plaza, y: rise, duration: 9000, ease: 'Sine.easeInOut', delay: 600 });
     this.time.delayedCall(2200, () => this.birds(v));
-    await this.wait(9800);
+    // The father's hadith line comes while the camera is still rising (it used to wait 9.8 s).
+    await this.wait(3000);
     if (!this.alive) return;
-
-    // The father's hadith line over the calm final frame.
     m.frequency = 400;
     // The story's consequence is done: the place counts even if he taps home now.
     completeMission('petra');
-    await Voice.say('petra_hadith');
+    await Promise.all([Voice.say('petra_hadith'), this.wait(6600)]);
     if (!this.alive) return;
-    await this.wait(2600);
+    await this.wait(1800);
     if (!this.alive) return;
     this.goTo('map');
   }
@@ -609,11 +612,11 @@ export class PetraScene extends BaseScene {
       this.tweens.add({ targets: img, angle: { from: -2, to: 2 }, duration: 300, yoyo: true, repeat: -1 });
       this.tweens.add({ targets: img, x: VANISH.x + dx, y: VANISH.y + 8, scale: img.scale * 0.3, alpha: { from: 1, to: 0 }, delay, duration: 7000, ease: 'Sine.easeIn' });
     }
-    await this.wait(5600);
+    await this.wait(3000);
     if (!this.alive) return;
     await Voice.say('qdp_end');
     if (!this.alive) return;
-    await this.wait(2500);
+    await this.wait(1500);
     steps.remove();
     if (!this.alive) return;
     this.goTo('map');

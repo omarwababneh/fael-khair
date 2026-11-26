@@ -184,8 +184,8 @@ export class MorningScene extends BaseScene {
     await new Promise<void>((res) => this.tweens.add({ targets: mama, x: POTS[1] + 34, duration: 2400, ease: 'Sine.easeOut', onComplete: () => res() }));
     if (!this.alive) return;
     mama.setAngle(0);
-    // She leans in to smell the mint, and smiles at the window.
-    this.tweens.add({ targets: mama, angle: -5, y: WALL_FOOT + 2, duration: 700, yoyo: true, hold: 1200, ease: 'Sine.easeInOut' });
+    // She leans in to smell the mint, and smiles at the window; then she breathes, at ease.
+    this.tweens.add({ targets: mama, angle: -5, y: WALL_FOOT + 2, duration: 700, yoyo: true, hold: 1200, ease: 'Sine.easeInOut', onComplete: () => this.alive && breathe(this, mama) });
     completeMission('amman');
     await this.wait(1800);
     if (!this.alive) return;

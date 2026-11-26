@@ -21,7 +21,8 @@ window.addEventListener('pagehide', () => void stopRecorder());
 document.addEventListener('visibilitychange', () => { if (document.hidden) void stopRecorder(); });
 
 const parentsContent = parentsJson as {
-  starters: Record<string, string[]>;
+  /** Three questions for every mission, grouped by place. */
+  starters: Record<string, Record<string, string[]>>;
   invitation: string;
   secret_note: { place: string; intro: string; text: string };
   music_credit: { text: string; tracks: string[] };
@@ -78,18 +79,24 @@ function section(title: string, ...children: HTMLElement[]): HTMLDetailsElement 
  * child: no statistics, no history of what he chose, nothing tracked.
  */
 function parentSections(): HTMLElement[] {
-  // Conversation starters, three per place.
+  // Conversation starters: three for every mission, grouped by place.
   const talk: HTMLElement[] = [];
-  for (const [id, qs] of Object.entries(parentsContent.starters)) {
+  for (const [id, missions] of Object.entries(parentsContent.starters)) {
     const h = el('h3', '');
     h.textContent = PLACE_NAMES[id] ?? id;
-    const ul = el('ul', '');
-    for (const q of qs) {
-      const li = el('li', '');
-      li.textContent = q;
-      ul.append(li);
+    talk.push(h);
+    for (const [mission, qs] of Object.entries(missions)) {
+      const m = el('h4', 'fk-mission');
+      // The mission's name without the place ("البترا: الكيس الضايع" → "الكيس الضايع").
+      m.textContent = (MISSION_AR[mission] ?? mission).replace(/^[^:]+:\s*/, '');
+      const ul = el('ul', '');
+      for (const q of qs) {
+        const li = el('li', '');
+        li.textContent = q;
+        ul.append(li);
+      }
+      talk.push(m, ul);
     }
-    talk.push(h, ul);
     // Under Irbid: good and bad secrets, for the parent to say in his own words.
     if (id === parentsContent.secret_note.place) {
       const intro = el('p', 'fk-secret-intro');

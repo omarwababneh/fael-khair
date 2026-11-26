@@ -8,6 +8,7 @@ import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
+import { breathe, pose } from '../kit';
 
 // P3. Petra: loading the cart (value: helping someone with his load; source
 // bukhari_2989, part "mount"). MISSIONS_V2.md section 5.
@@ -126,6 +127,7 @@ export class CartScene extends BaseScene {
 
     this.boy = this.add.image(BOY.x, BOY.y, 'boy_idle').setOrigin(0.5, 1).setDepth(36);
     fitHeight(this.boy, BOY.h);
+    breathe(this, this.boy);
 
     // The sacks that slid off: the big one beside the old man, the small ones around.
     const spots = Phaser.Utils.Array.Shuffle(GROUND_SPOTS.slice()).slice(0, this.toLoad + 1);
@@ -158,7 +160,7 @@ export class CartScene extends BaseScene {
     if (!this.alive) return;
     const said = Voice.say('p3_big');
     this.tweens.add({ targets: this.elder, angle: -5, duration: 400, yoyo: true, hold: 500 });
-    sfx('grab');
+    sfx('grab', { volume: 0.6 });
     await new Promise<void>((res) => this.tweens.add({ targets: big, x: ELDER.x + 30, y: GROUND - 60, angle: 0, duration: 700, ease: 'Sine.easeOut', onComplete: () => res() }));
     if (!this.alive) return;
     // Into the middle of the bed, over the wheel: it does not tip the cart.
@@ -199,16 +201,15 @@ export class CartScene extends BaseScene {
       best.img.setDepth(70);
       this.tweens.killTweensOf(best.img);
       this.tweens.add({ targets: best.img, scaleX: { from: best.base * 1.15, to: best.base * 1.05 }, scaleY: { from: best.base * 0.88, to: best.base * 1.05 }, angle: 0, duration: 200, ease: 'Back.easeOut' });
-      sfx('grab');
-      this.boy.setTexture('boy_lift');
-      fitHeight(this.boy, BOY.h * 0.81);
+      sfx('grab', { volume: 0.6 });
+      pose(this, this.boy, 'boy_lift', BOY.h * 0.81);
     } else if (this.state === 'water' && this.bucket) {
       if (Phaser.Math.Distance.Between(x, y, this.bucket.x, this.bucket.y - 20) < 46) {
         this.draggingBucket = true;
         this.dragId = p.id;
         this.bucket.setDepth(70);
         this.bucketRing?.setVisible(false);
-        sfx('grab');
+        sfx('grab', { volume: 0.6 });
       }
     }
   }
@@ -224,8 +225,7 @@ export class CartScene extends BaseScene {
   private up(p: Phaser.Input.Pointer): void {
     if (p.id !== this.dragId) return;
     this.dragId = -1;
-    this.boy.setTexture('boy_idle');
-    fitHeight(this.boy, BOY.h);
+    pose(this, this.boy, 'boy_idle', BOY.h);
     if (this.dragging) {
       const s = this.dragging;
       this.dragging = null;
@@ -352,8 +352,9 @@ export class CartScene extends BaseScene {
     // He takes it back down; it waits by the wall for the old man's next trip.
     this.unload(s, WALL_SPOT);
     this.tweens.add({ targets: this.cart, y: AXLE.y, angle: this.tiltAngle(), duration: 500 });
-    await Voice.say('p3_nexttrip');
-    if (!this.alive) return;
+    // The next-trip line plays while the bucket comes (no wait with nothing to do);
+    // the water line follows it.
+    const nextTrip = Voice.say('p3_nexttrip');
     // Water for the donkey instead.
     this.bucket = this.add.image(BUCKET_SPOT.x, BUCKET_SPOT.y, 'bucket_full').setOrigin(0.5, 1).setDepth(35);
     this.bucketScale = fitHeight(this.bucket, BOY.h * 0.43);
@@ -363,7 +364,7 @@ export class CartScene extends BaseScene {
     this.state = 'water';
     this.landing = false;
     this.setIdle(() => this.showHint());
-    await Voice.say('p3_water');
+    if ((await nextTrip) && this.alive && this.state === 'water') await Voice.say('p3_water');
   }
 
   private donkeyPose(key: 'donkey_stand' | 'donkey_tired'): void {
@@ -392,6 +393,7 @@ export class CartScene extends BaseScene {
     this.bucketRing = null;
     const head = this.donkeyHead();
     this.tweens.add({ targets: this.bucket, x: head.x + 4, y: GROUND + 10, scale: this.bucketScale, duration: 300, ease: 'Sine.easeOut' });
+    this.time.delayedCall(300, () => this.alive && sfx('thud', { weight: 0.1, volume: 0.4 }));
     await this.wait(400);
     if (!this.alive) return;
     sfx('lap');
@@ -415,8 +417,7 @@ export class CartScene extends BaseScene {
     this.tweens.add({ targets: this.cartImg, angle: { from: -1, to: 1 }, duration: 240, yoyo: true, repeat: 12, delay: 300 });
     this.tweens.add({ targets: this.elder, angle: { from: -2, to: 2 }, duration: 300, yoyo: true, repeat: 10, delay: 900 });
     this.tweens.add({ targets: this.elder, x: v.right + 60, duration: 6500, ease: 'Sine.easeIn', delay: 900 });
-    this.boy.setTexture('boy_happy');
-    fitHeight(this.boy, BOY.h);
+    pose(this, this.boy, 'boy_happy', BOY.h);
     await Promise.all([said, this.wait(5000)]);
     creak.remove();
     if (!this.alive) return;

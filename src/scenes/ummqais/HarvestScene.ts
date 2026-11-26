@@ -8,7 +8,7 @@ import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
-import { breathe, pose } from '../kit';
+import { breathe, pose, walkTo } from '../kit';
 
 // U3. Umm Qais: sharing the harvest (value: fairness between two; source
 // bukhari_2989, part "justice"). MISSIONS_V2.md section 5.
@@ -178,6 +178,7 @@ export class HarvestScene extends BaseScene {
         // Back onto the pile.
         this.pileLeft.unshift(h.w);
         this.shrinkPile();
+        sfx('rustle', { volume: 0.4 });
         this.tweens.add({ targets: h.img, x: PILE.x, y: PILE.y - 14, alpha: 0, duration: 260, onComplete: () => h.img.destroy() });
       }
     } else if (this.state === 'weigh' && this.pans) {
@@ -241,7 +242,7 @@ export class HarvestScene extends BaseScene {
     if (!this.alive) return;
     void Voice.say('u3_check');
     // He steps aside so the scale does not stand through him.
-    this.tweens.add({ targets: this.boy, x: BOY_ASIDE.x, y: BOY_ASIDE.y, duration: 600, ease: 'Sine.easeInOut' });
+    void walkTo(this, this.boy, BOY_ASIDE, BOY_H * 0.95).then(() => this.alive && pose(this, this.boy, 'boy_idle', BOY_H * 0.95));
     const base = this.add.image(SCALE_X, SCALE_FOOT, 'scale_base').setOrigin(0.5, 1).setDepth(31).setAlpha(0);
     fitHeight(base, BASE_H);
     this.beam = this.add.image(this.pivot().x, this.pivot().y, 'scale_beam').setDepth(32).setAlpha(0);

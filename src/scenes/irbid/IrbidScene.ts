@@ -102,7 +102,8 @@ export class IrbidScene extends BaseScene {
     this.boyImg = this.add.image(0, 0, 'boy_idle').setOrigin(0.5, 1);
     fitHeight(this.boyImg, BOY_H);
     this.boy = this.add.container(TREE.x + 50, TREE.y, [this.boyImg]).setDepth(30);
-    this.tweens.add({ targets: this.boyImg, scaleY: this.boyImg.scaleY * 1.02, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    // He breathes as a whole (the container), so changing his picture never distorts it.
+    this.tweens.add({ targets: this.boy, scaleY: 1.02, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.onDown(p));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.onMove(p));
@@ -226,6 +227,7 @@ export class IrbidScene extends BaseScene {
     this.tweens.add({ targets: this.basket, alpha: 0, duration: 250 });
     this.pose('boy_carry');
     this.tweens.add({ targets: this.boy, x: TREE.x, duration: 600, ease: 'Sine.easeInOut' });
+    this.tweens.add({ targets: this.boyImg, y: -4, duration: 150, yoyo: true, repeat: 1 }); // steps
     await Voice.say('ir_sneak');
     if (!this.alive) return;
     this.state = 'sneak';
@@ -361,7 +363,9 @@ export class IrbidScene extends BaseScene {
     if (this.state !== 'place' || this.boy.x < STOP_X) return;
     this.state = 'knock';
     this.pose('boy_idle');
-    this.basket.setPosition(DOOR.x - 6, DOOR.step).setAlpha(1).setDepth(26);
+    // He sets it down by the door (it travels from his hands, not a jump).
+    this.basket.setPosition(this.boy.x, DOOR.step - 30).setAlpha(1).setDepth(26);
+    this.tweens.add({ targets: this.basket, x: DOOR.x - 6, y: DOOR.step, duration: 260, ease: 'Sine.easeOut' });
     sfx('thud', { weight: 0.05, volume: 0.4 });
     this.kickIdle();
   }
@@ -400,19 +404,19 @@ export class IrbidScene extends BaseScene {
     await this.wait(800);
     if (!this.alive) return;
     this.basket.setVisible(false); // she holds it now
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       n.setFlipX(i % 2 === 0);
-      await this.wait(650);
+      await this.wait(600);
       if (!this.alive) return;
     }
     n.setFlipX(false);
-    await this.wait(1200);
+    await this.wait(700);
     if (!this.alive) return;
     this.tweens.add({ targets: n, alpha: 0, duration: 700 });
     await this.wait(600);
     if (!this.alive) return;
     sfx('door', { volume: 0.4 });
-    await this.wait(800);
+    await this.wait(500);
     if (!this.alive) return;
     await Voice.say('ir_secret');
     if (!this.alive) return;

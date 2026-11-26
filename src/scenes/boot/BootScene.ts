@@ -12,6 +12,7 @@ const SCENES: Record<string, string> = {
   irbid: 'irbid', i2: 'i2', i3: 'i3', wadirum: 'wadirum',
   jerash: 'jerash', j2: 'j2', j3: 'j3', 'jerash-morning': 'jerash-morning',
   deadsea: 'deadsea', d2: 'd2', d3: 'd3', 'deadsea-tap': 'deadsea-tap',
+  aqaba: 'aqaba', q2: 'q2', q3: 'q3', 'aqaba-sunrise': 'aqaba-sunrise',
 };
 
 export class BootScene extends Phaser.Scene {

@@ -504,3 +504,5 @@ button {
   animation: fk-rise 0.6s ease-out;
 }
 .fk-done { font-size: 32px; }
+
+.fk-section h4.fk-mission { margin: 10px 0 2px; font-size: 16px; opacity: 0.8; }
