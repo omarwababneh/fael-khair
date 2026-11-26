@@ -209,8 +209,8 @@ export class HarborScene extends BaseScene {
     if (f) {
       this.held = f;
       this.dragId = p.id;
-      f.img.setDepth(95);
       this.tweens.killTweensOf(f.img);
+      f.img.setDepth(95).setAlpha(1); // (its fade-in may have been cut short)
       sfx('grab', { volume: 0.6 });
       return;
     }
@@ -236,7 +236,7 @@ export class HarborScene extends BaseScene {
     const f = this.held;
     this.held = null;
     this.dragId = -1;
-    if (this.inBowl(f.img.x, f.img.y, this.panR)) {
+    if (this.state === 'weigh' && this.inBowl(f.img.x, f.img.y, this.panR)) {
       f.inPan = true;
       this.inPan.push(f);
       // In the pan it is drawn smaller, to fit; he takes it out by tapping the pan.
@@ -256,6 +256,11 @@ export class HarborScene extends BaseScene {
 
   private async level(): Promise<void> {
     if (this.state !== 'weigh' || this.total() !== this.target) return;
+    // Still holding a fish: wait until he lets go, then look again.
+    if (this.held) {
+      this.levelTimer = this.time.delayedCall(400, () => void this.level());
+      return;
+    }
     this.state = 'end';
     this.setIdle(null);
     this.hint.clear();

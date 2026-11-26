@@ -358,8 +358,8 @@ export class AmmanScene extends BaseScene {
   private async startSweep(): Promise<void> {
     this.state = 'talk';
     const big = [this.shards[0], this.shards[2]];
-    // He can sweep while Mama speaks; the father's بسم الله follows her line.
-    void Voice.say('am_mama_sharp').then((ended) => { if (ended && this.alive) void Voice.say('bismillah'); });
+    // The father's بسم الله opens the work, then Mama says who does what; he can start meanwhile.
+    void Voice.say('bismillah').then((ended) => { if (ended && this.alive) void Voice.say('am_mama_sharp'); });
     await this.wait(600);
     if (!this.alive || !this.mama) return;
     for (const [i, s] of big.entries()) {
@@ -406,8 +406,8 @@ export class AmmanScene extends BaseScene {
   private intoPan(s: Shard): void {
     s.done = true;
     this.tweens.add({ targets: s.img, x: DUSTPAN.x, y: DUSTPAN.y - 12, scale: s.img.scale * 0.6, alpha: 0, duration: 260, delay: 160 });
-    // Not on the last piece (not on the step that finishes the deed: that would be a reward sting).
-    if (!this.shards.every((x) => x.done)) this.time.delayedCall(420, () => this.alive && sfx('chime', { volume: 0.4 }));
+    // A finished step (the wipe still follows, so this does not finish the deed).
+    this.time.delayedCall(420, () => this.alive && sfx('chime', { volume: 0.4 }));
   }
 
   private startWipe(): void {

@@ -5,7 +5,7 @@ import { music } from '../../core/music';
 import { currentLap } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
-import { view, vp } from '../../core/viewport';
+import { vp } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 import { breathe, pose, walkTo } from '../kit';
@@ -67,6 +67,8 @@ export class CastleScene extends BaseScene {
   }
 
   create(): void {
+    // The scene object is reused: a visit left mid-build must not open zoomed in.
+    this.framing = null;
     this.setup();
     this.state = 'choose';
     this.friends = [];
@@ -137,7 +139,8 @@ export class CastleScene extends BaseScene {
     const cam = this.cameras.main;
     return new Promise((res) => {
       cam.pan(t.x, t.y, 700, 'Sine.easeInOut');
-      cam.zoomTo(vp.zoom * t.zoom, 700, 'Sine.easeInOut', false, (_c, p) => { if (p === 1) res(); });
+      // On arrival, settle exactly (a resize during the move would leave the old zoom).
+      cam.zoomTo(vp.zoom * t.zoom, 700, 'Sine.easeInOut', false, (_c, p) => { if (p === 1) { this.onLayout(); res(); } });
     });
   }
 
@@ -184,7 +187,7 @@ export class CastleScene extends BaseScene {
       // Back to her, as they agreed.
       await Voice.say('q3_back');
       if (!this.alive) return;
-      await walkTo(this, this.boy, { x: SISTER.x - 70, y: SISTER.foot + 30 }, BOY.h * 0.95);
+      await walkTo(this, this.boy, { x: SPOTS[1].x - 70, y: SPOTS[1].y + 12 }, BOY.h * 0.95);
       if (!this.alive) return;
       void this.startBuild(1);
     }
@@ -422,5 +425,3 @@ export class CastleScene extends BaseScene {
   }
 }
 
-// view() is used by the shared walk helpers' edges; keep the import used for clarity.
-void view;

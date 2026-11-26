@@ -846,7 +846,7 @@ Opened by holding the small lock button on the map for 3 seconds (a ring fills w
 
 No statistics about the child. No history of what he chose.
 
-Conversation starters:
+Conversation starters (the first sets, one per place; since wave 4 there are three for every mission, 27 in all, in `content/parents.json`, grouped by place and mission; the sets below became P1, U1, A1 and I1):
 
 - **Petra:** شو الإشي اللي ممكن يأذي الناس بطريقنا؟ / ليش شال الحجار مع إنه ما حدا طلب منه؟ / شو بنقدر نشيل عن الطريق سوا بكرا؟
 - **Umm Qais:** كيف عرفنا إنه الكلب عطشان؟ / مين كمان بيحتاج رحمتنا؟ / شو بنعمل لو شفنا قطة جوعانة؟

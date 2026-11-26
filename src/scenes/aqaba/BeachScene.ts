@@ -215,7 +215,8 @@ export class BeachScene extends BaseScene {
     if (!this.alive) return;
     pose(this, this.boy, 'boy_wave', BOY.h * depth(640));
     this.boy.setFlipX(true); // boy_wave faces left: he faces the hut
-    for (let i = 0; i < 3; i++) this.time.delayedCall(i * 280, () => this.alive && sfx('chime', { volume: 0.5 }));
+    // The bell rings (a plain ding-dong, not the step chime): calling an adult is not rewarded with a sound.
+    for (let i = 0; i < 2; i++) this.time.delayedCall(i * 320, () => this.alive && sfx('knock', { volume: 0.45 }));
     const ring = this.add.image(BELL.x, BELL.y, 'fx_glow').setDisplaySize(70, 70).setDepth(21).setAlpha(0).setBlendMode(Phaser.BlendModes.ADD);
     this.tweens.add({ targets: ring, alpha: 0.8, duration: 200, yoyo: true, repeat: 2, onComplete: () => ring.destroy() });
     await this.wait(900);

@@ -352,8 +352,9 @@ export class CartScene extends BaseScene {
     // He takes it back down; it waits by the wall for the old man's next trip.
     this.unload(s, WALL_SPOT);
     this.tweens.add({ targets: this.cart, y: AXLE.y, angle: this.tiltAngle(), duration: 500 });
-    // The next-trip line plays while the bucket comes: no wait with nothing to do.
-    void Voice.say('p3_nexttrip');
+    // The next-trip line plays while the bucket comes (no wait with nothing to do);
+    // the water line follows it.
+    const nextTrip = Voice.say('p3_nexttrip');
     // Water for the donkey instead.
     this.bucket = this.add.image(BUCKET_SPOT.x, BUCKET_SPOT.y, 'bucket_full').setOrigin(0.5, 1).setDepth(35);
     this.bucketScale = fitHeight(this.bucket, BOY.h * 0.43);
@@ -363,7 +364,7 @@ export class CartScene extends BaseScene {
     this.state = 'water';
     this.landing = false;
     this.setIdle(() => this.showHint());
-    await Voice.say('p3_water');
+    if ((await nextTrip) && this.alive && this.state === 'water') await Voice.say('p3_water');
   }
 
   private donkeyPose(key: 'donkey_stand' | 'donkey_tired'): void {

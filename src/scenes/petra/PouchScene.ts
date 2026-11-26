@@ -446,7 +446,7 @@ export class PouchScene extends BaseScene {
     this.tweens.add({ targets: found, x: other.x + (other.x < 195 ? 14 : -14), y: GROUND - TRAVELER_H * 0.48, angle: 0, duration: 700, ease: 'Sine.easeInOut', onComplete: () => found.setVisible(false) });
     this.tweens.add({ targets: other.bubble, alpha: 0, scale: 0.5, duration: 300, delay: 600 });
     // His line plays while he turns to go: no wait with nothing happening.
-    void Voice.say('p2_found_other');
+    const said = Voice.say('p2_found_other');
     await this.wait(900);
     if (!this.alive) return;
     // He thanks the guard with a nod and goes on his way.
@@ -454,6 +454,7 @@ export class PouchScene extends BaseScene {
     other.img.setFlipX(outX < other.x); // traveler_b faces right; flipped, he walks left
     this.tweens.add({ targets: other.img, angle: { from: -2, to: 2 }, duration: 260, yoyo: true, repeat: 6 });
     this.tweens.add({ targets: other.img, x: outX, duration: 2600, ease: 'Sine.easeIn' });
+    await said; // his line is never cut by the next one
   }
 
   /** His daughter runs to him, and they go on their way. */

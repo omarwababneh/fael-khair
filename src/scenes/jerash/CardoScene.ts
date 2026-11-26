@@ -42,6 +42,7 @@ export class CardoScene extends BaseScene {
   private walkers: Walker[] = [];
   private queue: string[] = [];
   private notSaid = 0;
+  private clueSaying = false;
   private hint!: HintHand;
   private clue: Clue = 'scarf';
   private speed = 70;
@@ -56,6 +57,7 @@ export class CardoScene extends BaseScene {
     this.walkers = [];
     this.queue = [];
     this.notSaid = 0;
+    this.clueSaying = false;
     this.guideRing = null;
     this.hint = new HintHand(this);
     const lap = currentLap();
@@ -113,7 +115,8 @@ export class CardoScene extends BaseScene {
       if (hit.mother) void this.found(hit);
       else {
         this.tweens.add({ targets: hit.img, angle: { from: -3, to: 3 }, duration: 120, yoyo: true, repeat: 1, onComplete: () => hit.img.setAngle(0) });
-        if (this.notSaid++ < 2) void Voice.say('j2_notmom');
+        // Never over the clue: she says it only once, and he needs it.
+        if (!this.clueSaying && this.notSaid++ < 2) void Voice.say('j2_notmom');
       }
     }
   }
@@ -149,7 +152,9 @@ export class CardoScene extends BaseScene {
     this.state = 'look';
     this.setIdle(() => this.showHint(), 9000);
     this.nextWalker();
+    this.clueSaying = true;
     await Voice.say(`j2_clue_${this.clue}`);
+    this.clueSaying = false;
     if (!this.alive || this.state !== 'look') return;
     await Voice.say('j2_look');
   }
