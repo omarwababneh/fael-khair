@@ -346,10 +346,11 @@ class UI {
     // The music license requires this credit (MISSIONS_V2.md section 9).
     const credit = el('div', 'fk-credit');
     credit.textContent = `${parentsContent.music_credit.text} Tracks: ${parentsContent.music_credit.tracks.join(', ')}.`;
-    // The longer sections fold away so the card stays short.
+    // Everything between the title and the close button scrolls together, so on a
+    // short screen nothing is squeezed out and "رجوع" always stays in reach.
     const scroll = el('div', 'fk-parent-scroll');
-    scroll.append(voice, ...parentSections());
-    card.append(h, soundGroup, volumeRow, speedRow, scroll, credit, build, close);
+    scroll.append(soundGroup, volumeRow, speedRow, voice, ...parentSections(), credit, build);
+    card.append(h, scroll, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());
     this.root.append(wrap);

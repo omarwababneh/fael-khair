@@ -721,7 +721,7 @@ Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما 
 - **Offline:** precache every file. After the first load the game runs with no connection. No request leaves the device after install.
 - **Hosting path:** the site is served from `https://<owner>.github.io/<repo>/`. Use relative paths everywhere (`base: './'`), including the manifest `start_url` and `scope`.
 - **iPhone details:**
-  - Portrait only. Design at 390 x 844 logical points; scale to fit any iPhone, with backgrounds covering the screen and interface kept inside the safe area (`viewport-fit=cover`, `env(safe-area-inset-*)`).
+  - Portrait only. Design at 390 x 844 logical points; scale to fit any iPhone, with backgrounds covering the screen and interface kept inside the safe area (`viewport-fit=cover`, `env(safe-area-inset-*)`). Backgrounds are drawn at one fixed scale and everything is placed in the picture's coordinates; a wider screen shows a centered portrait frame with plain bars (DECISIONS.md 95).
   - `apple-mobile-web-app-capable`, a 180 x 180 `apple-touch-icon` made from `icon_app`, `display: standalone`.
   - Disable page zoom, text selection, long-press callouts, pull-to-refresh and rubber-band scrolling.
   - Unlock Web Audio and speech on the first tap.

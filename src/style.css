@@ -76,6 +76,8 @@ body { position: fixed; inset: 0; }
 
 #game { position: fixed; inset: 0; }
 #game canvas { display: block; touch-action: none; }
+/* Plain bars around the portrait frame on a wide (or very tall) screen. */
+#bars > div { position: fixed; z-index: 3; background: var(--sand); touch-action: none; }
 
 #ui {
   position: fixed;
@@ -165,6 +167,8 @@ button {
   text-align: right;
 }
 .fk-bubble-text.is-long { font-size: 19px; }
+:root[data-short-frame] .fk-bubble-text { font-size: 17px; line-height: 1.25; }
+:root[data-short-frame] .fk-bubble-text.is-long { font-size: 16px; }
 .fk-bubble .fk-round { flex: none; width: 56px; height: 56px; }
 .fk-bubble.is-speaking .fk-speaker { animation: fk-pulse 0.9s ease-in-out infinite; }
 @keyframes fk-pulse { 50% { transform: scale(1.08); } }
@@ -255,7 +259,7 @@ button {
   text-align: right;
 }
 .fk-parent-card h2 { margin: 0; font-size: 26px; }
-.fk-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 22px; }
+.fk-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 22px; flex: none; }
 .fk-toggle {
   min-width: 120px;
   min-height: 56px;
@@ -280,16 +284,17 @@ button {
   background: var(--sand);
 }
 .fk-speed[aria-pressed='true'] { background: var(--olive); color: var(--cream); }
-.fk-group { display: flex; flex-direction: column; gap: 6px; font-size: 22px; }
+.fk-group { display: flex; flex-direction: column; gap: 6px; font-size: 22px; flex: none; }
 .fk-options { display: flex; flex-wrap: wrap; gap: 6px; }
 .fk-row[hidden] { display: none; }
 .fk-credit { font-size: 11px; line-height: 1.35; opacity: 0.75; direction: ltr; text-align: left; }
 .fk-secret-intro { font-size: 15px !important; opacity: 0.8; margin-bottom: 0 !important; }
 .fk-secret { font-weight: 700; }
 .fk-voice-status { font-size: 16px; line-height: 1.4; direction: rtl; }
-.fk-parent-card { max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 32px); }
+.fk-parent-card { max-height: calc(var(--frame-height, 100dvh) - var(--safe-top) - var(--safe-bottom) - 32px); }
 .fk-parent-scroll {
   overflow-y: auto;
+  padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   touch-action: pan-y;
@@ -297,8 +302,9 @@ button {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
 }
+.fk-parent-scroll > * { flex: none; }
 .fk-section { border: 2px solid rgba(74, 44, 23, 0.35); border-radius: 16px; padding: 4px 12px; }
 .fk-section summary { font-size: 20px; font-weight: 700; min-height: 44px; line-height: 44px; cursor: pointer; }
 .fk-section h3 { margin: 10px 0 4px; font-size: 19px; }
@@ -322,15 +328,15 @@ button {
   padding: 4px 16px 0;
 }
 
-/* Wide screens (a computer, a tablet): keep the interface in a phone-shaped
-   column over the game instead of stretching it across the whole width. */
-@media (min-aspect-ratio: 3/4) {
-  #ui {
-    left: 50%;
-    right: auto;
-    width: min(100vw, calc(100vh * 390 / 844));
-    transform: translateX(-50%);
-  }
+/* The interface follows the game's portrait frame (src/core/viewport.ts): the
+   whole screen on a phone, a centered column with plain bars on a wide screen. */
+#ui {
+  left: var(--frame-left, 0px);
+  top: var(--frame-top, 0px);
+  right: auto;
+  bottom: auto;
+  width: var(--frame-width, 100vw);
+  height: var(--frame-height, 100vh);
 }
 
 /* The game is portrait only. iPhone home-screen apps ignore the manifest's

@@ -5,7 +5,7 @@ import { music } from '../../core/music';
 import { completeMission } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
-import { view } from '../../core/viewport';
+import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
 
@@ -27,11 +27,12 @@ let playsSinceOpen = 0;
 
 const GROUND = 712; // feet line on the Treasury plaza
 const BOY_H = 128;
-const GUARD = { x: 165, h: 150 };
+// Heights follow the art checklist (boy = 1.0): adults 1.35, the girl 0.7, the pouch 0.18.
+const GUARD = { x: 165, h: 173 };
 const BESIDE_GUARD = 232;
 const TRAVELER_X = { left: 62, right: 330 };
-const TRAVELER_H = 150;
-const POUCH_H = 26;
+const TRAVELER_H = 173;
+const POUCH_H = 23;
 // Where the tie-string knot and the star patch are on the pouch art (fractions).
 const KNOT = { x: 0.5, y: 0.34 };
 const PATCH = { x: 0.5, y: 0.68 };
@@ -104,9 +105,9 @@ export class PouchScene extends BaseScene {
     this.breathe(this.boy);
 
     const px = boyRight ? Phaser.Math.Between(70, 120) : Phaser.Math.Between(250, 320);
-    this.pouch = this.add.image(px, GROUND + 14, 'pouch_red').setOrigin(0.5, 1).setDepth(31).setAngle(-12);
+    this.pouch = this.add.image(px, GROUND + 4, 'pouch_red').setOrigin(0.5, 1).setDepth(31).setAngle(-12);
     fitHeight(this.pouch, POUCH_H);
-    this.pouchRing = glowRing(this, px, GROUND + 2, 24, 29);
+    this.pouchRing = glowRing(this, px, GROUND - 8, 24, 29);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.move(p));
@@ -245,7 +246,7 @@ export class PouchScene extends BaseScene {
   /** A large view of the pouch: he looks at its tie-string and its patch. He does not open it. */
   private openCloseUp(): void {
     const v = view();
-    const dim = this.add.rectangle(v.x, v.y, v.w, v.h, 0x2a1a0e, 0).setOrigin(0);
+    const dim = this.add.rectangle(PIC.x, PIC.y, PIC.w, PIC.h, 0x2a1a0e, 0).setOrigin(0);
     const big = this.add.image(195, 400, 'pouch_red');
     fitHeight(big, 230);
     const w = big.frame.width * big.scale, h = big.frame.height * big.scale;
@@ -442,7 +443,7 @@ export class PouchScene extends BaseScene {
     const v = view();
     const fromRight = t.x > 195;
     const girl = this.add.image(fromRight ? v.right + 40 : v.x - 40, GROUND + 4, 'girl_happy').setOrigin(0.5, 1).setDepth(31);
-    fitHeight(girl, 80);
+    fitHeight(girl, BOY_H * 0.7);
     girl.setFlipX(fromRight); // girl_happy runs to the right
     this.tweens.add({ targets: girl, angle: { from: -3, to: 3 }, duration: 200, yoyo: true, repeat: 5 });
     await new Promise<void>((res) => this.tweens.add({ targets: girl, x: t.x + (fromRight ? 36 : -36), duration: 1300, ease: 'Sine.easeOut', onComplete: () => res() }));

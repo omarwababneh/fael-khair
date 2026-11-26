@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DESIGN_H, DESIGN_W, view, vp } from '../core/viewport';
+import { COVER_FACTOR, DESIGN_H, DESIGN_W, vp } from '../core/viewport';
 import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
 import { completeMission, type Place } from '../core/session';
 import { ui } from '../core/ui';
@@ -40,10 +40,14 @@ export abstract class BaseScene extends Phaser.Scene {
     requestAnimationFrame(() => fadeLabels(1, 350));
   }
 
-  /** Fit the 390 x 844 design frame inside the screen. */
+  /**
+   * The camera covers the whole canvas (so a touch always maps to the right
+   * world point), zoomed so the 390 x 844 design frame fits and centred on it.
+   * Anything past the portrait frame is covered by the HTML bars (main.ts).
+   */
   protected fit(): void {
     const cam = this.cameras.main;
-    cam.setSize(vp.w, vp.h);
+    cam.setViewport(0, 0, vp.w, vp.h);
     cam.setZoom(vp.zoom);
     cam.centerOn(DESIGN_W / 2, DESIGN_H / 2);
     for (const c of this.covers) this.sizeCover(c.img, c.factor);
@@ -55,11 +59,11 @@ export abstract class BaseScene extends Phaser.Scene {
   protected onLayout(): void {}
 
   /**
-   * A background centred on the design frame, `factor` times the frame height,
-   * and never smaller than what the camera shows. Keeping its size tied to the
-   * design frame keeps art and gameplay lined up on every phone.
+   * A background picture, centred on the design frame at the one fixed scale
+   * (see core/viewport.ts). Its size never depends on the screen, so the
+   * characters and objects placed on it stay on the same spot of the picture.
    */
-  protected addCover(key: string, factor = 1.12, depth = 0): Phaser.GameObjects.Image {
+  protected addCover(key: string, factor = COVER_FACTOR, depth = 0): Phaser.GameObjects.Image {
     const img = this.add.image(DESIGN_W / 2, DESIGN_H / 2, key).setDepth(depth);
     this.covers.push({ img, factor });
     this.sizeCover(img, factor);
@@ -84,9 +88,9 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   protected sizeCover(img: Phaser.GameObjects.Image, factor: number): void {
-    const v = view();
-    const s = Math.max((DESIGN_H * factor) / img.frame.height, (v.h + 4) / img.frame.height, (v.w + 4) / img.frame.width);
-    img.setScale(s);
+    // Delivered backgrounds and their placeholders share the 2:3 shape, so one
+    // fixed scale puts every background on the same picture rectangle.
+    img.setScale((DESIGN_H * factor) / img.frame.height);
   }
 
   /**
