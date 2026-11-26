@@ -32,7 +32,8 @@ const GUARD = { x: 165, h: 173 };
 const BESIDE_GUARD = 232;
 const TRAVELER_X = { left: 62, right: 330 };
 const TRAVELER_H = 173;
-const POUCH_H = 23;
+// Larger than the checklist's 0.18: anything he must touch is at least 44 points tall.
+const POUCH_H = 44;
 // Where the tie-string knot and the embroidered flower are on pouch_red (fractions,
 // measured on the 710 x 768 art: knot near x 490, y 235; flower head near x 335, y 440).
 const KNOT = { x: 0.69, y: 0.31 };
@@ -116,7 +117,12 @@ export class PouchScene extends BaseScene {
     this.events.once('shutdown', () => this.hint.clear());
 
     this.time.addEvent({ delay: 8000, loop: true, callback: () => Math.random() < 0.6 && sfx('birds', { volume: 0.45 }) });
-    void Voice.say('p2_open');
+    // One opening line, then straight to what to do.
+    void Voice.say('p2_open').then((ended) => {
+      if (!ended || !this.alive || this.state !== 'find' || this.hintSaid) return;
+      this.hintSaid = true;
+      void Voice.say('p2_hint');
+    });
     this.setIdle(() => this.showHint());
   }
 
@@ -478,7 +484,7 @@ export class PouchScene extends BaseScene {
     if (!this.alive) return;
     if (this.state === 'find') {
       this.hint.show('tap', { x: this.pouch.x, y: this.pouch.y - 10 }, undefined, () => this.kickIdle());
-      if (!this.hintSaid) {
+      if (!this.hintSaid && !Voice.busy) {
         this.hintSaid = true;
         void Voice.say('p2_hint');
       }

@@ -317,6 +317,19 @@ button {
 .fk-lines .fk-file { display: block; opacity: 0.7; }
 .fk-lines .fk-review-text { display: block; margin-top: 4px; }
 .fk-lines .fk-review-own { display: block; font-size: 14px; font-weight: 700; color: #8a4a1c; }
+.fk-lines .fk-review-ref { display: block; font-size: 15px; font-weight: 700; opacity: 0.8; }
+.fk-lines .fk-review-where { display: block; font-size: 14px; opacity: 0.7; }
+.fk-voice-test { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; border-top: 1px solid rgba(74, 44, 23, 0.2); border-bottom: 1px solid rgba(74, 44, 23, 0.2); flex: none; }
+.fk-voice-test-title { font-size: 20px; font-weight: 700; }
+.fk-voice-facts { font-size: 15px; line-height: 1.5; white-space: pre-line; direction: rtl; }
+.fk-voice-result { font-size: 15px; min-height: 1.4em; font-weight: 700; color: #8a4a1c; }
+.fk-voice-note { font-size: 14px; margin: 0; opacity: 0.8; }
+.fk-voice-test .fk-speed { align-self: flex-start; }
+.fk-rec { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+.fk-rec-btn { font: inherit; font-size: 15px; min-height: 40px; padding: 4px 12px; border-radius: 12px; border: 2px solid #4a2c17; background: #fbf1dc; color: #4a2c17; }
+.fk-rec-btn.is-recording { background: #c8623a; color: #fff; }
+.fk-rec-btn[hidden] { display: none; }
+.fk-rec-status { font-size: 13px; opacity: 0.8; }
 .fk-close {
   align-self: center;
   min-width: 140px;

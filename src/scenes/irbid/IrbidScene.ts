@@ -92,7 +92,7 @@ export class IrbidScene extends BaseScene {
 
     FOODS.forEach((key, i) => {
       const img = this.add.image(FOOD_ROW.xs[i], FOOD_ROW.y, key).setDepth(25);
-      fitWidth(img, 58);
+      fitHeight(img, 46); // he drags each one: at least 44 points tall
       img.setData('home', { x: img.x, y: img.y });
       img.setData('base', img.scale);
       this.tweens.add({ targets: img, y: img.y - 3, duration: 1200 + i * 130, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
@@ -109,10 +109,16 @@ export class IrbidScene extends BaseScene {
     this.input.on('pointerup', (p: Phaser.Input.Pointer) => this.onUp(p));
     this.input.on('pointerupoutside', (p: Phaser.Input.Pointer) => this.onUp(p));
 
-    void Voice.say('ir_open');
     let packSaid = false;
+    // One opening line, then straight to what to do.
+    void Voice.say('ir_open').then((ended) => {
+      if (!ended || !this.alive || this.state !== 'pack' || packSaid) return;
+      packSaid = true;
+      void Voice.say('ir_pack');
+    });
     this.setIdle(() => {
-      if (this.state === 'pack' && !packSaid) {
+      // The hint's line never cuts off a line still being said.
+      if (this.state === 'pack' && !packSaid && !Voice.busy) {
         packSaid = true;
         void Voice.say('ir_pack');
       }

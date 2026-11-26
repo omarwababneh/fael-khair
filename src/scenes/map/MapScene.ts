@@ -2,13 +2,15 @@ import Phaser from 'phaser';
 import { motes } from '../../core/fx';
 import { addLabel, replay } from '../../core/labels';
 import { music } from '../../core/music';
-import { getVoiceSpeed, setVoiceSpeed } from '../../core/settings';
+import { applyAudioSession, audioSessionType } from '../../core/audio';
+import { getLine } from '../../core/content';
+import { getThroughSilent, getVoiceSpeed, setThroughSilent, setVoiceSpeed } from '../../core/settings';
 import { dayComplete, MISSIONS_PER_DAY, missionFor, session, sunStep, type Place } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
+import { BaseScene, onMap } from '../BaseScene';
 
 interface Pin {
   id: string;
@@ -22,9 +24,10 @@ interface Pin {
   place?: Place;
 }
 
-// Pins sit on the landmarks drawn in bg_map (measured from the art, which is
-// shown 390 points wide with its top at y = 129.5); names sit beside them.
-export const PINS: Pin[] = [
+// Pins sit on the landmarks drawn in bg_map; names sit beside them. Measured on
+// the map drawn 390 points wide (top at y = 129.5) and moved with it to its
+// place inside the margin (onMap, BaseScene.ts).
+const RAW_PINS: Pin[] = [
   { id: 'ummqais', name: 'أُمّ قَيْس', line: 'map_ummqais', x: 76, y: 212, lx: 162, ly: 196, place: 'ummqais' },
   { id: 'irbid', name: 'إِرْبِد', line: 'map_irbid', x: 135, y: 252, lx: 232, ly: 250, place: 'irbid' },
   { id: 'jerash', name: 'جَرَش', line: 'map_jerash', x: 118, y: 298, lx: 232, ly: 300, place: 'jerash' },
@@ -34,6 +37,10 @@ export const PINS: Pin[] = [
   { id: 'wadirum', name: 'وادي رَمّ', line: 'map_wadirum', x: 172, y: 545, lx: 290, ly: 576 },
   { id: 'aqaba', name: 'العَقَبة', line: 'map_aqaba', x: 62, y: 628, lx: 158, ly: 650, place: 'aqaba' },
 ];
+export const PINS: Pin[] = RAW_PINS.map((p) => {
+  const a = onMap(p.x, p.y), b = onMap(p.lx, p.ly);
+  return { ...p, x: a.x, y: a.y, lx: b.x, ly: b.y };
+});
 
 // The sun's path across the top of the map, from morning to sunset (west).
 const SUN_PATH = [
@@ -42,7 +49,7 @@ const SUN_PATH = [
   { x: 200, y: 86, color: 0xffb93a },
   { x: 134, y: 94, color: 0xff9c38 },
   { x: 72, y: 116, color: 0xff7b36 },
-];
+].map((s) => ({ ...onMap(s.x, s.y), color: s.color }));
 const WARMTH = [0, 0.05, 0.1, 0.15, 0.3];
 const DAY_TINT = 0xff9a4a;
 const DUSK_TINT = 0xa48ac8; // after all four places, the sky turns to dusk
@@ -260,6 +267,13 @@ export class MapScene extends BaseScene {
       onSpeed: (sp) => {
         setVoiceSpeed(sp);
         void Voice.say('map_next'); // a sample at the new speed
+      },
+      voiceInfo: () => ({ ...Voice.info(), session: audioSessionType() }),
+      testVoice: (report) => Voice.test(getLine('map_next').tts, report),
+      throughSilent: getThroughSilent(),
+      onThroughSilent: (on) => {
+        setThroughSilent(on);
+        applyAudioSession();
       },
       onSound: (m) => music.setSoundMode(m),
       onVolume: (v) => music.setVolume(v),

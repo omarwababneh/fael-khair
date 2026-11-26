@@ -75,7 +75,7 @@ export class MorningScene extends BaseScene {
     this.boy = this.add.image(150, WALL_FOOT, 'boy_idle').setOrigin(0.5, 1).setDepth(30);
     fitHeight(this.boy, BOY_H);
     breathe(this, this.boy);
-    this.can = new PourCan(this, CAN_REST.x, CAN_REST.y, BOY_H * 0.3);
+    this.can = new PourCan(this, CAN_REST.x, CAN_REST.y, BOY_H * 0.34); // at least 44 points tall
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.move(p));
@@ -99,9 +99,8 @@ export class MorningScene extends BaseScene {
   }
 
   private async intro(): Promise<void> {
-    await Voice.say('qda_open');
-    if (!this.alive) return;
     this.state = 'work';
+    this.open('qda_open');
     this.setIdle(() => this.showHint());
   }
 

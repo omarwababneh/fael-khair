@@ -1,6 +1,27 @@
 // One Web Audio graph for everything: music, sound effects and recorded voice.
 // iOS needs the first sound to start inside a tap, so unlock() is called from
 // the start-screen tap (and again from any later tap, harmlessly).
+import { getThroughSilent } from './settings';
+
+/**
+ * Safari's audio session type: "playback" plays through the silent switch.
+ * The parents' corner can turn it off ("auto") if the phone's voice is not
+ * heard with it on (see the voice test there).
+ */
+export function applyAudioSession(): void {
+  try {
+    const nav = navigator as Navigator & { audioSession?: { type: string } };
+    if (nav.audioSession) nav.audioSession.type = getThroughSilent() ? 'playback' : 'auto';
+  } catch {
+    /* not supported */
+  }
+}
+
+/** The current audio session type, for the voice test (or null where Safari has none). */
+export function audioSessionType(): string | null {
+  const nav = navigator as Navigator & { audioSession?: { type: string } };
+  return nav.audioSession ? nav.audioSession.type : null;
+}
 
 type Bus = 'music' | 'sfx' | 'voice';
 
@@ -26,13 +47,7 @@ class AudioEngine {
 
   /** Must run synchronously inside a user tap. */
   unlock(): void {
-    try {
-      // Play through the silent switch where Safari allows it.
-      const nav = navigator as Navigator & { audioSession?: { type: string } };
-      if (nav.audioSession) nav.audioSession.type = 'playback';
-    } catch {
-      /* not supported */
-    }
+    if (!this.ctx) applyAudioSession();
     const first = !this.ctx;
     if (!this.ctx) {
       const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -102,6 +117,31 @@ class AudioEngine {
       this.buffers.set(url, p);
     }
     return p;
+  }
+
+  /** Put the audio session back after the microphone was used. */
+  reapplySession(): void {
+    applyAudioSession();
+  }
+
+  /** Decode a recording made on this phone (the parent's own voice). */
+  decodeBlob(blob: Blob): Promise<AudioBuffer | null> {
+    const ctx = this.ctx;
+    if (!ctx) return Promise.resolve(null);
+    return blob.arrayBuffer()
+      .then((ab) => new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(ab, res, rej)))
+      .catch(() => null);
+  }
+
+  /** Play a decoded buffer on the voice bus. Resolves when it ends. */
+  playVoiceBuffer(buf: AudioBuffer): { done: Promise<void>; stop: () => void } {
+    const ctx = this.ctx as AudioContext;
+    const s = ctx.createBufferSource();
+    s.buffer = buf;
+    s.connect(this.buses.voice);
+    const done = new Promise<void>((res) => { s.onended = () => res(); });
+    s.start();
+    return { done, stop: () => { try { s.stop(); } catch { /* already stopped */ } } };
   }
 
   /** Play a file directly (not on the music or effects buses). Resolves when it ends. */

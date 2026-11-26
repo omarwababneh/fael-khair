@@ -31,22 +31,27 @@ Press and hold the small lock at the top left of the map for **3 seconds**. Insi
 - **الصوت بالخلفية:** cheerful music (the default), nature sounds only, or nothing (بدون). With music or nature sounds, **علوّ الموسيقى** sets the volume: quiet or medium.
 - **سرعة الصوت:** slower, normal or faster speech. Tap one to hear a sample.
 - **The phone's Arabic voice:** which one the phone has, or that it has none. A higher-quality "Enhanced" or "Premium" Arabic voice can be downloaded free in the iPhone's settings (look under Accessibility, then Spoken Content, then Voices, then Arabic), and the game will use it.
+- **اختبار الصوت (voice test):** whether the phone can speak, how many voices it shows the game, the Arabic voice names, and how the game speaks right now. Tap **جرّب الصوت**: it speaks one line and shows what happened (started, ended, or the error). If it says it started and ended but you heard nothing, set **الصوت مع زر الصامت** to **مطفي** and try again; that setting is remembered.
 - **أسئلة للحديث مع ابنك:** three questions for each place, to talk through together.
 - **فكرة لليوم:** one small act of kindness to try. It is never tracked or checked.
 - **دليل التسجيل:** the recording guide (see below).
-- **مراجعة النصوص الدينية:** how many religious texts still wait for your review.
+- **مراجعة النصوص الدينية:** every text still waiting for your review, with its source in Arabic, where it is used, and the words the game says.
 - At the bottom, in small text: the music credit, which the music license requires.
 
-The game keeps no statistics about your son and no history of what he chose. The only things saved on the phone are the sound choice, the music volume, the voice speed, and one number per place for which mission comes next and whether he has been around once.
+The game keeps no statistics about your son and no history of what he chose. The only things saved on the phone are the sound choice, the music volume, the voice speed, the silent-switch choice, one number per place for which mission comes next and whether he has been around once, and your own recordings (below). Nothing is sent anywhere.
 
 ## Recording your own voice (recommended)
 
 The game speaks with the phone's built-in voice until your recordings are added. Your voice replaces it line by line, with no change to the game.
 
-1. In the parents' corner, open **دليل التسجيل**. Each line shows a file name (for example `start.m4a`) and the Jordanian sentence to read.
-2. Record each sentence with the iPhone's **Voice Memos** app. It saves `.m4a` files.
-3. Rename each recording to its file name.
-4. On GitHub, open the folder `public/assets/audio/vo`, tap **Add file**, then **Upload files**, and commit to the main branch.
+**On the phone (easiest).** In the parents' corner, open **دليل التسجيل**. Under each sentence there are three buttons:
+1. **سجّل**: the phone asks once for the microphone. Read the sentence, then tap **وقّف**.
+2. **اسمع**: plays what you recorded. **سجّل من جديد** replaces it.
+3. **احذف**: removes it; that line goes back to the phone's voice.
+
+These recordings stay on that phone only. They are never uploaded or sent anywhere, so they are not on another phone or in the repository. A recorded line always plays instead of the phone's voice.
+
+**For every phone (optional).** You can also add a recording to the game itself: record the sentence with **Voice Memos** (it saves `.m4a`), rename it to the file name shown above the sentence (for example `start.m4a`), and upload it to `public/assets/audio/vo` on GitHub (**Add file**, **Upload files**, commit to main). A recording made on the phone comes first; then a file in the game; then the phone's voice.
 
 Once a recording exists, the speech bubble shows the Jordanian sentence you recorded.
 

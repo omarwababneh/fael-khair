@@ -28,7 +28,7 @@ const BOY_ASIDE = { x: 268, y: GROUND - 32 };
 const SCALE_FOOT = GROUND - 22; // it stands a little farther back than the baskets
 const BASE_H = BOY_H * 0.8;
 const BEAM_W = BOY_H * 0.9;
-const PAN_H = BOY_H * 0.3;
+const PAN_H = BOY_H * 0.33; // 46 points: he takes handfuls from the pans
 const TILT_PER = 7; // degrees per handful of difference
 const HANDFUL_W = BOY_H * 0.25;
 
@@ -88,7 +88,8 @@ export class HarvestScene extends BaseScene {
       this.baskets[side] = b;
     }
     this.pile = this.add.image(PILE.x, PILE.y, 'olives_pile').setOrigin(0.5, 1).setDepth(35).setScale(0.01);
-    this.pileScale = (BOY_H * 0.5) / this.pile.frame.width; // art checklist: 0.5 wide
+    // Wider than the checklist's 0.5, so the pile he takes from is at least 44 points tall.
+    this.pileScale = (BOY_H * 0.86) / this.pile.frame.width;
 
     this.boy = this.add.image(PILE.x, GROUND - 26, 'boy_idle').setOrigin(0.5, 1).setDepth(29);
     fitHeight(this.boy, BOY_H * 0.95); // a step farther back, behind the pile
@@ -114,14 +115,15 @@ export class HarvestScene extends BaseScene {
       x: { min: PILE.x - 40, max: PILE.x + 40 }, y: GROUND - 200, speedY: { min: 200, max: 280 }, gravityY: 300,
       scale: { min: 0.25, max: 0.4 }, lifespan: 600, frequency: 90, tint: [0x6b7a2a, 0x3d2a3a, 0x8a9a3a],
     }).setDepth(36);
-    this.tweens.add({ targets: this.pile, scale: this.pileScale, duration: 3200, ease: 'Sine.easeOut' });
-    this.time.addEvent({ delay: 600, repeat: 4, callback: () => sfx('rustle', { volume: 0.5 }) });
-    await Promise.all([said, this.wait(3400)]);
+    this.tweens.add({ targets: this.pile, scale: this.pileScale, duration: 1400, ease: 'Sine.easeOut' });
+    this.time.addEvent({ delay: 300, repeat: 3, callback: () => sfx('rustle', { volume: 0.5 }) });
+    // He can deal as soon as the pile is down; what to do follows the opening line.
+    await this.wait(1500);
     drops.emitting = false;
     if (!this.alive) return;
     this.state = 'deal';
-    void Voice.say('u3_deal');
     this.setIdle(() => this.showHint());
+    void said.then((ended) => { if (this.alive && ended) void Voice.say('u3_deal'); });
   }
 
   // ---------------------------------------------------------------- input
@@ -192,7 +194,8 @@ export class HarvestScene extends BaseScene {
   private shrinkPile(): void {
     const total = currentLap() ? 10 : 8;
     const left = this.pileLeft.reduce((a, b) => a + b, 0);
-    this.tweens.add({ targets: this.pile, scale: this.pileScale * Math.max(0.0001, left / total), duration: 200 });
+    // It shrinks a little as he deals, but stays at least 44 points tall until it is gone.
+    this.tweens.add({ targets: this.pile, scale: left ? this.pileScale * (0.82 + 0.18 * left / total) : 0.0001, duration: 200 });
   }
 
   private intoBasket(h: Handful, side: Side): void {

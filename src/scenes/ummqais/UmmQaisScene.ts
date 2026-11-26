@@ -451,7 +451,7 @@ export class UmmQaisScene extends BaseScene {
     const again = () => this.kickIdle();
     if (this.state === 'pull') {
       this.hint.show('drag', { x: HANDLE.x, y: HANDLE.top }, { x: HANDLE.x, y: HANDLE.bottom }, again);
-      if (!this.hintSaid) {
+      if (!this.hintSaid && !Voice.busy) {
         this.hintSaid = true;
         void Voice.say('uq_hint');
       }

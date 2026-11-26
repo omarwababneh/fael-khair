@@ -31,8 +31,8 @@ const GROUND = AXLE.y + (CART_ART.wheelBottom - CART_ART.hubY) * CART_S; // unde
 const DONKEY = { x: AXLE.x + Math.round(550 * CART_S) + 12, h: 124, tiredH: 112 };
 const ELDER = { x: 68, h: 161 };
 const BOY = { x: 262, y: 726, h: 124 };
-const SMALL_H = 38; // a small sack on the ground
-const BED_SMALL_H = 40;
+const SMALL_H = 44; // a small sack on the ground (at least 44 points: he must touch it)
+const BED_SMALL_H = 44;
 const BED_BIG_H = 56;
 // Where sacks sit in the bed, relative to the axle (x), bottoms hidden behind the rim.
 const BED_BOTTOM = -(CART_ART.hubY - 75) * CART_S;
@@ -147,6 +147,8 @@ export class CartScene extends BaseScene {
     // He may start loading at once (an easy first win inside 10 seconds),
     // while the old man lifts the big sack.
     this.state = 'load';
+    // The hint hand is ready at once (it shows after 3 seconds if he has not touched anything).
+    this.setIdle(() => this.showHint());
     void this.intro(big);
   }
 
@@ -175,8 +177,7 @@ export class CartScene extends BaseScene {
     if (!this.alive) return;
     this.introDone = true;
     if (this.state !== 'load') return;
-    this.setIdle(() => this.showHint());
-    if (this.loaded.left + this.loaded.right === 0) void Voice.say('p3_hint');
+    if (this.loaded.left + this.loaded.right === 0 && !Voice.busy) void Voice.say('p3_hint');
   }
 
   // ---------------------------------------------------------------- input
