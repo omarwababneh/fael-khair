@@ -28,6 +28,6 @@ The background music in `public/assets/audio/music/` is by Kevin MacLeod (incomp
 | `deadsea.m4a` | "Wallpaper" |
 | `aqaba.m4a` | "Life of Riley" |
 
-The last three are ready for places that are not built yet. They play once those places exist under the keys `jerash`, `deadsea` and `aqaba`.
+`jerash` and `deadsea` play in their places (wave 3). `aqaba` is ready for Aqaba, which is built in wave 4.
 
 The license requires this credit to stay wherever the game is shared. It is also shown inside the game, at the bottom of the parents' corner.

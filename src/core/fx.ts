@@ -161,6 +161,26 @@ export class HintHand {
     this.hand = null;
   }
 
+  /** A finger going round in a circle about a point (turning a tap). */
+  circle(center: { x: number; y: number }, r: number, onDone?: () => void): void {
+    this.clear();
+    const hand = this.scene.add.image(center.x + r, center.y, 'fx_hand').setOrigin(0.37, 0.05).setDepth(950).setAlpha(0);
+    hand.setDisplaySize(58, 72);
+    this.hand = hand;
+    this.scene.tweens.add({ targets: hand, alpha: 1, duration: 250 });
+    this.tween = this.scene.tweens.addCounter({
+      from: 0, to: Math.PI * 4, duration: 3200, ease: 'Sine.easeInOut',
+      onUpdate: (tw) => {
+        const a = tw.getValue() ?? 0;
+        hand.setPosition(center.x + Math.cos(a) * r, center.y + Math.sin(a) * r);
+      },
+      onComplete: () => {
+        this.clear();
+        onDone?.();
+      },
+    });
+  }
+
   show(kind: 'drag' | 'tap' | 'hold', from: { x: number; y: number }, to?: { x: number; y: number }, onDone?: () => void): void {
     this.clear();
     const hand = this.scene.add.image(from.x, from.y, 'fx_hand').setOrigin(0.37, 0.05).setDepth(950).setAlpha(0);

@@ -34,8 +34,8 @@ const ROTATION: Record<Place, Array<MissionDef | null>> = {
   amman: [{ id: 'A1', scene: 'amman' }, { id: 'A2', scene: 'a2' }, { id: 'A3', scene: 'a3' }],
   // I1 is Irbid's quiet deed, so Irbid's ordinary rotation is I2 and I3 only.
   irbid: [{ id: 'I2', scene: 'i2' }, { id: 'I3', scene: 'i3' }],
-  jerash: [null, null, null],
-  deadsea: [null, null, null],
+  jerash: [{ id: 'J1', scene: 'jerash' }, { id: 'J2', scene: 'j2' }, { id: 'J3', scene: 'j3' }],
+  deadsea: [{ id: 'D1', scene: 'deadsea' }, { id: 'D2', scene: 'd2' }, { id: 'D3', scene: 'd3' }],
   aqaba: [null, null, null],
 };
 
@@ -45,8 +45,8 @@ const QUIET: Record<Place, MissionDef | null> = {
   ummqais: { id: 'QD-U', scene: 'ummqais-dusk' },
   amman: { id: 'QD-A', scene: 'amman-morning' },
   irbid: { id: 'I1', scene: 'irbid' },
-  jerash: null,
-  deadsea: null,
+  jerash: { id: 'QD-J', scene: 'jerash-morning' },
+  deadsea: { id: 'QD-D', scene: 'deadsea-tap' },
   aqaba: null,
 };
 

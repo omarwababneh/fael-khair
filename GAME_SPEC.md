@@ -100,12 +100,12 @@ Shared rules: every mission opens with one father voice line that sets the situa
 | I1 | The secret helper | Irbid | giving in secret | `bukhari_660` | built (Irbid's quiet deed) |
 | I2 | Too much change | Irbid | trust, giving people what is theirs | `quran_4_58` | built (wave 2) |
 | I3 | The new boy | Irbid | a kind word; including the one left out | `bukhari_2989` (good word) | built (wave 2) |
-| J1 | After the festival | Jerash | removing harm from where people walk | `bukhari_2989` (harm) | wave 3 |
-| J2 | The lost little girl | Jerash | helping someone in distress | `muslim_2699a` | wave 3 |
-| J3 | The forgotten lunch | Jerash | feeding others | `bukhari_12` | wave 3 |
-| D1 | The dripping taps | Dead Sea | not wasting water | `quran_7_31` | wave 3 |
-| D2 | Seeing the blessings | Dead Sea | gratitude | `quran_14_7` | wave 3 |
-| D3 | Walking with Grandfather | Dead Sea | honoring the elderly | `tirmidhi_1920` | wave 3 |
+| J1 | After the festival | Jerash | removing harm from where people walk | `bukhari_2989` (harm) | built (wave 3) |
+| J2 | The lost little girl | Jerash | helping someone in distress | `muslim_2699a` | built (wave 3) |
+| J3 | The forgotten lunch | Jerash | feeding others | `bukhari_12` | built (wave 3) |
+| D1 | The dripping taps | Dead Sea | not wasting water | `quran_7_31` | built (wave 3) |
+| D2 | Seeing the blessings | Dead Sea | gratitude | `quran_14_7` | built (wave 3) |
+| D3 | Walking with Grandfather | Dead Sea | honoring the elderly | `tirmidhi_1920` | built (wave 3) |
 | Q1 | The turtle and the plastic | Aqaba | mercy to animals; keeping harm out of their home | `bukhari_2363` | wave 4 |
 | Q2 | The honest scale | Aqaba | honest weight | `quran_55_9` | wave 4 |
 | Q3 | The sandcastle promise | Aqaba | keeping a promise | `quran_17_34` | wave 4 |
@@ -644,6 +644,69 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `a3_hadith` R | ending | registry `quran_17_23` | registry `quran_17_23` |
 | `i2_hadith` R | ending | registry `quran_4_58` | registry `quran_4_58` |
 | `i3_hadith` R | ending | registry `bukhari_2989`, part `good_word` | registry `bukhari_2989`, part `good_word` |
+| `j1_open` | J1 start | بسم الله. بعد المهرجان بقيت أوساخ كثيرة في الساحة. | بسم الله. بعد المهرجان ضلّ وساخة كتير بالساحة. |
+| `j1_hint` | how to bin | ضع كل شيء في السلّة التي عليها صورته. | حطّ كل إشي بالسلّة اللي عليها صورته. |
+| `j1_wrong` | another bin | هذه سلّة أخرى. انظر إلى الصورة. | هاي سلّة ثانية. طلّع عالصورة. |
+| `j1_glass` | he touches the glass | هذا زجاج مكسور. هذا لشخص كبير، لا نلمسه. | هاد قزاز مكسور. هاد لواحد كبير، ما بنلمسه. |
+| `j1_tell` | tell the guard | نخبر حارس المكان. اضغط عليه. | بنحكي لحارس المكان. اكبس عليه. |
+| `j1_guard` | the guard | شكراً لأنك أخبرتني. أنا أكنسه. | يسلموا إنك حكيتلي. أنا بكنسه. |
+| `j1_breeze` | a breeze moves the paper | طارت الورقة! الحقها. | طارت الورقة! إلحقها. |
+| `j1_end` | people cross the plaza | الحمد لله، صارت الساحة نظيفة وآمنة للجميع. | الحمد لله، صارت الساحة نظيفة وآمنة للكل. |
+| `qdj_open` | Jerash quiet deed start | بسم الله. الصباح باكر، والساحة فارغة. | بسم الله. الصبح بكّير، والساحة فاضية. |
+| `qdj_end` | the first visitors walk in | دخل الزوّار، ومشوا على حجارة نظيفة. | دخلوا الزوّار، ومشيوا على حجار نظيفة. |
+| `j2_open` | J2 start | بسم الله. هناك بنت صغيرة تبكي وحدها. | بسم الله. في بنت زغيرة بتعيّط لحالها. |
+| `j2_stay` | he stays and waves | نبقى معها هنا، وننادي المرشد. لوّح له. | بنضلّ معها هون، وبننادي المرشد. لوّحله. |
+| `j2_guide` | the guide | لا تخافي، سنجد ماما معاً. | لا تخافي، رح نلاقي ماما سوا. |
+| `j2_clue_scarf` | the girl (first lap) | ماما تلبس شالاً أخضر. | ماما لابسة شال أخضر. |
+| `j2_clue_bag` | the girl (later lap) | مع ماما حقيبة صفراء. | ماما معها شنطة صفرا. |
+| `j2_clue_dress` | the girl (later lap) | ماما تلبس فستاناً أزرق. | ماما لابسة فستان أزرق. |
+| `j2_look` | visitors pass | انظر إلى الناس. اضغط على ماما عندما تراها. | طلّع عالناس. اكبس على ماما لمّا تشوفها. |
+| `j2_notmom` | he taps a visitor | هذه ليست ماما. ننتظر قليلاً. | هاي مش ماما. بنستنّى شوي. |
+| `j2_call` | the guide calls her | يا أختي! بنتك هنا! | يا أختي! بنتك هون! |
+| `j2_thanks` | the mother, to both | الحمد لله! شكراً لكما. | الحمد لله! يسلموا إيديكم. |
+| `j2_end` | the hug | رجعت البنت إلى أمّها، والحمد لله. | رجعت البنت لإمّها، الحمد لله. |
+| `j3_open` | J3 start | بسم الله. رحلة المدرسة! صاحبك نسي طعامه. | بسم الله. رحلة المدرسة! صاحبك نسي أكله. |
+| `j3_ask` | the boy asks first | هل تحبّ الجبنة؟ هل يمكنك أن تأكلها؟ | بتحبّ الجبنة؟ بتقدر تاكلها؟ |
+| `j3_yes` | the classmate | نعم، أحبّها كثيراً! | آه، بحبّها كتير! |
+| `j3_cut` | the sandwich close-up | ارسم خطاً في الوسط لتقسمها نصفين. | ارسم خط بالنص عشان تقسمها نصّين. |
+| `j3_middle` | the cut is off the middle | أقرب إلى الوسط، ليكون النصفان متساويين. | أقرب عالنص، عشان يطلعوا النصّين متساويين. |
+| `j3_pour` | the cup close-up | اضغط لتسكب الماء، واترك عند الخط. | اكبس عشان تكبّ الميّ، واترك عند الخط. |
+| `j3_more` | let go below the line | قليلاً بعد. | كمان شوي. |
+| `j3_spill` | over the brim | انسكب قليلاً، لا بأس. | انكبّ شوي، مش مشكلة. |
+| `j3_give` | hand both over | أعطه نصف الشطيرة، وكأسه. | أعطيه نصّ السندويشة، وكاسته. |
+| `j3_thanks` | the classmate | شكراً يا صاحبي! | يسلموا يا صاحبي! |
+| `j3_end` | eating together | الحمد لله، أكلا معاً وشبعا. | الحمد لله، أكلوا سوا وشبعوا. |
+| `d1_open` | D1 start | بسم الله. الحنفيات تنقّط، والماء يضيع. | بسم الله. الحنفيات بتنقّط، والميّ بتروح عالفاضي. |
+| `d1_hint` | how to turn | أدِر رأس الحنفية بإصبعك. | لفّ راس الحنفية بإصبعك. |
+| `d1_stiff` | a stiffer tap | هذه أقسى. أدِرها لفّة كاملة. | هاي أقسى. لفّها لفّة كاملة. |
+| `d1_leak` | he touches the leak | هذا الأنبوب مكسور. هذا لشخص كبير. | هاي الماسورة مكسورة. هاي لواحد كبير. |
+| `d1_tell` | tell the attendant | نخبر عامل الاستراحة. اضغط عليه. | بنحكي لعامل الاستراحة. اكبس عليه. |
+| `d1_fixed` | the attendant | أصلحتها. شكراً لأنك أخبرتني. | صلّحتها. يسلموا إنك حكيتلي. |
+| `d1_plants` | the plants | والماء الذي وفّرناه نسقي به الزرع. | والميّ اللي وفّرناها بنسقي فيها الزرعات. |
+| `d1_end` | the plants are watered | الحمد لله، لم يعد الماء يضيع، وشرب الزرع. | الحمد لله، الميّ ما عادت تروح، والزرعات شربت. |
+| `qdd_open` | Dead Sea quiet deed start | بسم الله. حنفية تنقّط، ولا أحد هنا. | بسم الله. حنفية بتنقّط، وما في حدا هون. |
+| `qdd_end` | a visitor walks by | لم تعد الحنفية تنقّط. | الحنفية ما عادت تنقّط. |
+| `d2_open` | D2 start (Baba) | بسم الله. ما النعم التي تراها حولنا؟ | بسم الله. شو النعم اللي بتشوفها حوالينا؟ |
+| `d2_hint` | how to play | اضغط على أي شيء تراه نعمة. | اكبس على أي إشي بتشوفه نعمة. |
+| `d2_water` | he taps the water | الحمد لله على الماء. | الحمد لله على الميّ. |
+| `d2_bread` | he taps the bread | الحمد لله على الخبز. | الحمد لله على الخبز. |
+| `d2_hands` | he taps his hands | الحمد لله على يديك. | الحمد لله على إيديك. |
+| `d2_baba` | he taps Baba | والحمد لله أننا معاً. | والحمد لله إنّا سوا. |
+| `d2_sea` | he taps the sea | سبحان الله، ما أجمل البحر والجبال! | سبحان الله، شو حلو البحر والجبال! |
+| `d2_end` | the evening light | الحمد لله على كل النعم. | الحمد لله على كل النعم. |
+| `d3_open` | D3 start | بسم الله. نمشي مع جدّو إلى المقعد. | بسم الله. بنمشي مع سيدو للمقعد. |
+| `d3_hint` | how to walk | اضغط لتمشي، واترك لتنتظر. | اكبس عشان تمشي، واترك عشان تستنّى. |
+| `d3_wait` | he ran ahead | جدّو يمشي على مهله. ننتظره. | سيدو بيمشي على مهله. بنستنّاه. |
+| `d3_stone` | a stone on the path | حجر على الطريق! أبعده قبل أن يصل جدّو. | في حجر عالطريق! بعّده قبل ما يوصل سيدو. |
+| `d3_water` | at the bench | اسكب لجدّو كأس ماء. | كبّ لسيدو كاسة ميّ. |
+| `d3_grandpa` | Grandfather | الله يرضى عليك يا حبيبي. | الله يرضى عليك يا حبيبي. |
+| `d3_end` | Grandfather rests | الحمد لله، جلس جدّو مرتاحاً ينظر إلى البحر. | الحمد لله، قعد سيدو مرتاح بيطلّع عالبحر. |
+| `j1_hadith` R | ending | registry `bukhari_2989`, part `harm` | registry `bukhari_2989`, part `harm` |
+| `j2_hadith` R | ending | registry `muslim_2699a` | registry `muslim_2699a` |
+| `j3_hadith` R | ending | registry `bukhari_12` | registry `bukhari_12` |
+| `d1_hadith` R | ending | registry `quran_7_31` | registry `quran_7_31` |
+| `d2_hadith` R | ending | registry `quran_14_7` | registry `quran_14_7` |
+| `d3_hadith` R | ending | registry `tirmidhi_1920` | registry `tirmidhi_1920` |
 
 ### 7.3 Music
 Copied word for word from `MISSIONS_V2.md` section 9 (its point 9 is carried out by this section):
