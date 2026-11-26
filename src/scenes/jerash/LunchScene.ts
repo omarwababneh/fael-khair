@@ -152,7 +152,7 @@ export class LunchScene extends BaseScene {
     const box = this.sandwichBox();
     const pts = this.stroke;
     this.stroke = [];
-    this.time.delayedCall(250, () => this.trail.clear());
+    this.time.delayedCall(250, () => { if (this.strokeId === -1) this.trail.clear(); });
     if (pts.length < 2) return;
     const ys = pts.map((p) => p.y);
     // A cut goes across the sandwich, from above it to below it (or back).

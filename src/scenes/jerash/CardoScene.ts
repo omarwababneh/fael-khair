@@ -158,7 +158,10 @@ export class CardoScene extends BaseScene {
   /** The next visitor crosses the street; the mother keeps coming back until he spots her. */
   private nextWalker(): void {
     if (!this.alive || this.state !== 'look') return;
-    const key = this.queue.shift() ?? 'mother_search';
+    // Once the queue is empty the mother comes again, with a visitor between her
+    // passes: never two of her on screen at once.
+    const motherOut = this.walkers.some((w) => w.mother);
+    const key = this.queue.shift() ?? (motherOut ? (Math.random() < 0.5 ? 'visitor_a' : 'visitor_b') : 'mother_search');
     // visitor_a faces right; visitor_b and the mother face left: each walks the way she faces.
     const rightward = key === 'visitor_a';
     const v = view();
@@ -174,7 +177,6 @@ export class CardoScene extends BaseScene {
       onComplete: () => {
         img.destroy();
         this.walkers = this.walkers.filter((w) => w.img !== img);
-        if (mother && this.state === 'look') this.queue.unshift('mother_search');
       },
     });
     this.walkers.push({ img, mother, tween, bob });
@@ -215,6 +217,7 @@ export class CardoScene extends BaseScene {
     await Voice.say('j2_thanks');
     if (!this.alive) return;
     await this.wait(400);
+    if (!this.alive) return;
     await Voice.say('j2_end');
     if (!this.alive) return;
     await this.finishAdventure('jerash', 'j2_hadith');

@@ -218,7 +218,9 @@ export class WalkScene extends BaseScene {
     this.hint.clear();
     const x = p.worldX, y = p.worldY;
     if (this.state === 'walk') {
-      const stone = this.stones.find((st) => !st.moved && Phaser.Math.Distance.Between(x, y, st.img.x, st.img.y - 10) < 36);
+      // Only the nearest stone still on the path can be moved: he never walks past one.
+      const nearest = this.stones.filter((st) => !st.moved).sort((a, b) => a.img.x - b.img.x)[0];
+      const stone = nearest && Phaser.Math.Distance.Between(x, y, nearest.img.x, nearest.img.y - 10) < 36 ? nearest : undefined;
       if (stone && !this.moving) {
         void this.moveStone(stone);
         return;
@@ -358,6 +360,7 @@ export class WalkScene extends BaseScene {
     await Voice.say('d3_grandpa');
     if (!this.alive) return;
     await this.wait(500);
+    if (!this.alive) return;
     await Voice.say('d3_end');
     if (!this.alive) return;
     await this.finishAdventure('deadsea', 'd3_hadith');
@@ -366,6 +369,7 @@ export class WalkScene extends BaseScene {
   private showHint(): void {
     if (!this.alive) return;
     const again = () => this.kickIdle();
+    if (this.holdId !== -1 || this.pourId !== -1 || this.cupId !== -1 || this.moving) return again();
     if (this.state === 'walk') {
       const st = this.stones.find((x) => !x.moved);
       if (st && st.img.x - this.grandpaFront() < 90) this.hint.show('tap', { x: st.img.x, y: st.img.y - 10 }, undefined, again);

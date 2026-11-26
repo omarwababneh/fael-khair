@@ -45,7 +45,7 @@ type State = 'intro' | 'turn' | 'fix' | 'water' | 'end';
 interface Tap {
   body: Phaser.GameObjects.Image;
   handle: Phaser.GameObjects.Image;
-  cx: number; cy: number; // the handle's centre
+  cx: number; cy: number; // the handle's center
   spout: { x: number; y: number };
   need: number; // degrees of handle turn to close it
   turned: number;
@@ -175,7 +175,10 @@ export class TapsScene extends BaseScene {
     this.hint.clear();
     const x = p.worldX, y = p.worldY;
     if (this.state === 'turn') {
-      const tap = this.taps.find((t) => !t.done && Phaser.Math.Distance.Between(x, y, t.cx, t.cy) < HANDLE_D * 0.5 + 26);
+      // The nearest open tap within reach (on later laps they stand close together).
+      const tap = this.taps
+        .filter((t) => !t.done && Phaser.Math.Distance.Between(x, y, t.cx, t.cy) < HANDLE_D * 0.5 + 26)
+        .sort((a, b) => Phaser.Math.Distance.Between(x, y, a.cx, a.cy) - Phaser.Math.Distance.Between(x, y, b.cx, b.cy))[0];
       if (tap) {
         this.active = tap;
         this.turnId = p.id;
@@ -261,7 +264,8 @@ export class TapsScene extends BaseScene {
     if (!this.pipeSeen) {
       this.pipeSeen = true;
       await Voice.say('d1_leak');
-      if (!this.alive || this.pipeFixed) return;
+      // He may already have called the attendant while the father spoke.
+      if (!this.alive || this.pipeFixed || this.state !== 'turn') return;
     }
     if (this.attendant && !this.attendantRing) {
       this.attendantRing = glowRing(this, this.attendant.x - 8, this.attendant.y - this.attendant.displayHeight * 0.55, 46, 49);
@@ -340,7 +344,7 @@ export class TapsScene extends BaseScene {
     this.state = 'end';
     this.setIdle(null);
     if (this.can) {
-      if (this.canId !== -1) this.canId = -1;
+      this.canId = -1;
       this.tweens.add({ targets: this.can.img, x: 150, y: 708, angle: 0, duration: 400 });
     }
     pose(this, this.boy, 'boy_happy', BOY.h);

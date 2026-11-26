@@ -656,7 +656,7 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `qdj_end` | the first visitors walk in | دخل الزوّار، ومشوا على حجارة نظيفة. | دخلوا الزوّار، ومشيوا على حجار نظيفة. |
 | `j2_open` | J2 start | بسم الله. هناك بنت صغيرة تبكي وحدها. | بسم الله. في بنت زغيرة بتعيّط لحالها. |
 | `j2_stay` | he stays and waves | نبقى معها هنا، وننادي المرشد. لوّح له. | بنضلّ معها هون، وبننادي المرشد. لوّحله. |
-| `j2_guide` | the guide | لا تخافي، سنجد ماما معاً. | لا تخافي، رح نلاقي ماما سوا. |
+| `j2_guide` | the guide | لا تخافي، سنجد ماما معاً إن شاء الله. | لا تخافي، رح نلاقي ماما سوا إن شاء الله. |
 | `j2_clue_scarf` | the girl (first lap) | ماما تلبس شالاً أخضر. | ماما لابسة شال أخضر. |
 | `j2_clue_bag` | the girl (later lap) | مع ماما حقيبة صفراء. | ماما معها شنطة صفرا. |
 | `j2_clue_dress` | the girl (later lap) | ماما تلبس فستاناً أزرق. | ماما لابسة فستان أزرق. |
@@ -849,7 +849,7 @@ Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما 
   - Pause all sound when the app goes to the background.
 - **Storage:** only what section 2 allows (the parents' sound settings and one rotation number per place), in `localStorage`, wrapped in try/catch.
 - **Performance:** steady 60 frames per second on an iPhone from the last five years. Total download under 25 MB.
-- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Version 2 adds `p2`, `p3`, `petra-dawn`, `u2`, `u3`, `ummqais-dusk`, `a2`, `a3`, `amman-morning`, `i2` and `i3` (the quiet deeds are `petra-dawn`, `ummqais-dusk`, `amman-morning`; Irbid's is `irbid`); add `&lap=1` to play a later lap. Debug runs never move a rotation. Remove nothing from production; it is harmless.
+- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Version 2 adds `p2`, `p3`, `petra-dawn`, `u2`, `u3`, `ummqais-dusk`, `a2`, `a3`, `amman-morning`, `i2`, `i3`, `jerash`, `j2`, `j3`, `jerash-morning`, `deadsea`, `d2`, `d3` and `deadsea-tap` (the quiet deeds are `petra-dawn`, `ummqais-dusk`, `amman-morning`, `jerash-morning`, `deadsea-tap`; Irbid's is `irbid`); add `&lap=1` to play a later lap. Debug runs never move a rotation. Remove nothing from production; it is harmless.
 
 ### Repository layout
 

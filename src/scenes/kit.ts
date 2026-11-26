@@ -43,6 +43,8 @@ export function walkTo(
   frames: [string, string] = ['boy_walk_a', 'boy_walk_b'], speed = 110,
 ): Promise<void> {
   scene.tweens.killTweensOf(img);
+  // A walk cut short by a new one must stop its own frame timer too.
+  (img.getData('walkTimer') as Phaser.Time.TimerEvent | undefined)?.remove();
   const dist = Math.hypot(to.x - img.x, (to.y ?? img.y) - img.y);
   const dur = Math.max(350, (dist / speed) * 1000);
   let a = true;
@@ -57,9 +59,10 @@ export function walkTo(
       sfx('step', { volume: 0.45 });
     },
   });
+  img.setData('walkTimer', t);
   return new Promise((res) => scene.tweens.add({
     targets: img, x: to.x, y: to.y ?? img.y, duration: dur, ease: 'Sine.easeInOut',
-    onComplete: () => { t.remove(); img.setFlipX(false); res(); },
+    onComplete: () => { t.remove(); img.setData('walkTimer', undefined); img.setFlipX(false); res(); },
   }));
 }
 
@@ -192,7 +195,7 @@ export class CupPour {
   private static readonly BOTTOM = 0.97;
   private static readonly BRIM = 0.13;
 
-  /** target: the fill line (0 to 1); x, y: the centre of the cup. */
+  /** target: the fill line (0 to 1); x, y: the center of the cup. */
   constructor(private scene: Phaser.Scene, x: number, y: number, cupH: number, readonly target: number, private dim: Phaser.GameObjects.Rectangle) {
     this.cup = scene.add.image(x, y, 'cup_empty');
     fitHeight(this.cup, cupH);

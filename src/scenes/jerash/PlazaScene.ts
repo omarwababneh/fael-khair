@@ -277,7 +277,8 @@ export class PlazaScene extends BaseScene {
     if (!this.glassSeen) {
       this.glassSeen = true;
       await Voice.say('j1_glass');
-      if (!this.alive || this.swept) return;
+      // He may already have called the guard while the father spoke.
+      if (!this.alive || this.swept || this.state !== 'play') return;
     }
     if (this.guard && !this.guardRing) this.guardRing = glowRing(this, this.guard.x, this.guard.y - this.guard.displayHeight * 0.55, 46, 24);
     await Voice.say('j1_tell');
