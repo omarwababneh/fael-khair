@@ -201,7 +201,7 @@ class VoiceSystem {
    * report what happened: started, ended, or the error.
    */
   test(text: string, report: (msg: string) => void): void {
-    if (this.busy) this.stop(false);
+    this.stop(false); // also stops a file test that is still playing
     this.pick();
     if (!synth) return report('هذا المتصفح لا يدعم الكلام.');
     // Each test reports only about itself; a later tap's test replaces it.
@@ -283,8 +283,14 @@ class VoiceSystem {
       p.done.then(() => true),
       new Promise<boolean>((res) => window.setTimeout(() => res(false), buf.duration * 1000 + 2500)),
     ]);
-    music.duck(false);
-    if (this.stopSource === p.stop) this.stopSource = null;
+    // Only if nothing else has started meanwhile (a game line, a speed sample or
+    // another test): their own ducking must stay as it is.
+    const mine = tid === this.testId && this.stopSource === p.stop;
+    if (!ended) p.stop(); // timed out: never let it start later on its own
+    if (mine) {
+      this.stopSource = null;
+      music.duck(false);
+    }
     if (ended) say(`اشتغل (${buf.duration.toFixed(1)} ثانية). إذا ما سمعت شي، جرّب خيار زر الصامت تحت.`);
     else say(`خطأ: الملف ما خلص. وضع الصوت: ${ctx.state}.`);
   }

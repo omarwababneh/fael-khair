@@ -80,7 +80,7 @@ function section(title: string, ...children: HTMLElement[]): HTMLDetailsElement 
  * Parents' corner sections (GAME_SPEC.md section 10). Nothing here is about the
  * child: no statistics, no history of what he chose, nothing tracked.
  */
-function parentSections(lineSource: (id: string) => LineSource): HTMLElement[] {
+function parentSections(lineSource: (id: string) => LineSource, onSourceChange: () => void): HTMLElement[] {
   // Conversation starters: three for every mission, grouped by place.
   const talk: HTMLElement[] = [];
   for (const [id, missions] of Object.entries(parentsContent.starters)) {
@@ -137,7 +137,7 @@ function parentSections(lineSource: (id: string) => LineSource): HTMLElement[] {
     const showSource = () => { src.textContent = `الصوت: ${SOURCE_AR[lineSource(id)]}`; };
     showSource();
     li.append(file, txt, src);
-    if (canRecord()) li.append(recorder(id, showSource, () => SOURCE_AR[lineSource(id)]));
+    if (canRecord()) li.append(recorder(id, () => { showSource(); onSourceChange(); }, () => SOURCE_AR[lineSource(id)]));
     list.append(li);
   }
   // Review list: every registry entry not yet approved, with the words the
@@ -604,7 +604,7 @@ class UI {
     // Everything between the title and the close button scrolls together, so on a
     // short screen nothing is squeezed out and "رجوع" always stays in reach.
     const scroll = el('div', 'fk-parent-scroll');
-    scroll.append(soundGroup, volumeRow, speedRow, speedNote, voice, test, ...parentSections(opts.lineSource), credit, build);
+    scroll.append(soundGroup, volumeRow, speedRow, speedNote, voice, test, ...parentSections(opts.lineSource, showSources), credit, build);
     card.append(h, scroll, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());

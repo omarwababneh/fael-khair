@@ -22,7 +22,7 @@ const files = fs.existsSync(dir)
 
 /** Same rule as src/core/content.ts: may a synthetic voice say this line? */
 function speakable(raw) {
-  if (!raw.registry) return raw.speak !== false && !!raw.tts;
+  if (!raw.registry) return raw.speak !== false;
   const e = registry.find((r) => r.source_id === raw.registry);
   if (!e) return false;
   const p = raw.part ? e.parts?.[raw.part] : e;
