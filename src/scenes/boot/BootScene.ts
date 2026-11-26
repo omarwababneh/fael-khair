@@ -7,7 +7,9 @@ import { debugRun, session } from '../../core/session';
 // Petra's other missions and its quiet deed.
 const SCENES: Record<string, string> = {
   map: 'map', petra: 'petra', p2: 'p2', p3: 'p3', 'petra-dawn': 'petra-dawn',
-  ummqais: 'ummqais', amman: 'amman', irbid: 'irbid', wadirum: 'wadirum',
+  ummqais: 'ummqais', u2: 'u2', u3: 'u3', 'ummqais-dusk': 'ummqais-dusk',
+  amman: 'amman', a2: 'a2', a3: 'a3', 'amman-morning': 'amman-morning',
+  irbid: 'irbid', i2: 'i2', i3: 'i3', wadirum: 'wadirum',
 };
 
 export class BootScene extends Phaser.Scene {
@@ -27,7 +29,7 @@ export class BootScene extends Phaser.Scene {
     const want = new URLSearchParams(location.search).get('scene');
     if (want) {
       const key = SCENES[want] ?? 'map';
-      session.current = debugRun(key);
+      session.current = debugRun(key, new URLSearchParams(location.search).get('lap') === '1' ? 1 : 0);
       this.scene.start(key);
     }
     else this.scene.start('start');

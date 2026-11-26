@@ -40,6 +40,23 @@ export function makeFxTextures(scene: Phaser.Scene): void {
     }
   }
 
+  // A warm red glow at the screen's edges (A2: his face goes hot). Light, not scenery.
+  if (!scene.textures.exists('fx_vignette')) {
+    const w = 256, h = 512;
+    const t = scene.textures.createCanvas('fx_vignette', w, h);
+    if (t) {
+      const c = t.getContext();
+      // Clear in the middle; the warm red only near the edges.
+      const g = c.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.56);
+      g.addColorStop(0, 'rgba(220,40,30,0)');
+      g.addColorStop(0.62, 'rgba(220,40,30,0)');
+      g.addColorStop(1, 'rgba(220,40,30,0.9)');
+      c.fillStyle = g;
+      c.fillRect(0, 0, w, h);
+      t.refresh();
+    }
+  }
+
   // Hint hand: a simple pointing hand icon.
   if (!scene.textures.exists('fx_hand')) {
     const w = 96, h = 120;

@@ -46,7 +46,7 @@ Never trade test 2 or 3 for test 1.
 
 ### Privacy
 - The repository is public. Never commit names, photos or personal details of the family.
-- **Storage.** The game may store, on the device only, the sound choice, the music volume, the voice speed, and one number per place for the next mission. Nothing about what he chose or how he played. It is never shown, never counted and never sent anywhere. (Confirmed by the owner for version 2.)
+- **Storage.** The game may store, on the device only, the sound choice, the music volume, the voice speed, and one number per place: which mission comes next and whether he has been around once. Nothing about what he chose or how he played. It is never shown, never counted and never sent anywhere. (Confirmed by the owner for version 2.)
 
 ### Rules added by MISSIONS_V2
 Every rule above still holds. `MISSIONS_V2.md` section 4 adds rules that apply to every mission, old and new: mercy with wisdom (a trusted adult whenever a stranger, an animal in trouble, broken glass, a leak or a lost child is involved; never alone with a stranger; never touching a wild or unfamiliar animal; light loads only; food shared only after asking, never a shared cup; good and bad secrets), no shame, the father describes and does not grade, everyday remembrance (only بسم الله، الحمد لله، إن شاء الله، ما شاء الله، سبحان الله are used freely; any other religious sentence comes from the registry), Quran in missions only as the short paraphrase, no jingle or musical sting for a moral choice or a good deed, and short two-form voice lines.
@@ -92,14 +92,14 @@ Shared rules: every mission opens with one father voice line that sets the situa
 | P2 | The lost pouch | Petra | trust (amanah), returning what is lost | `bukhari_2427` | built (wave 1) |
 | P3 | Loading the cart | Petra | helping someone with his load | `bukhari_2989` (mount) | built (wave 1) |
 | U1 | The thirsty dog | Umm Qais | mercy to animals | `bukhari_2363` | built |
-| U2 | The olive saplings | Umm Qais | planting good others enjoy later; patience; trust in Allah | `muslim_1553a` | wave 2 |
-| U3 | Sharing the harvest | Umm Qais | fairness between two | `bukhari_2989` (justice) | wave 2 |
+| U2 | The olive saplings | Umm Qais | planting good others enjoy later; patience; trust in Allah | `muslim_1553a` | built (wave 2) |
+| U3 | Sharing the harvest | Umm Qais | fairness between two | `bukhari_2989` (justice) | built (wave 2) |
 | A1 | The broken jar | Amman | truthfulness | `muslim_2607c` | built |
-| A2 | The block tower | Amman | self-control when angry | `bukhari_6114` | wave 2 |
-| A3 | Mama's shopping | Amman | kindness to parents | `quran_17_23` | wave 2 |
+| A2 | The block tower | Amman | self-control when angry | `bukhari_6114` | built (wave 2) |
+| A3 | Mama's shopping | Amman | kindness to parents | `quran_17_23` | built (wave 2) |
 | I1 | The secret helper | Irbid | giving in secret | `bukhari_660` | built (Irbid's quiet deed) |
-| I2 | Too much change | Irbid | trust, giving people what is theirs | `quran_4_58` | wave 2 |
-| I3 | The new boy | Irbid | a kind word; including the one left out | `bukhari_2989` (good word) | wave 2 |
+| I2 | Too much change | Irbid | trust, giving people what is theirs | `quran_4_58` | built (wave 2) |
+| I3 | The new boy | Irbid | a kind word; including the one left out | `bukhari_2989` (good word) | built (wave 2) |
 | J1 | After the festival | Jerash | removing harm from where people walk | `bukhari_2989` (harm) | wave 3 |
 | J2 | The lost little girl | Jerash | helping someone in distress | `muslim_2699a` | wave 3 |
 | J3 | The forgotten lunch | Jerash | feeding others | `bukhari_12` | wave 3 |
@@ -587,6 +587,63 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `p3_water` | bucket appears | الحمار عطشان. أعطه ماءً. | الحمار عطشان. اسقيه ميّ. |
 | `p3_end` | the cart rolls on | العربة مستوية، والحمار يمشي مرتاحاً. الحمد لله. | العربيّة مستوية، والحمار ماشي مرتاح. الحمد لله. |
 | `p3_hadith` R | P3 ending | registry `bukhari_2989`, part `mount` | registry `bukhari_2989`, part `mount` |
+| `bismillah` | as the work starts (P1, U1, A1) | بسم الله. | بسم الله. |
+| `petra_care` | P1, after the opening | بسم الله. نُبعد الحجارة والأغصان، ولا نلمس الصخر القديم. | بسم الله. بنشيل الحجار والأغصان، والصخر القديم ما بنلمسه. |
+| `uq_stepback` | U1, after pouring | ونبتعد قليلاً، حتى يشرب براحته. | وبنبعد شوي، عشان يشرب على راحته. |
+| `am_mama_sharp` | A1, cleaning up | أنا أرفع القطع الحادّة، وأنت اكنس الصغيرة بالمكنسة. | أنا بشيل القطع الحادّة، وإنت اكنس الزغار بالمكنسة. |
+| `u2_open` | U2 start | بسم الله. سنزرع اليوم ثلاث شجرات زيتون. | بسم الله. اليوم بنزرع تلات شجرات زيتون. |
+| `u2_dig` | first hole | افرك التراب لتحفر حفرة. | افرك التراب عشان تحفر حفرة. |
+| `u2_hard` | second hole | هذا التراب أقسى قليلاً. | هاد التراب أقسى شوي. |
+| `u2_stone` | third hole | هنا حجر. اسحبه جانباً. | هون في حجر. اسحبه عَ جنب. |
+| `u2_plant` | hole dug | ضع الشجرة في الحفرة. | حطّ الشجرة بالحفرة. |
+| `u2_press` | sapling in | اضغط التراب حولها. | اكبس التراب حواليها. |
+| `u2_water` | soil pressed | اسقها بالماء. | اسقيها ميّ. |
+| `u2_wait` | the seasons begin | والآن ننتظر. الشجر يحتاج إلى وقت. | وهلأ بنستنّى. الشجر بدّه وقت. |
+| `u2_trust` | the trees have grown (MISSIONS_V2 exact script) | نحن زرعناها وسقيناها، والله هو الذي أنبتها. الحمد لله. | إحنا زرعناها وسقيناها، والله هو اللي أنبتها. الحمد لله. |
+| `u2_end` | birds and the stranger | صار هنا ظلّ للناس وطعام للطيور. | صار هون فيّ للناس وأكل للطيور. |
+| `qdu_open` | Umm Qais quiet deed start | بسم الله. أشجار الجار عطشى، ولا أحد هنا. | بسم الله. شجرات الجار عطشانين، وما في حدا هون. |
+| `qdu_end` | evening | في المساء، وقفت الأشجار من جديد. | بالمسا، وقفوا الشجرات من جديد. |
+| `u3_open` | U3 start | بسم الله. قطف الصديقان الزيتون معاً منذ الصباح. | بسم الله. الصاحبين قطفوا الزيتون سوا من الصبح. |
+| `u3_deal` | dealing | وزّع الزيتون: حفنة هنا، وحفنة هناك. | وزّع الزيتون: حفنة لهون، وحفنة لهون. |
+| `u3_check` | the scale comes | لنتأكّد بالميزان. | خلّينا نتأكّد بالميزان. |
+| `u3_move` | not level | جهة أثقل من الأخرى. انقل حفنة. | جهة أتقل من التانية. انقل حفنة. |
+| `u3_level` | level | الميزان مستوٍ. | الميزان مستوي. |
+| `u3_end` | friends walk home | تعبا التعب نفسه، فأخذا الحصّة نفسها. | تعبوا نفس التعب، فأخدوا نفس الحصّة. |
+| `a2_open` | A2 start | بسم الله. هيّا نبني برجاً عالياً! | بسم الله. يلّا نبني برج عالي! |
+| `a2_hot` | the tower falls | وقع البرج. أنت غاضب، وهذا طبيعي. | وقع البرج. إنت معصّب، وهاد طبيعي. |
+| `a2_breathe` | breathing | اضغط مطوّلاً وتنفّس ببطء، ثلاث مرّات. | اكبس وطوّل وتنفّس عَ مهل، تلات مرّات. |
+| `a2_feel` | the boy, after three breaths | زعلت لأني تعبت على البرج كثيراً. | زعلت لأني تعبت عالبرج كتير. |
+| `a2_sister` | his sister | كنت أريد أن ألعب معك. | كان بدّي ألعب معك. |
+| `a2_together` | rebuilding | هيّا نبنيه معاً! | يلّا نبنيه سوا! |
+| `a2_end` | taller tower | الغضب شعور طبيعي، والقويّ يهدّئ نفسه. | طبيعي الواحد يعصّب، والقوي اللي بيهدّي حاله. |
+| `a3_open` | A3 start | بسم الله. عادت ماما من السوق، ومعها أكياس كثيرة. | بسم الله. ماما رجعت من السوق، ومعها أكياس كتير. |
+| `a3_climb` | bags taken | اصعد درجة درجة: يمين، يسار. | اطلع درجة درجة: يمين، شمال. |
+| `a3_rest` | the landing | لنرتح قليلاً هنا. | خلّينا نرتاح شوي هون. |
+| `a3_cat` | the cat step | قطّة نائمة! امشِ بجانبها بهدوء. | في بسّة نايمة! امشي من جنبها عَ رواق. |
+| `a3_mama` | Mama at the top | الحمد لله، وصلنا وأنا مرتاحة. | الحمد لله، وصلنا وأنا مرتاحة. |
+| `a3_end` | ending | وصلت ماما، ويداها فارغتان، ونفَسها مرتاح. | وصلت ماما وإيديها فاضيات، ونفَسها مرتاح. |
+| `qda_open` | Amman quiet deed start | بسم الله. ما زالت ماما نائمة، ونعناعها عطشان. | بسم الله. ماما لسّا نايمة، والنعنع تبعها عطشان. |
+| `qda_end` | Mama at the window | استيقظت ماما، والنعناع أخضر. | صحيت ماما، والنعنع أخضر. |
+| `i2_open_5_3` | I2 start (first lap) | بسم الله. معك خمس قطع، والخبز بثلاث. | بسم الله. معك خمس قطع، والخبز بتلاتة. |
+| `i2_open_5_2` | I2 start (later lap) | بسم الله. معك خمس قطع، والخبز بقطعتين. | بسم الله. معك خمس قطع، والخبز بقطعتين. |
+| `i2_open_4_2` | I2 start (later lap) | بسم الله. معك أربع قطع، والخبز بقطعتين. | بسم الله. معك أربع قطع، والخبز بقطعتين. |
+| `i2_change_2` | change outlines (2) | هذا الباقي. ضع قطعتين في مكانهما. | هاد الباقي. حطّ قطعتين بمكانهم. |
+| `i2_change_3` | change outlines (3) | هذا الباقي. ضع ثلاث قطع في أماكنها. | هاد الباقي. حطّ تلات قطع بمكانهم. |
+| `i2_extra_2` | two left over | بقيت قطعتان زائدتان. لمن هما؟ | ضلّ قطعتين زيادة. لمين هدول؟ |
+| `i2_extra_1` | one left over | بقيت قطعة زائدة. لمن هي؟ | ضلّت قطعة زيادة. لمين هاي؟ |
+| `i2_baker` | the baker | لم أنتبه! شكراً لك يا حبيبي. | ما انتبهت! يسلموا إيديك يا حبيبي. |
+| `i2_end` | closing time | في آخر النهار، كان حساب الخبّاز صحيحاً. | آخر النهار، حساب الخبّاز طلع مزبوط. |
+| `i3_open` | I3 start | بسم الله. هيّا نلعب بالكرة، مرّر لأصدقائك! | بسم الله. يلّا نلعب طابة، مرّر لصحابك! |
+| `i3_look` | after some passes | انظر، هناك ولد جديد واقف وحده. | شوف، في ولد جديد واقف لحاله. |
+| `i3_invite` | the boy, at the speech button | تعال العب معنا! | تعال العب معنا! |
+| `i3_pass_new` | four players | مرّر له الكرة! | مرّرله الطابة! |
+| `i3_end` | the new boy scores | صاروا أربعة أصدقاء بدل ثلاثة. | صاروا أربع صحاب بدل تلاتة. |
+| `u2_hadith` R | ending | registry `muslim_1553a` | registry `muslim_1553a` |
+| `u3_hadith` R | ending | registry `bukhari_2989`, part `justice` | registry `bukhari_2989`, part `justice` |
+| `a2_hadith` R | ending | registry `bukhari_6114` | registry `bukhari_6114` |
+| `a3_hadith` R | ending | registry `quran_17_23` | registry `quran_17_23` |
+| `i2_hadith` R | ending | registry `quran_4_58` | registry `quran_4_58` |
+| `i3_hadith` R | ending | registry `bukhari_2989`, part `good_word` | registry `bukhari_2989`, part `good_word` |
 
 ### 7.3 Music
 Copied word for word from `MISSIONS_V2.md` section 9 (its point 9 is carried out by this section):
@@ -728,7 +785,7 @@ Invitation text: اعملوا إشي حلو لحدا اليوم، بدون ما 
   - Pause all sound when the app goes to the background.
 - **Storage:** only what section 2 allows (the parents' sound settings and one rotation number per place), in `localStorage`, wrapped in try/catch.
 - **Performance:** steady 60 frames per second on an iPhone from the last five years. Total download under 25 MB.
-- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Version 2 adds `p2`, `p3` and `petra-dawn` (Petra's quiet deed); each later wave lists its own. Remove nothing from production; it is harmless.
+- **Debug:** `?scene=petra` (or `ummqais`, `amman`, `irbid`, `wadirum`, `map`) jumps straight to a scene. Version 2 adds `p2`, `p3`, `petra-dawn`, `u2`, `u3`, `ummqais-dusk`, `a2`, `a3`, `amman-morning`, `i2` and `i3` (the quiet deeds are `petra-dawn`, `ummqais-dusk`, `amman-morning`; Irbid's is `irbid`); add `&lap=1` to play a later lap. Debug runs never move a rotation. Remove nothing from production; it is harmless.
 
 ### Repository layout
 

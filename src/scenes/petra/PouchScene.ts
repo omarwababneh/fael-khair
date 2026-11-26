@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { fitHeight } from '../../core/assets';
 import { dustPuff, glowRing, HintHand, motes } from '../../core/fx';
 import { music } from '../../core/music';
-import { completeMission } from '../../core/session';
+import { completeMission, currentLap } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view } from '../../core/viewport';
@@ -20,10 +20,8 @@ import { BaseScene } from '../BaseScene';
 
 type Variant = 'color' | 'string' | 'patch';
 const OTHER_POUCH: Record<Variant, string> = { color: 'pouch_blue', string: 'pouch_red_bluestring', patch: 'pouch_red_moon' };
-// The first time P2 plays after the app opens, the pouches differ by color (the
-// easy round). Later plays differ by the tie-string or the patch. Kept in
-// memory only, never stored.
-let playsSinceOpen = 0;
+// On the first lap through Petra's missions the pouches differ by color (the
+// easy round); on later laps they differ by the tie-string or the patch.
 
 const GROUND = 712; // feet line on the Treasury plaza
 const BOY_H = 128;
@@ -81,8 +79,7 @@ export class PouchScene extends BaseScene {
     this.hintSaid = false;
     this.walkTimer = undefined;
     this.hint = new HintHand(this);
-    this.variant = playsSinceOpen === 0 ? 'color' : Math.random() < 0.5 ? 'string' : 'patch';
-    playsSinceOpen++;
+    this.variant = currentLap() === 0 ? 'color' : Math.random() < 0.5 ? 'string' : 'patch';
 
     ui.setPill('البَتْرا');
     ui.setHome(() => this.goTo('map'));

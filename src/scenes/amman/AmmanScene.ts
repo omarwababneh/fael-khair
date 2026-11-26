@@ -51,7 +51,6 @@ export class AmmanScene extends BaseScene {
   private cloth: Phaser.GameObjects.Image | null = null;
   private cloud: Phaser.GameObjects.Container | null = null;
   private hint!: HintHand;
-  private dragShard: Shard | null = null;
   private pointerId = -1;
   private lastPoint = new Phaser.Math.Vector2();
   private lastSound = 0;
@@ -72,7 +71,6 @@ export class AmmanScene extends BaseScene {
     this.wiped = new Set();
     this.mama = this.dustpan = this.cloth = null;
     this.cloud = null;
-    this.dragShard = null;
     this.pointerId = -1;
     this.removeButtons = null;
     this.hint = new HintHand(this);
@@ -152,12 +150,8 @@ export class AmmanScene extends BaseScene {
         .filter((o) => o.d < 48).sort((a, b) => a.d - b.d)[0];
       this.pointerId = p.id;
       this.lastPoint.set(p.worldX, p.worldY);
-      if (this.state === 'hide' && s) {
-        this.dragShard = s.x;
-        s.x.img.setDepth(60);
-        sfx('grab', { volume: 0.5 });
-      }
-      if (this.state === 'sweep') this.pose('boy_sweep');
+      // He never touches the shards with his hands: hiding or cleaning, he uses the broom.
+      if (this.state === 'hide' || this.state === 'sweep') this.pose('boy_sweep');
     }
     if (this.state === 'wipe' && this.cloth) {
       this.pointerId = p.id;
@@ -167,10 +161,10 @@ export class AmmanScene extends BaseScene {
 
   private onMove(p: Phaser.Input.Pointer): void {
     if (p.id !== this.pointerId) return;
-    if (this.state === 'hide' && this.dragShard) {
-      this.dragShard.img.setPosition(p.worldX, p.worldY);
+    if (this.state === 'hide') {
+      this.sweepAlong(p, { x: RUG.x, y: RUG.y }, (s) => this.tuckUnderRug(s));
     } else if (this.state === 'sweep') {
-      this.sweepAlong(p);
+      this.sweepAlong(p, { x: DUSTPAN.x, y: DUSTPAN.y - 14 }, (s) => this.intoPan(s));
     } else if (this.state === 'wipe' && this.cloth) {
       this.cloth.setPosition(p.worldX, p.worldY - 10);
       this.wipeAt(this.cloth.x, this.cloth.y + 10);
@@ -181,17 +175,7 @@ export class AmmanScene extends BaseScene {
   private onUp(p: Phaser.Input.Pointer): void {
     if (p.id !== this.pointerId) return;
     this.pointerId = -1;
-    if (this.state === 'hide' && this.dragShard) {
-      const s = this.dragShard;
-      this.dragShard = null;
-      if (Phaser.Math.Distance.Between(s.img.x, s.img.y, RUG.x, RUG.y) < 95) this.tuckUnderRug(s);
-      else {
-        const i = this.shards.indexOf(s);
-        sfx('slide', { volume: 0.5 });
-        this.tweens.add({ targets: s.img, x: SHARDS[i].x, y: SHARDS[i].y, duration: 350, ease: 'Back.easeOut', onComplete: () => s.img.setDepth(22) });
-      }
-    }
-    if (this.state === 'sweep') this.pose('boy_sweep');
+    if (this.state === 'sweep' || this.state === 'hide') this.pose('boy_sweep');
     this.kickIdle();
   }
 
@@ -277,6 +261,7 @@ export class AmmanScene extends BaseScene {
   }
 
   private tuckUnderRug(s: Shard): void {
+    if (s.done) return;
     s.done = true;
     sfx('slide', { volume: 0.6 });
     this.tweens.add({ targets: s.img, x: RUG.x + Phaser.Math.Between(-30, 30), y: RUG.y, scale: s.img.scale * 0.7, alpha: 0, duration: 400, ease: 'Sine.easeIn' });
@@ -359,12 +344,37 @@ export class AmmanScene extends BaseScene {
     this.tweens.add({ targets: this.mama, scaleY: { from: this.mama.scaleY * 0.92, to: this.mama.scaleY }, duration: 400, ease: 'Back.easeOut' });
     await Voice.say('am_mama_thanks');
     if (!this.alive) return;
-    this.startSweep();
+    void this.startSweep();
   }
 
   // ------------------------------------------------------------ cleaning up
 
-  private startSweep(): void {
+  /**
+   * Cleaning up (A1 safeguard, MISSIONS_V2.md section 5): Mama picks up the big,
+   * sharp pieces herself; he sweeps the small bits with the long broom.
+   */
+  private async startSweep(): Promise<void> {
+    this.state = 'talk';
+    const big = [this.shards[0], this.shards[2]];
+    const said = Voice.say('am_mama_sharp');
+    await this.wait(600);
+    if (!this.alive || !this.mama) return;
+    for (const [i, s] of big.entries()) {
+      s.done = true;
+      this.tweens.add({ targets: s.img, x: this.mama.x + 24, y: FLOOR - MAMA.kneelH * 0.45, scale: s.img.scale * 0.8, duration: 600, delay: i * 700, ease: 'Sine.easeInOut' });
+      this.tweens.add({ targets: s.img, alpha: 0, duration: 300, delay: i * 700 + 700 });
+    }
+    // Two small bits that broke off, beside the middle piece, for him to sweep.
+    const mid = this.shards[1];
+    for (const dx of [-26, 24]) {
+      const img = this.add.image(mid.img.x + dx, mid.img.y + Phaser.Math.Between(-4, 6), SHARD_KEYS[1]).setDepth(22).setAngle(Phaser.Math.Between(-60, 60));
+      fitWidth(img, 24);
+      this.shards.push({ img, done: false });
+    }
+    await said;
+    if (!this.alive) return;
+    await Voice.say('bismillah');
+    if (!this.alive) return;
     this.state = 'sweep';
     this.pose('boy_sweep');
     this.dustpan = this.add.image(DUSTPAN.x, DUSTPAN.y, 'dustpan').setOrigin(0.5, 1).setDepth(21).setAlpha(0);
@@ -373,14 +383,14 @@ export class AmmanScene extends BaseScene {
     this.setIdle(() => this.showHint());
   }
 
-  /** Swipes push each shard toward the dustpan. */
-  private sweepAlong(p: Phaser.Input.Pointer): void {
+  /** Swipes of the broom push each shard toward a target (the dustpan, or under the rug). */
+  private sweepAlong(p: Phaser.Input.Pointer, target: { x: number; y: number }, arrive: (s: Shard) => void): void {
     const dx = p.worldX - this.lastPoint.x, dy = p.worldY - this.lastPoint.y;
     if (Math.hypot(dx, dy) < 2) return;
     for (const s of this.shards) {
       if (s.done) continue;
       if (Phaser.Math.Distance.Between(p.worldX, p.worldY, s.img.x, s.img.y) > 46) continue;
-      const toPan = new Phaser.Math.Vector2(DUSTPAN.x - s.img.x, DUSTPAN.y - 14 - s.img.y);
+      const toPan = new Phaser.Math.Vector2(target.x - s.img.x, target.y - s.img.y);
       const step = Math.min(toPan.length(), 34);
       toPan.normalize().scale(step);
       this.tweens.add({ targets: s.img, x: s.img.x + toPan.x, y: s.img.y + toPan.y, angle: s.img.angle + 25, duration: 160, ease: 'Sine.easeOut' });
@@ -389,13 +399,15 @@ export class AmmanScene extends BaseScene {
         sfx('sweep', { volume: 0.7 });
         dustPuff(this, s.img.x, s.img.y + 6, 3, 0xe8d8b8, 23);
       }
-      if (Phaser.Math.Distance.Between(s.img.x + toPan.x, s.img.y + toPan.y, DUSTPAN.x, DUSTPAN.y - 14) < 30) {
-        s.done = true;
-        this.tweens.add({ targets: s.img, x: DUSTPAN.x, y: DUSTPAN.y - 12, scale: s.img.scale * 0.6, alpha: 0, duration: 260, delay: 160 });
-        this.time.delayedCall(420, () => this.alive && sfx('chime', { volume: 0.4 }));
-      }
+      if (Phaser.Math.Distance.Between(s.img.x + toPan.x, s.img.y + toPan.y, target.x, target.y) < (this.state === 'hide' ? 60 : 30)) arrive(s);
     }
-    if (this.shards.every((s) => s.done)) this.startWipe();
+    if (this.state === 'sweep' && this.shards.every((s) => s.done)) this.startWipe();
+  }
+
+  private intoPan(s: Shard): void {
+    s.done = true;
+    this.tweens.add({ targets: s.img, x: DUSTPAN.x, y: DUSTPAN.y - 12, scale: s.img.scale * 0.6, alpha: 0, duration: 260, delay: 160 });
+    this.time.delayedCall(420, () => this.alive && sfx('chime', { volume: 0.4 }));
   }
 
   private startWipe(): void {
@@ -464,7 +476,7 @@ export class AmmanScene extends BaseScene {
       this.hint.show('tap', { x: this.ball.x, y: this.ball.y }, undefined, again);
     } else if (this.state === 'hide') {
       const s = this.shards.find((x) => !x.done);
-      if (s) this.hint.show('drag', { x: s.img.x, y: s.img.y }, RUG, again);
+      if (s) this.hint.show('drag', { x: s.img.x + 30, y: s.img.y }, RUG, again);
     } else if (this.state === 'sweep') {
       const s = this.shards.find((x) => !x.done);
       if (s) this.hint.show('drag', { x: s.img.x + 30, y: s.img.y }, { x: DUSTPAN.x, y: DUSTPAN.y - 14 }, again);

@@ -138,7 +138,7 @@ export class UmmQaisScene extends BaseScene {
 
     this.time.addEvent({ delay: 7000, loop: true, callback: () => Math.random() < 0.7 && sfx('birds', { volume: 0.45 }) });
 
-    void Voice.say('uq_open');
+    void Voice.say('uq_open').then(() => { if (this.alive && this.state === 'pull') void Voice.say('bismillah'); });
     this.setIdle(() => this.showHint());
   }
 
@@ -394,7 +394,9 @@ export class UmmQaisScene extends BaseScene {
     this.state = 'done';
     this.setIdle(null);
     this.handle.setVisible(false);
-    await this.wait(600);
+    // U1 safeguard: he pours and steps back. He does not pet or go near the dog.
+    this.tweens.add({ targets: this.boy, x: BOY.x + 18, duration: 600, ease: 'Sine.easeInOut' });
+    await Voice.say('uq_stepback');
     if (!this.alive) return;
     // The dog goes to the trough and drinks.
     // It walks back to the trough's right end (smaller: it is farther away) and
