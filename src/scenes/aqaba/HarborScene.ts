@@ -136,7 +136,13 @@ export class HarborScene extends BaseScene {
     fitHeight(this.panR, PAN_H);
     this.iron = this.add.image(0, 0, 'weight_iron').setOrigin(0.5, 1);
     fitHeight(this.iron, 56);
-    this.scaleView = this.add.container(0, 0, [base, this.panL, this.panR, this.beam, this.iron]).setDepth(86).setAlpha(0);
+    // A tray card behind the fish (interface chrome, the speech bubble's colors):
+    // the six fish are too wide to fit between the boy and the customer, so the
+    // card covers the people behind and reads as "pick from here".
+    const tray = this.add.graphics();
+    tray.fillStyle(0xfbf1dc, 0.94).fillRoundedRect(6, 548, 378, 154, 18);
+    tray.lineStyle(3, 0x4a2c17, 1).strokeRoundedRect(6, 548, 378, 154, 18);
+    this.scaleView = this.add.container(0, 0, [tray, base, this.panL, this.panR, this.beam, this.iron]).setDepth(86).setAlpha(0);
     for (const s of SUPPLY) {
       const img = this.add.image(s.x, s.y, s.size === BIG ? 'fish_big' : 'fish_small').setDepth(88);
       // Fish he touches are at least 44 points tall; the big ones are bigger.
