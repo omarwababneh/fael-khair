@@ -29,9 +29,9 @@ Every change merged into the project publishes itself in about 2 minutes. The re
 Press and hold the small lock at the top left of the map for **3 seconds**. Inside:
 
 - **الصوت بالخلفية:** cheerful music (the default), nature sounds only, or nothing (بدون). With music or nature sounds, **علوّ الموسيقى** sets the volume: quiet or medium.
-- **سرعة الصوت:** slower, normal or faster speech. Tap one to hear a sample.
+- **سرعة الصوت:** slower, normal or faster speech. Tap one to hear a sample. It changes only the phone's own speech; the game's recorded voice files play at their own speed.
 - **The phone's Arabic voice:** which one the phone has, or that it has none. A higher-quality "Enhanced" or "Premium" Arabic voice can be downloaded free in the iPhone's settings (look under Accessibility, then Spoken Content, then Voices, then Arabic), and the game will use it.
-- **اختبار الصوت (voice test):** whether the phone can speak, how many voices it shows the game, the Arabic voice names, and how the game speaks right now. Tap **جرّب الصوت**: it speaks one line and shows what happened (started, ended, or the error). If it says it started and ended but you heard nothing, set **الصوت مع زر الصامت** to **مطفي** and try again; that setting is remembered.
+- **اختبار الصوت (voice test):** tap **جرّب الصوت**: it plays the game's own recording of the welcome line, the same way every line is played, and says **اشتغل** (played) or the exact error. Under it: how many lines use each voice source (your recording, the game's recorded voice, the phone's speech, or text only). If it says اشتغل but you heard nothing, set **الصوت مع زر الصامت** to **مطفي** and try again; that setting is remembered. The smaller row **جرّب صوت الجهاز** tests the phone's own speech, which is used only for a line with no file and no recording; under it are the phone's voice details.
 - **أسئلة للحديث مع ابنك:** three questions for every mission, grouped by place, to talk through together. The third one always points to real life.
 - **فكرة لليوم:** one small act of kindness to try. It is never tracked or checked.
 - **دليل التسجيل:** the recording guide (see below).
@@ -42,18 +42,18 @@ The game keeps no statistics about your son and no history of what he chose. The
 
 ## Recording your own voice (recommended)
 
-The game speaks with the phone's built-in voice until your recordings are added. Your voice replaces it line by line, with no change to the game.
+The game speaks every line with its own recorded voice (made with Piper text-to-speech). Your voice replaces it line by line, with no change to the game. Each line in the recording guide shows which voice it uses now.
 
 **On the phone (easiest).** In the parents' corner, open **دليل التسجيل**. Under each sentence there are three buttons:
 1. **سجّل**: the phone asks once for the microphone. Read the sentence, then tap **وقّف**.
 2. **اسمع**: plays what you recorded. **سجّل من جديد** replaces it.
-3. **احذف**: removes it; that line goes back to the phone's voice.
+3. **احذف**: removes it; that line goes back to the game's recorded voice.
 
-These recordings stay on that phone only. They are never uploaded or sent anywhere, so they are not on another phone or in the repository. A recorded line always plays instead of the phone's voice.
+These recordings stay on that phone only. They are never uploaded or sent anywhere, so they are not on another phone or in the repository. A recorded line always plays instead of the game's voice.
 
 **For every phone (optional).** You can also add a recording to the game itself: record the sentence with **Voice Memos** (it saves `.m4a`), rename it to the file name shown above the sentence (for example `start.m4a`), and upload it to `public/assets/audio/vo` on GitHub (**Add file**, **Upload files**, commit to main). A recording made on the phone comes first; then a file in the game; then the phone's voice.
 
-Once a recording exists, the speech bubble shows the Jordanian sentence you recorded.
+The speech bubble shows the words being said: the Jordanian sentence while your recording plays, the Standard Arabic sentence while the game's voice (or the phone's) speaks.
 
 **The ayah** is never read by the phone's voice. If you want a recitation to play in the night ending, add it as `public/assets/audio/quran/3_190.m4a`. Without it, the ayah is shown in silence for 10 seconds.
 

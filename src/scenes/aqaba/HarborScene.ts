@@ -25,6 +25,10 @@ const COUNTER_Y = 548;
 const BOY = { x: 84, foot: 716, h: 150 };
 const FISHER = { x: 262, foot: 640, h: 150 * 1.35 * 0.9 }; // behind the stall: only what is above the counter shows
 const CUSTOMER = { x: 330, foot: 716, h: 150 * 1.3 };
+// Measured on customer_basket at that size: the mouth of her basket.
+const BASKET = { x: 313, y: 624 };
+// Where the fisherman takes the weighed fish, just above his counter.
+const HANDOVER = { x: 246, y: 532 };
 // The large view of the scale.
 const PIVOT = { x: 195, y: 252 };
 const BEAM_W = 256;
@@ -113,11 +117,14 @@ export class HarborScene extends BaseScene {
     this.input.on('pointerupoutside', (p: Phaser.Input.Pointer) => this.up(p));
     this.events.once('shutdown', () => this.hint.clear());
 
-    // The large view opens at once: he can weigh straight away.
+    // The large view opens at once: he can weigh straight away. The boy and the
+    // customer would show under and through the tray, so they step out of sight
+    // until it goes (they come back for the ending).
     this.time.delayedCall(350, () => {
       if (!this.alive) return;
       this.tweens.add({ targets: this.dim, fillAlpha: 0.5, duration: 400 });
       this.tweens.add({ targets: this.scaleView, alpha: 1, duration: 400 });
+      this.tweens.add({ targets: [this.boy, this.customer], alpha: 0, duration: 300 });
       this.state = 'weigh';
       this.setIdle(() => this.showHint());
     });
@@ -140,7 +147,7 @@ export class HarborScene extends BaseScene {
     // the six fish are too wide to fit between the boy and the customer, so the
     // card covers the people behind and reads as "pick from here".
     const tray = this.add.graphics();
-    tray.fillStyle(0xfbf1dc, 0.94).fillRoundedRect(6, 548, 378, 154, 18);
+    tray.fillStyle(0xfbf1dc, 1).fillRoundedRect(6, 548, 378, 154, 18);
     tray.lineStyle(3, 0x4a2c17, 1).strokeRoundedRect(6, 548, 378, 154, 18);
     this.scaleView = this.add.container(0, 0, [tray, base, this.panL, this.panR, this.beam, this.iron]).setDepth(86).setAlpha(0);
     for (const s of SUPPLY) {
@@ -273,27 +280,56 @@ export class HarborScene extends BaseScene {
     // No chime for the level beam: it is the end of the deed (as in U3).
     await Voice.say('u3_level');
     if (!this.alive) return;
-    // The customer checks the beam and smiles.
-    await Voice.say('q2_check');
-    if (!this.alive) return;
+    // The large view and its tray go; the stall shows whole again: the fisherman,
+    // the boy and the customer, fully visible.
+    const weighed = [...this.inPan];
+    this.inPan = []; // placePans() no longer holds them in the pan: they travel now
     this.tweens.add({ targets: this.dim, fillAlpha: 0, duration: 400 });
-    this.tweens.add({ targets: [this.scaleView, ...this.fish.map((k) => k.img)], alpha: 0, duration: 400 });
-    await this.wait(500);
+    this.tweens.add({ targets: [this.scaleView, ...this.fish.filter((k) => !k.inPan).map((k) => k.img)], alpha: 0, duration: 400 });
+    this.tweens.add({ targets: [this.boy, this.customer], alpha: 1, duration: 400 });
+    // The weighed fish go down to the fisherman at his counter…
+    weighed.forEach((f, i) => {
+      f.img.setDepth(42);
+      this.tweens.add({
+        targets: f.img, x: HANDOVER.x + (i - (weighed.length - 1) / 2) * 10, y: HANDOVER.y - i * 3,
+        scale: f.base * 0.42, duration: 520, ease: 'Sine.easeInOut',
+      });
+    });
+    await this.wait(800);
+    if (!this.alive) return;
+    // …and into her basket: she receives her fish, and they stay in it.
+    const inBasket = (i: number) => ({ dx: (i - (weighed.length - 1) / 2) * 7, dy: -i * 2 });
+    weighed.forEach((f, i) => {
+      this.tweens.add({
+        targets: f.img, x: BASKET.x + inBasket(i).dx, y: BASKET.y + inBasket(i).dy, scale: f.base * 0.3,
+        duration: 420, delay: i * 110, ease: 'Sine.easeIn',
+      });
+    });
+    this.time.delayedCall(420 + weighed.length * 110, () => this.alive && sfx('thud', { weight: 0.1, volume: 0.35 }));
+    await this.wait(560 + weighed.length * 110);
     if (!this.alive) return;
     pose(this, this.boy, 'boy_happy', BOY.h);
     this.tweens.add({ targets: this.customer, y: CUSTOMER.foot - 6, duration: 200, yoyo: true, repeat: 1 });
-    await this.wait(700);
+    // She checks it and thanks him.
+    await Voice.say('q2_check');
     if (!this.alive) return;
-    // She carries dinner home to her family.
-    this.tweens.killTweensOf(this.customer);
-    this.customer.setFlipX(true);
-    this.tweens.add({ targets: this.customer, y: CUSTOMER.foot - 3, duration: 260, yoyo: true, repeat: -1 });
-    this.tweens.add({ targets: this.customer, x: view().right + 70, duration: 3200, ease: 'Linear' });
-    const steps = this.time.addEvent({ delay: 400, loop: true, callback: () => sfx('step', { volume: 0.3 }) });
-    await this.wait(1600);
-    steps.remove();
-    if (!this.alive) return;
+    // "She took her dinner to her family": said while she is still in view, then she goes.
     await Voice.say('q2_end');
+    if (!this.alive) return;
+    this.tweens.killTweensOf(this.customer);
+    this.customer.setY(CUSTOMER.foot).setFlipX(true);
+    this.tweens.add({ targets: this.customer, y: CUSTOMER.foot - 3, duration: 260, yoyo: true, repeat: -1 });
+    const away = view().right + 70;
+    this.tweens.add({ targets: this.customer, x: away, duration: 3200, ease: 'Linear' });
+    // Turned to go, her basket is on her other side; the fish go with it.
+    const side = CUSTOMER.x - BASKET.x;
+    weighed.forEach((f, i) => {
+      f.img.setX(CUSTOMER.x + side + inBasket(i).dx);
+      this.tweens.add({ targets: f.img, x: away + side + inBasket(i).dx, duration: 3200, ease: 'Linear' });
+    });
+    const steps = this.time.addEvent({ delay: 400, loop: true, callback: () => sfx('step', { volume: 0.3 }) });
+    await this.wait(1400);
+    steps.remove();
     if (!this.alive) return;
     await this.finishAdventure('aqaba', 'q2_hadith');
   }

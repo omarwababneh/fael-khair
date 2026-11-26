@@ -324,6 +324,9 @@ button {
 .fk-voice-facts { font-size: 15px; line-height: 1.5; white-space: pre-line; direction: rtl; }
 .fk-voice-result { font-size: 15px; min-height: 1.4em; font-weight: 700; color: #8a4a1c; }
 .fk-voice-note { font-size: 14px; margin: 0; opacity: 0.8; }
+.fk-voice-speech { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 16px; margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(74, 44, 23, 0.25); }
+.fk-speed.fk-speed-small { min-height: 44px; font-size: 15px; border-width: 2px; }
+.fk-line-source { display: block; font-size: 13px; opacity: 0.75; }
 .fk-voice-test .fk-speed { align-self: flex-start; }
 .fk-rec { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
 .fk-rec-btn { font: inherit; font-size: 15px; min-height: 40px; padding: 4px 12px; border-radius: 12px; border: 2px solid #4a2c17; background: #fbf1dc; color: #4a2c17; }

@@ -31,3 +31,7 @@ The background music in `public/assets/audio/music/` is by Kevin MacLeod (incomp
 `jerash` and `deadsea` play in their places (wave 3), `aqaba` in Aqaba (wave 4).
 
 The license requires this credit to stay wherever the game is shared. It is also shown inside the game, at the bottom of the parents' corner.
+
+## Voice credit
+
+The built-in voice in `public/assets/audio/vo/` was made with Piper text-to-speech, voice ar_JO-kareem-medium (rhasspy/piper-voices). `npm run check:vo` lists spoken lines with no file and files with no line.
