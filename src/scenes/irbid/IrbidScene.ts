@@ -78,7 +78,7 @@ export class IrbidScene extends BaseScene {
     ui.setPill('إِرْبِد');
     ui.setHome(() => this.goTo('map'));
     ui.clearBubble();
-    music.play('irbid');
+    music.play('irbid', { natureOnly: true }); // I1 is Irbid's quiet deed: no music
 
     const bg = this.addCover('bg_irbid_dusk');
     this.tweens.add({ targets: bg, scale: bg.scale * 1.01, duration: 9000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });

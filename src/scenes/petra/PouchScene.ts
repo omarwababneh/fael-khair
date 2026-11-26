@@ -12,16 +12,18 @@ import { BaseScene } from '../BaseScene';
 // P2. Petra: the lost pouch (value: trust, returning what is lost to its true
 // owner; source bukhari_2427). MISSIONS_V2.md section 5.
 //
-// He finds a pouch in the sand, looks closely at its tie-string and patch
-// without opening it, and takes it to the site guard, who stays with him in
+// He finds a pouch in the sand, looks closely at its tie-string and the small
+// flower sewn on it without opening it, and takes it to the site guard, who stays with him in
 // plain view the whole time. Two travelers come, each thinking of the pouch he
 // lost. He gives it to the one whose picture matches. The other traveler is not
 // lying: he lost a different pouch, and the guard finds it a moment later.
 
-type Variant = 'color' | 'string' | 'patch';
-const OTHER_POUCH: Record<Variant, string> = { color: 'pouch_blue', string: 'pouch_red_bluestring', patch: 'pouch_red_moon' };
+type Variant = 'color' | 'string' | 'leaf';
+// The art key pouch_red_moon is kept from the first draft; the picture now
+// carries an embroidered green leaf instead of the yellow flower.
+const OTHER_POUCH: Record<Variant, string> = { color: 'pouch_blue', string: 'pouch_red_bluestring', leaf: 'pouch_red_moon' };
 // On the first lap through Petra's missions the pouches differ by color (the
-// easy round); on later laps they differ by the tie-string or the patch.
+// easy round); on later laps they differ by the tie-string or the flower/leaf.
 
 const GROUND = 712; // feet line on the Treasury plaza
 const BOY_H = 128;
@@ -31,9 +33,10 @@ const BESIDE_GUARD = 232;
 const TRAVELER_X = { left: 62, right: 330 };
 const TRAVELER_H = 173;
 const POUCH_H = 23;
-// Where the tie-string knot and the star patch are on the pouch art (fractions).
-const KNOT = { x: 0.5, y: 0.34 };
-const PATCH = { x: 0.5, y: 0.68 };
+// Where the tie-string knot and the embroidered flower are on pouch_red (fractions,
+// measured on the 710 x 768 art: knot near x 490, y 235; flower head near x 335, y 440).
+const KNOT = { x: 0.69, y: 0.31 };
+const FLOWER = { x: 0.47, y: 0.575 };
 
 type State = 'find' | 'look' | 'toGuard' | 'wait' | 'give' | 'end';
 
@@ -56,7 +59,7 @@ export class PouchScene extends BaseScene {
   private walkTimer?: Phaser.Time.TimerEvent;
   private dragging = false;
   private dragId = -1;
-  private seen = { knot: false, patch: false };
+  private seen = { knot: false, flower: false };
   private closeUp: Phaser.GameObjects.Container | null = null;
   private variant: Variant = 'color';
   private detailSay = 0;
@@ -74,12 +77,12 @@ export class PouchScene extends BaseScene {
     this.closeUp = null;
     this.dragging = false;
     this.dragId = -1;
-    this.seen = { knot: false, patch: false };
+    this.seen = { knot: false, flower: false };
     this.detailSay = 0;
     this.hintSaid = false;
     this.walkTimer = undefined;
     this.hint = new HintHand(this);
-    this.variant = currentLap() === 0 ? 'color' : Math.random() < 0.5 ? 'string' : 'patch';
+    this.variant = currentLap() === 0 ? 'color' : Math.random() < 0.5 ? 'string' : 'leaf';
 
     ui.setPill('البَتْرا');
     ui.setHome(() => this.goTo('map'));
@@ -240,7 +243,7 @@ export class PouchScene extends BaseScene {
     this.openCloseUp();
   }
 
-  /** A large view of the pouch: he looks at its tie-string and its patch. He does not open it. */
+  /** A large view of the pouch: he looks at its tie-string and its flower. He does not open it. */
   private openCloseUp(): void {
     const v = view();
     const dim = this.add.rectangle(PIC.x, PIC.y, PIC.w, PIC.h, 0x2a1a0e, 0).setOrigin(0);
@@ -249,10 +252,10 @@ export class PouchScene extends BaseScene {
     const w = big.frame.width * big.scale, h = big.frame.height * big.scale;
     const left = big.x - w / 2, top = big.y - h / 2;
     const knot = glowRing(this, left + w * KNOT.x, top + h * KNOT.y, 40, 0);
-    const patch = glowRing(this, left + w * PATCH.x, top + h * PATCH.y, 44, 0);
+    const flower = glowRing(this, left + w * FLOWER.x, top + h * FLOWER.y, 48, 0);
     knot.setData('kind', 'knot');
-    patch.setData('kind', 'patch');
-    this.closeUp = this.add.container(0, 0, [dim, big, knot, patch]).setDepth(85).setAlpha(0);
+    flower.setData('kind', 'flower');
+    this.closeUp = this.add.container(0, 0, [dim, big, knot, flower]).setDepth(85).setAlpha(0);
     this.tweens.add({ targets: this.closeUp, alpha: 1, duration: 450 });
     this.tweens.add({ targets: dim, fillAlpha: 0.45, duration: 450 });
     big.setScale(big.scale * 0.6);
@@ -260,26 +263,33 @@ export class PouchScene extends BaseScene {
     this.pouch.setVisible(false);
     void Voice.say('p2_look');
     this.setIdle(() => {
-      const next = [knot, patch].find((r) => r.active && r.visible && !this.seen[r.getData('kind') as 'knot' | 'patch']);
+      const next = [knot, flower].find((r) => r.active && r.visible && !this.seen[r.getData('kind') as 'knot' | 'flower']);
       if (next) this.hint.show('tap', { x: next.x, y: next.y }, undefined, () => this.kickIdle());
     });
   }
 
   private tapDetail(x: number, y: number): void {
     if (!this.closeUp) return;
-    for (const r of this.closeUp.list) {
-      if (!(r instanceof Phaser.GameObjects.Image) || !r.getData('kind')) continue;
-      const kind = r.getData('kind') as 'knot' | 'patch';
-      if (this.seen[kind] || Phaser.Math.Distance.Between(x, y, r.x, r.y) > 60) continue;
+    // The nearest unseen detail within reach answers (the two are close together).
+    let r: Phaser.GameObjects.Image | null = null;
+    let best = 60;
+    for (const o of this.closeUp.list) {
+      if (!(o instanceof Phaser.GameObjects.Image) || !o.getData('kind')) continue;
+      if (this.seen[o.getData('kind') as 'knot' | 'flower']) continue;
+      const d = Phaser.Math.Distance.Between(x, y, o.x, o.y);
+      if (d <= best) { best = d; r = o; }
+    }
+    if (r) {
+      const ring = r;
+      const kind = ring.getData('kind') as 'knot' | 'flower';
       this.seen[kind] = true;
       sfx('pop');
-      this.tweens.add({ targets: r, scale: r.scale * 1.5, alpha: 0, duration: 500, onComplete: () => r.setVisible(false) });
+      this.tweens.add({ targets: ring, scale: ring.scale * 1.5, alpha: 0, duration: 500, onComplete: () => ring.setVisible(false) });
       // Close the view only after the last detail's line has finished.
       const n = ++this.detailSay;
       void Voice.say(kind === 'knot' ? 'p2_string' : 'p2_patch').then(() => {
-        if (this.alive && n === this.detailSay && this.seen.knot && this.seen.patch && this.state === 'look') void this.closeCloseUp();
+        if (this.alive && n === this.detailSay && this.seen.knot && this.seen.flower && this.state === 'look') void this.closeCloseUp();
       });
-      return;
     }
   }
 

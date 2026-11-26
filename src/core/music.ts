@@ -324,6 +324,8 @@ class Music {
   private track: Track | null = null;
   private place: MusicPlace | null = null;
   private ducked = false;
+  /** A quiet deed has no music: it plays the place's nature sounds instead. */
+  private natureOnly = false;
 
   constructor() {
     audio.onUnlock(() => {
@@ -339,10 +341,21 @@ class Music {
     return this.volume;
   }
 
-  play(place: MusicPlace): void {
-    if (this.place === place && this.track) return;
+  /**
+   * Start a place's background. natureOnly (the quiet deeds): never music;
+   * the place's nature sounds play instead, or nothing if the parents chose
+   * no sound.
+   */
+  play(place: MusicPlace, opts: { natureOnly?: boolean } = {}): void {
+    const natureOnly = !!opts.natureOnly;
+    if (this.place === place && this.track && this.natureOnly === natureOnly) return;
     this.place = place;
+    this.natureOnly = natureOnly;
     if (audio.ready) this.startTrack(place);
+  }
+
+  private effectiveMode(): SoundMode {
+    return this.mode === 'off' ? 'off' : this.natureOnly ? 'nature' : this.mode;
   }
 
   private startTrack(place: MusicPlace): void {
@@ -350,11 +363,12 @@ class Music {
     if (!ctx) return;
     this.track?.stop();
     this.track = null;
-    if (this.mode === 'off') {
+    const mode = this.effectiveMode();
+    if (mode === 'off') {
       this.applyVolume(0.6);
       return;
     }
-    this.track = new Track(ctx, place, this.mode);
+    this.track = new Track(ctx, place, mode);
     this.track.start();
     this.applyVolume(1);
   }

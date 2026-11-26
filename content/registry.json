@@ -88,7 +88,7 @@
     "todo_owner": "TODO owner: paste the exact Arabic text and translation of Sahih al-Bukhari 2427 from the collection. Do not fill from memory.",
     "child_paraphrase_tts": "علّمنا نبيّنا محمد صلى الله عليه وسلم أن من وجد شيئاً ضائعاً يعرف وعاءه ورباطه، ويسأل عن صاحبه، فإذا جاء صاحبه أعطاه إياه.",
     "child_paraphrase_script": "نبيّنا محمد صلى الله عليه وسلم علّمنا إنه اللي بيلاقي إشي ضايع بيعرف بشو محطوط وبشو مربوط، وبيسأل عن صاحبه، ولمّا ييجي صاحبه بيعطيه إياه.",
-    "fictional_adaptation": "A boy finds a lost pouch at the Treasury in Petra, looks at its tie-string and patch without opening it, and returns it with the site guard to the traveler who lost it. Invented.",
+    "fictional_adaptation": "A boy finds a lost pouch at the Treasury in Petra, looks at its tie-string and the flower sewn on it without opening it, and returns it with the site guard to the traveler who lost it. Invented.",
     "used_in": [
       "P2"
     ],
@@ -338,6 +338,21 @@
       "WR"
     ],
     "kind": "direct",
+    "approval_status": "pending"
+  },
+  {
+    "source_id": "father_u2",
+    "reference": "The father's own words (not a quoted hadith or ayah)",
+    "original_arabic": "",
+    "translation": "",
+    "todo_owner": "The father's own words, reviewed together with the religious texts. Approve the line as written, or change it.",
+    "child_paraphrase_tts": "نحن زرعناها وسقيناها، والله هو الذي أنبتها. الحمد لله.",
+    "child_paraphrase_script": "إحنا زرعناها وسقيناها، والله هو اللي أنبتها. الحمد لله.",
+    "fictional_adaptation": "U2: after the three saplings are planted and watered, the father says who makes them grow.",
+    "used_in": [
+      "U2"
+    ],
+    "kind": "father_own_words",
     "approval_status": "pending"
   }
 ]

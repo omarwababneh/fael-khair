@@ -2,7 +2,7 @@
 // right-to-left, and inside the iPhone safe area.
 import parentsJson from '../../content/parents.json';
 import linesContent from '../../content/lines.json';
-import { getLine, registry } from './content';
+import { getLine, registry, type Paraphrase } from './content';
 
 const parentsContent = parentsJson as {
   starters: Record<string, string[]>;
@@ -79,17 +79,48 @@ function parentSections(): HTMLElement[] {
     li.append(file, txt);
     list.append(li);
   }
-  // Review status of the religious content registry.
-  const pending = registry.filter((r) => r.approval_status !== 'approved').length;
+  // Review list: every registry entry not yet approved, with the words the
+  // game uses. The father's own lines (kind father_own_words) are reviewed
+  // here too and are marked as his words, not a quoted text.
+  const pendingEntries = registry.filter((r) => r.approval_status !== 'approved');
   const review = el('p', '');
-  review.textContent = pending
-    ? `${pending} من ${registry.length} نصوص دينية بانتظار مراجعتك في content/registry.json.`
+  review.textContent = pendingEntries.length
+    ? `${pendingEntries.length} من ${registry.length} نصوص بانتظار مراجعتك في content/registry.json:`
     : 'كل النصوص الدينية تمّت مراجعتها.';
+  const reviewList = el('ul', 'fk-lines');
+  for (const r of pendingEntries) {
+    const li = el('li', '');
+    const own = r.kind === 'father_own_words';
+    if (own) {
+      const mark = el('span', 'fk-review-own');
+      mark.textContent = `كلام الأب نفسه، مش نص ديني (${r.used_in.join('، ')})`;
+      li.append(mark);
+    } else {
+      const head = el('span', 'fk-file');
+      head.textContent = `${r.reference} · ${r.used_in.join(', ')}`;
+      li.append(head);
+    }
+    const texts: [string, Paraphrase][] = r.parts ? Object.entries(r.parts) : [['', r]];
+    for (const [part, t] of texts) {
+      const txt = el('span', 'fk-review-text');
+      const words = t.child_paraphrase_script ?? t.child_paraphrase_tts;
+      // An entry with no children's wording (the Wadi Rum ayah) is shown as its
+      // exact text, which the owner pastes into original_arabic.
+      txt.textContent = words ?? 'نص الآية الأصلي يُعرض كما هو؛ أضِفه في original_arabic.';
+      if (part) {
+        const label = el('span', 'fk-file');
+        label.textContent = `part: ${part}`;
+        li.append(label);
+      }
+      li.append(txt);
+    }
+    reviewList.append(li);
+  }
   return [
     section('أسئلة للحديث مع ابنك', ...talk),
     section('فكرة لليوم', inv),
     section('دليل التسجيل', note, path, note2, list),
-    section('مراجعة النصوص الدينية', review),
+    section('مراجعة النصوص الدينية', review, reviewList),
   ];
 }
 
