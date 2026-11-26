@@ -5,10 +5,10 @@ import { music } from '../../core/music';
 import { completeMission, currentLap } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
-import { PIC, vp } from '../../core/viewport';
+import { PIC, view, vp } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
-import { breathe, pose } from '../kit';
+import { breathe, pose, walkTo } from '../kit';
 
 // I2. Irbid: too much change (value: trust, giving people what is theirs;
 // source quran_4_58). MISSIONS_V2.md section 5.
@@ -270,7 +270,8 @@ export class BakeryScene extends BaseScene {
     // Closing time: the light turns to evening, and his tray is right.
     const eve = this.add.rectangle(PIC.x, PIC.y, PIC.w, PIC.h, 0xff9a4a, 0).setOrigin(0).setDepth(80);
     this.tweens.add({ targets: eve, fillAlpha: 0.22, duration: 2200 });
-    await this.wait(1200);
+    // He walks home with the bread.
+    await walkTo(this, this.boy, { x: view().x - 70 }, BOY.h);
     if (!this.alive) return;
     this.boy.setVisible(false);
     this.tweens.add({ targets: this.baker, angle: { from: -3, to: 3 }, duration: 300, yoyo: true, repeat: 3 });

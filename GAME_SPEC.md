@@ -588,7 +588,7 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `p3_end` | the cart rolls on | العربة مستوية، والحمار يمشي مرتاحاً. الحمد لله. | العربيّة مستوية، والحمار ماشي مرتاح. الحمد لله. |
 | `p3_hadith` R | P3 ending | registry `bukhari_2989`, part `mount` | registry `bukhari_2989`, part `mount` |
 | `bismillah` | as the work starts (P1, U1, A1) | بسم الله. | بسم الله. |
-| `petra_care` | P1, after the opening | بسم الله. نُبعد الحجارة والأغصان، ولا نلمس الصخر القديم. | بسم الله. بنشيل الحجار والأغصان، والصخر القديم ما بنلمسه. |
+| `petra_care` | P1, after the opening | بسم الله. نُبعد الحجارة والأغصان، ونحافظ على المكان القديم. | بسم الله. بنشيل الحجار والأغصان، وبنحافظ عالمكان القديم. |
 | `uq_stepback` | U1, after pouring | ونبتعد قليلاً، حتى يشرب براحته. | وبنبعد شوي، عشان يشرب على راحته. |
 | `am_mama_sharp` | A1, cleaning up | أنا أرفع القطع الحادّة، وأنت اكنس الصغيرة بالمكنسة. | أنا بشيل القطع الحادّة، وإنت اكنس الزغار بالمكنسة. |
 | `u2_open` | U2 start | بسم الله. سنزرع اليوم ثلاث شجرات زيتون. | بسم الله. اليوم بنزرع تلات شجرات زيتون. |

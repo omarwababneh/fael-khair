@@ -26,7 +26,7 @@ const GROUND = 706;
 const SPOTS = [80, 200, 320];
 const BOY_H = 140;
 // Heights from the art checklist (boy = 1.0).
-const H = { sapling: 0.35, soil: 0.15, can: 0.3, young: 0.9, grown: 2.2, stranger: 0.85, birds: 0.25, stone: 0.24 };
+const H = { sapling: 0.35, soil: 0.15, can: 0.3, young: 0.9, grown: 2.2, stranger: 0.85, birds: 0.25, stone: 0.48 };
 const CAN_REST = { x: 360, y: GROUND + 2 };
 const RUB_NEED = [260, 460, 320]; // points of rubbing to dig each hole; the second soil is harder
 const POUR_NEED = [1500, 1800, 2600]; // ms of pouring; the last one needs a longer pour
@@ -93,7 +93,8 @@ export class OliveScene extends BaseScene {
       this.spots.push({ x, tree: null, mound: null, pour: { x, y: GROUND - 40, progress: 0, need, done: false } });
     }
 
-    this.boy = this.add.image(this.quiet ? 300 : SPOTS[0] - 44, GROUND + 8, 'boy_idle').setOrigin(0.5, 1).setDepth(36);
+    // At dusk he stands in front of the trees, between the second and the third.
+    this.boy = this.add.image(this.quiet ? 262 : SPOTS[0] - 44, this.quiet ? GROUND + 18 : GROUND + 8, 'boy_idle').setOrigin(0.5, 1).setDepth(36);
     fitHeight(this.boy, BOY_H);
     breathe(this, this.boy);
     this.can = new PourCan(this, CAN_REST.x, CAN_REST.y, BOY_H * H.can);
@@ -135,7 +136,7 @@ export class OliveScene extends BaseScene {
       pose(this, this.boy, 'boy_kneel', BOY_H * 0.65);
       // The third spot has a stone on it to move first (heavier on a later lap).
       if (i === 2) {
-        const w = BOY_H * H.stone * (currentLap() ? 1.35 : 1);
+        const w = BOY_H * H.stone; // heavier on a later lap: it follows the finger more slowly
         this.stoneHome = { x: s.x + 4, y: GROUND - 6 };
         this.stone = this.add.image(this.stoneHome.x, this.stoneHome.y, 'rock_b').setDepth(30).setTint(0x5a5652);
         fitWidth(this.stone, w);
@@ -191,9 +192,9 @@ export class OliveScene extends BaseScene {
     const s = this.spots[this.cur];
     // The sapling lies ready beside the hole (on the side away from the boy).
     const lx = this.cur === 2 ? s.x + 52 : s.x + 60;
-    this.lying = this.add.image(lx, GROUND + 14, 'sapling_small').setOrigin(0.5, 1).setDepth(34).setAngle(70);
+    this.lying = this.add.image(lx, GROUND + 6, 'sapling_small').setOrigin(0.5, 1).setDepth(34).setAngle(70);
     fitHeight(this.lying, BOY_H * H.sapling);
-    this.lying.setData('home', { x: lx, y: GROUND + 14 });
+    this.lying.setData('home', { x: lx, y: GROUND + 6 });
     if (this.cur === 0) void Voice.say('u2_plant');
     this.kickIdle();
   }

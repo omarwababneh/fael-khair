@@ -22,6 +22,8 @@ const FRIEND_H = 140; // friends: the boy's age (art checklist 1.0)
 const LEFT = { friend: 46, basket: 96 };
 const RIGHT = { friend: 344, basket: 294 };
 const PILE = { x: 195, y: GROUND + 4 };
+const SCALE_X = 165; // the scale stands left of centre; the boy steps aside to the right of it
+const BOY_ASIDE = { x: 268, y: GROUND - 32 };
 // The balance scale (art: scale_base 0.8, scale_beam 0.9 wide, scale_pan 0.3).
 const SCALE_FOOT = GROUND - 22; // it stands a little farther back than the baskets
 const BASE_H = BOY_H * 0.8;
@@ -86,7 +88,7 @@ export class HarvestScene extends BaseScene {
       this.baskets[side] = b;
     }
     this.pile = this.add.image(PILE.x, PILE.y, 'olives_pile').setOrigin(0.5, 1).setDepth(35).setScale(0.01);
-    this.pileScale = (BOY_H * 0.9) / this.pile.frame.width;
+    this.pileScale = (BOY_H * 0.5) / this.pile.frame.width; // art checklist: 0.5 wide
 
     this.boy = this.add.image(PILE.x, GROUND - 26, 'boy_idle').setOrigin(0.5, 1).setDepth(29);
     fitHeight(this.boy, BOY_H * 0.95); // a step farther back, behind the pile
@@ -209,7 +211,7 @@ export class HarvestScene extends BaseScene {
   // ---------------------------------------------------------------- weighing
 
   private pivot(): { x: number; y: number } {
-    return { x: PILE.x, y: SCALE_FOOT - BASE_H + 6 };
+    return { x: SCALE_X, y: SCALE_FOOT - BASE_H + 6 };
   }
 
   /** The beam's hook on one side, for the current tilt. */
@@ -235,7 +237,9 @@ export class HarvestScene extends BaseScene {
     await this.wait(400);
     if (!this.alive) return;
     void Voice.say('u3_check');
-    const base = this.add.image(PILE.x, SCALE_FOOT, 'scale_base').setOrigin(0.5, 1).setDepth(31).setAlpha(0);
+    // He steps aside so the scale does not stand through him.
+    this.tweens.add({ targets: this.boy, x: BOY_ASIDE.x, y: BOY_ASIDE.y, duration: 600, ease: 'Sine.easeInOut' });
+    const base = this.add.image(SCALE_X, SCALE_FOOT, 'scale_base').setOrigin(0.5, 1).setDepth(31).setAlpha(0);
     fitHeight(base, BASE_H);
     this.beam = this.add.image(this.pivot().x, this.pivot().y, 'scale_beam').setDepth(32).setAlpha(0);
     fitWidth(this.beam, BEAM_W);
@@ -314,7 +318,7 @@ export class HarvestScene extends BaseScene {
     this.setIdle(null);
     await this.wait(700);
     if (!this.alive) return;
-    sfx('chime', { volume: 0.45 }); // the beam is level: a finished step
+    // No chime: the level beam is the fair share, a moral moment (MISSIONS_V2.md section 4).
     await Voice.say('u3_level');
     if (!this.alive || !this.pans) return;
     // Back into the baskets: two full, equal baskets.

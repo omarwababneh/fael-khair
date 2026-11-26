@@ -132,8 +132,11 @@ export class BlocksScene extends BaseScene {
     const y = Math.min(this.topY() - 70, 560);
     const b = this.add.image(from?.x ?? TOWER_X, from?.y ?? y, 'block').setOrigin(0.5, 1).setDepth(40).setTint(COLORS[i % COLORS.length]);
     fitHeight(b, BLOCK_H);
-    this.swinging = b;
+    // It can be dropped only once it swings (not while the sister hands it over).
+    this.swinging = null;
     const swing = () => {
+      if (!this.alive) return;
+      this.swinging = b;
       b.setPosition(TOWER_X - 46, y);
       this.swingTween = this.tweens.add({ targets: b, x: TOWER_X + 46, duration: this.swingMs, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     };
@@ -146,6 +149,7 @@ export class BlocksScene extends BaseScene {
     if (!b || this.dropping) return;
     this.dropping = true;
     this.swingTween?.stop();
+    this.tweens.killTweensOf(b);
     this.swinging = null;
     const below = this.tower[this.tower.length - 1];
     const cx = below ? below.x : TOWER_X;

@@ -144,10 +144,6 @@ export class AmmanScene extends BaseScene {
     this.hint.clear();
     if (this.state === 'play') return this.tapBall();
     if (this.state === 'hide' || this.state === 'sweep') {
-      // Pick the nearest shard under the finger (forgiving radius).
-      const s = this.shards.filter((x) => !x.done)
-        .map((x) => ({ x, d: Phaser.Math.Distance.Between(p.worldX, p.worldY, x.img.x, x.img.y) }))
-        .filter((o) => o.d < 48).sort((a, b) => a.d - b.d)[0];
       this.pointerId = p.id;
       this.lastPoint.set(p.worldX, p.worldY);
       // He never touches the shards with his hands: hiding or cleaning, he uses the broom.

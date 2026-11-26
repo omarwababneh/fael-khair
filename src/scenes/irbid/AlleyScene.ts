@@ -86,7 +86,9 @@ export class AlleyScene extends BaseScene {
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.move(p));
     this.input.on('pointerup', (p: Phaser.Input.Pointer) => this.up(p));
     this.input.on('pointerupoutside', (p: Phaser.Input.Pointer) => this.up(p));
-    this.events.once('shutdown', () => { this.hint.clear(); this.removeAction?.(); });
+    const cleanUp = () => { this.hint.clear(); this.removeAction?.(); this.removeAction = null; };
+    this.events.once('leave', cleanUp);
+    this.events.once('shutdown', cleanUp);
 
     void this.intro();
   }
@@ -175,7 +177,7 @@ export class AlleyScene extends BaseScene {
     if (p.id !== this.dragBoy) return;
     this.dragBoy = -1;
     // Close enough to the new boy: he walks over to him.
-    if (Math.abs(p.worldX - this.newSpot.x) < 90 && p.worldY < SPOT.boy.y - 20) void this.goToNewBoy();
+    if (Math.abs(this.boy.x - this.newSpot.x) < 90) void this.goToNewBoy();
     else this.tweens.add({ targets: this.boy, x: SPOT.boy.x, duration: 300, ease: 'Back.easeOut' });
     this.kickIdle();
   }
@@ -218,6 +220,7 @@ export class AlleyScene extends BaseScene {
   }
 
   private async invite(): Promise<void> {
+    if (!this.alive) return;
     this.state = 'score';
     pose(this, this.boy, 'boy_wave', BOY_H * DEPTH(this.boy.y));
     await Voice.say('i3_invite');
@@ -230,7 +233,7 @@ export class AlleyScene extends BaseScene {
     if (!this.alive) return;
     const join = { x: 344, y: 712 };
     this.tweens.killTweensOf(nb);
-    this.tweens.add({ targets: nb, x: join.x, y: join.y, duration: 900, ease: 'Sine.easeInOut', onUpdate: () => fitHeight(nb, BOY_H * DEPTH(nb.y)) });
+    this.tweens.add({ targets: nb, x: join.x, y: join.y, duration: 900, ease: 'Sine.easeInOut', onUpdate: () => fitHeight(nb, BOY_H * DEPTH(nb.y)), onComplete: () => fitHeight(nb, BOY_H) });
     await walkTo(this, this.boy, SPOT.boy, BOY_H);
     if (!this.alive) return;
     pose(this, this.boy, 'boy_idle', BOY_H);

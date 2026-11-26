@@ -13,7 +13,8 @@ export function breathe(scene: Phaser.Scene, img: Phaser.GameObjects.Image, amou
   return t;
 }
 
-function stopBreathing(scene: Phaser.Scene, img: Phaser.GameObjects.Image): void {
+/** Stop a figure's breathing (before resizing it as it moves, then call breathe again). */
+export function stopBreathing(scene: Phaser.Scene, img: Phaser.GameObjects.Image): void {
   const t = img.getData('breath') as Phaser.Tweens.Tween | undefined;
   if (t) {
     t.stop();

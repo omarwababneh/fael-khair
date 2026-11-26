@@ -7,7 +7,7 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
-import { breathe, pose } from '../kit';
+import { breathe, pose, stopBreathing } from '../kit';
 
 // A3. Amman: Mama's shopping (value: kindness to parents, noticing without
 // being asked; source quran_17_23). MISSIONS_V2.md section 5.
@@ -22,7 +22,7 @@ import { breathe, pose } from '../kit';
 const START = { x: 150, y: 722 };
 const LANDING = { x: 262, y: 488 };
 const UPPER = { from: { x: 342, y: 462 }, to: { x: 358, y: 312 } };
-const MAMA = { x: 70, y: 730 };
+const MAMA = { x: 70, y: 716 };
 const BOY_H = 150;
 const MAMA_H = BOY_H * 1.3; // art checklist
 // Things farther up the stairs are farther away: smaller.
@@ -125,7 +125,8 @@ export class StairsScene extends BaseScene {
     await Voice.say('a3_open');
     if (!this.alive) return;
     this.state = 'offer';
-    this.setIdle(() => this.showHint());
+    // Nobody asks him: the hint hand waits a long time before showing the bags.
+    this.setIdle(() => this.showHint(), 16000);
   }
 
   // ---------------------------------------------------------------- the offer
@@ -188,12 +189,15 @@ export class StairsScene extends BaseScene {
     const x = to.cat ? to.x - 22 : to.x;
     const h = BOY_H * depthScale(to.y);
     sfx('step', { volume: 0.6 });
+    // Farther up is smaller: resize as he climbs (his breathing pauses meanwhile).
+    stopBreathing(this, this.boy);
     this.tweens.add({
       targets: this.boy, x, y: to.y, duration: 260, ease: 'Sine.easeOut',
       onUpdate: () => fitHeight(this.boy, BOY_H * depthScale(this.boy.y)),
       onComplete: () => {
         this.moving = false;
         fitHeight(this.boy, h);
+        breathe(this, this.boy);
         this.updateRings();
         this.mamaFollows();
         if (this.at === this.landingAt) void this.rest();
@@ -210,13 +214,19 @@ export class StairsScene extends BaseScene {
 
   /** Mama climbs a few steps behind him, with the heavy bag. */
   private mamaFollows(): void {
-    const i = Math.max(0, this.at - 3);
-    const s = this.steps[i];
-    if (i === 0 && this.mama.x === MAMA.x && this.at < 3) return;
-    this.tweens.add({
-      targets: this.mama, x: s.x - 30, y: s.y, duration: 420, ease: 'Sine.easeOut',
+    if (this.at < 3) return;
+    const s = this.steps[this.at - 3];
+    this.moveMama(s.x - 30, s.y, 420);
+  }
+
+  /** Move Mama, resizing her for the distance (her breathing pauses meanwhile). */
+  private moveMama(x: number, y: number, ms: number): Promise<void> {
+    stopBreathing(this, this.mama);
+    return new Promise((res) => this.tweens.add({
+      targets: this.mama, x, y, duration: ms, ease: 'Sine.easeInOut',
       onUpdate: () => fitHeight(this.mama, MAMA_H * depthScale(this.mama.y)),
-    });
+      onComplete: () => { fitHeight(this.mama, MAMA_H * depthScale(this.mama.y)); breathe(this, this.mama); res(); },
+    }));
   }
 
   private async rest(): Promise<void> {
@@ -228,10 +238,7 @@ export class StairsScene extends BaseScene {
     if (!this.alive) return;
     // Mama catches up on the landing.
     const s = this.steps[this.landingAt - 1];
-    await new Promise<void>((res) => this.tweens.add({
-      targets: this.mama, x: s.x - 40, y: s.y, duration: 1200, ease: 'Sine.easeInOut',
-      onUpdate: () => fitHeight(this.mama, MAMA_H * depthScale(this.mama.y)), onComplete: () => res(),
-    }));
+    await this.moveMama(s.x - 40, s.y, 1200);
     if (!this.alive) return;
     await this.wait(900);
     if (!this.alive) return;
@@ -251,10 +258,7 @@ export class StairsScene extends BaseScene {
     // He sets the bags down by the door; Mama arrives, hands free, breath back.
     const end = this.steps[this.steps.length - 1];
     const s = this.steps[this.steps.length - 2];
-    await new Promise<void>((res) => this.tweens.add({
-      targets: this.mama, x: s.x - 34, y: s.y, duration: 1600, ease: 'Sine.easeInOut',
-      onUpdate: () => fitHeight(this.mama, MAMA_H * depthScale(this.mama.y)), onComplete: () => res(),
-    }));
+    await this.moveMama(s.x - 34, s.y, 1600);
     if (!this.alive) return;
     pose(this, this.boy, 'boy_happy', BOY_H * depthScale(end.y));
     const hm = MAMA_H * depthScale(this.mama.y);

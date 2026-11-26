@@ -17,6 +17,7 @@ export abstract class BaseScene extends Phaser.Scene {
   private covers: Array<{ img: Phaser.GameObjects.Image; factor: number }> = [];
   private baseIdleTimer?: Phaser.Time.TimerEvent;
   private idleAction: (() => void) | null = null;
+  private idleMs = 6000;
 
   protected setup(): void {
     this.alive = true;
@@ -99,10 +100,12 @@ export abstract class BaseScene extends Phaser.Scene {
    */
   protected setIdle(action: (() => void) | null, ms = 6000): void {
     this.idleAction = action;
+    this.idleMs = ms;
     this.kickIdle(ms);
   }
 
-  protected kickIdle(ms = 6000): void {
+  /** Restart the wait; it keeps the delay the hint was set with. */
+  protected kickIdle(ms = this.idleMs): void {
     this.baseIdleTimer?.remove();
     this.baseIdleTimer = undefined;
     if (!this.idleAction || !this.alive) return;
