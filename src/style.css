@@ -316,6 +316,7 @@ button {
 .fk-lines li { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(74, 44, 23, 0.15); }
 .fk-lines .fk-file { display: block; opacity: 0.7; }
 .fk-lines .fk-review-text { display: block; margin-top: 4px; }
+.fk-lines .fk-review-own { display: block; font-size: 14px; font-weight: 700; color: #8a4a1c; }
 .fk-close {
   align-self: center;
   min-width: 140px;

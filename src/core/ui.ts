@@ -90,10 +90,16 @@ function parentSections(): HTMLElement[] {
   const reviewList = el('ul', 'fk-lines');
   for (const r of pendingEntries) {
     const li = el('li', '');
-    const head = el('span', 'fk-file');
     const own = r.kind === 'father_own_words';
-    head.textContent = `${own ? 'كلام الأب نفسه، مش نص ديني' : r.reference} · ${r.used_in.join('، ')}`;
-    li.append(head);
+    if (own) {
+      const mark = el('span', 'fk-review-own');
+      mark.textContent = `كلام الأب نفسه، مش نص ديني (${r.used_in.join('، ')})`;
+      li.append(mark);
+    } else {
+      const head = el('span', 'fk-file');
+      head.textContent = `${r.reference} · ${r.used_in.join(', ')}`;
+      li.append(head);
+    }
     const texts: [string, Paraphrase][] = r.parts ? Object.entries(r.parts) : [['', r]];
     for (const [part, t] of texts) {
       const txt = el('span', 'fk-review-text');
@@ -101,7 +107,11 @@ function parentSections(): HTMLElement[] {
       // An entry with no children's wording (the Wadi Rum ayah) is shown as its
       // exact text, which the owner pastes into original_arabic.
       txt.textContent = words ?? 'نص الآية الأصلي يُعرض كما هو؛ أضِفه في original_arabic.';
-      if (part) txt.textContent = `${part}: ${txt.textContent}`;
+      if (part) {
+        const label = el('span', 'fk-file');
+        label.textContent = `part: ${part}`;
+        li.append(label);
+      }
       li.append(txt);
     }
     reviewList.append(li);
