@@ -26,6 +26,9 @@ function readingTime(text: string): number {
   return Math.max(1800, text.length * 85 + 700);
 }
 
+/** Where a line's voice comes from. */
+export type VoiceSource = 'own' | 'file' | 'speech' | 'text';
+
 /** What the voice test in the parents' corner shows. */
 export interface VoiceInfo {
   speech: boolean;
@@ -198,7 +201,7 @@ class VoiceSystem {
    * report what happened: started, ended, or the error.
    */
   test(text: string, report: (msg: string) => void): void {
-    if (this.busy) this.stop(false);
+    this.stop(false); // also stops a file test that is still playing
     this.pick();
     if (!synth) return report('هذا المتصفح لا يدعم الكلام.');
     // Each test reports only about itself; a later tap's test replaces it.
@@ -234,6 +237,64 @@ class VoiceSystem {
     window.setTimeout(() => { if (!started) say('ما بدأ الكلام خلال ٤ ثواني.', true); }, 4000);
   }
 
+  /** Which source a line will use now: the parent's recording, the built-in file, the phone's speech, or text only. */
+  source(id: string): VoiceSource {
+    const line = getLine(id);
+    const canPlay = audio.ready && !!audio.ctx;
+    if (canPlay && recordings.has(id)) return 'own';
+    if (canPlay && hasAudio('vo', id)) return 'file';
+    this.pick();
+    if (synth && this.mode() !== 'text' && line.speakable && line.tts) return 'speech';
+    return 'text';
+  }
+
+  /**
+   * The parents' corner main voice test: play one built-in file (inside the tap)
+   * through the game's own audio, the way every line is played, and report
+   * "played" or the exact error.
+   */
+  async testFile(id: string, report: (msg: string) => void): Promise<void> {
+    this.stop(false);
+    const tid = ++this.testId;
+    const say = (msg: string) => { if (tid === this.testId) report(msg); };
+    audio.unlock(); // inside the tap: starts or resumes the game's audio
+    const ctx = audio.ctx;
+    if (!ctx) return say('خطأ: صوت اللعبة ما اشتغل على هالجهاز.');
+    if (!hasAudio('vo', id)) return say(`خطأ: ملف الصوت ${id}.m4a مش موجود باللعبة.`);
+    let buf: AudioBuffer;
+    try {
+      const r = await fetch(`assets/audio/vo/${id}.m4a`);
+      if (!r.ok) return say(`خطأ: ما قدرت أجيب ملف الصوت (${r.status}).`);
+      const ab = await r.arrayBuffer();
+      buf = await new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(ab, res, rej));
+    } catch (e) {
+      return say(`خطأ بقراءة ملف الصوت: ${(e as Error)?.name || ''} ${(e as Error)?.message || String(e)}`.trim());
+    }
+    if (tid !== this.testId) return;
+    if (ctx.state !== 'running') {
+      try { await ctx.resume(); } catch { /* reported below */ }
+    }
+    if (tid !== this.testId) return;
+    const p = audio.playVoiceBuffer(buf);
+    this.stopSource = p.stop;
+    music.duck(true);
+    say(`عم بشغّل الملف… (وضع الصوت: ${ctx.state})`);
+    const ended = await Promise.race([
+      p.done.then(() => true),
+      new Promise<boolean>((res) => window.setTimeout(() => res(false), buf.duration * 1000 + 2500)),
+    ]);
+    // Only if nothing else has started meanwhile (a game line, a speed sample or
+    // another test): their own ducking must stay as it is.
+    const mine = tid === this.testId && this.stopSource === p.stop;
+    if (!ended) p.stop(); // timed out: never let it start later on its own
+    if (mine) {
+      this.stopSource = null;
+      music.duck(false);
+    }
+    if (ended) say(`اشتغل (${buf.duration.toFixed(1)} ثانية). إذا ما سمعت شي، جرّب خيار زر الصامت تحت.`);
+    else say(`خطأ: الملف ما خلص. وضع الصوت: ${ctx.state}.`);
+  }
+
   /**
    * Resolves when the line has finished: true if it ended by itself, false if it
    * was replaced or stopped (so a follow-up line is chained only on true).
@@ -246,8 +307,17 @@ class VoiceSystem {
     const line = getLine(id);
     const own = recordings.has(id);
     const recorded = own || hasAudio('vo', id);
-    const text = recorded ? line.script : line.tts;
-    ui.showBubble(text, () => void this.say(id));
+    const canPlay = audio.ready && !!audio.ctx;
+    // The bubble shows what the voice says: the parent's own recording says the
+    // everyday words (`script`); the built-in file and the phone's speech say the
+    // Standard Arabic `tts` text. Lines with no `tts` show `script`.
+    const ttsText = line.tts || line.script;
+    let text = own && canPlay ? line.script : ttsText;
+    const show = (t: string) => {
+      text = t;
+      ui.showBubble(t, () => void this.say(id));
+    };
+    show(text);
     ui.setSpeaking(true);
     music.duck(true);
 
@@ -291,7 +361,7 @@ class VoiceSystem {
         this.timers.push(window.setTimeout(() => finish(), buf.duration * 1000 + 1500));
       };
 
-      if (recorded && audio.ready && audio.ctx) {
+      if (recorded && canPlay) {
         if (own) {
           // The parent's own recording, decoded once and kept.
           const cached = this.decoded.get(id);
@@ -301,6 +371,9 @@ class VoiceSystem {
             void recordings.get(id).then((blob) => (blob ? audio.decodeBlob(blob) : null)).then((buf) => {
             // Keep the decoded copy only if the recording did not change meanwhile.
             if (buf && version === this.recVersion) this.decoded.set(id, buf);
+            // The recording could not be read: the built-in file or the phone says
+            // the `tts` text, so the bubble shows that instead.
+            if (!buf && token === this.token && !done) show(ttsText);
             if (buf || !hasAudio('vo', id)) return playBuffer(buf);
             return audio.load(`assets/audio/vo/${id}.m4a`).then(playBuffer);
             });

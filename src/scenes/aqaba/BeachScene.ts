@@ -27,6 +27,8 @@ import { breathe, pose, walkTo } from '../kit';
 // the rescue hut stands at the right, its bell hanging at (278, 388) and its
 // door at x = 362, y = 500.
 const SHORE_Y = 500;
+// The ending swim: from near the shore out to sea, left of the hut.
+const SWIM = { from: { x: 178, y: 468 }, to: { x: 104, y: 398 } };
 const BELL = { x: 278, y: 390 };
 const DOOR = { x: 362, foot: 506 };
 const BOY = { x: 200, foot: 712, h: 150 };
@@ -320,10 +322,16 @@ export class BeachScene extends BaseScene {
     this.hint.clear();
     pose(this, this.boy, 'boy_happy', BOY.h);
     const turtle = this.turtle as Phaser.GameObjects.Image;
-    turtle.setAlpha(0.9).setPosition(view().right + 40, 430).setDepth(5);
+    // It swims out in the open water between the palm trunk and the hut (measured
+    // on bg_aqaba_beach: the hut's left post is at x = 215, the trunk near x = 40),
+    // getting smaller as it goes out to sea, and never crosses the hut.
+    turtle.setAlpha(0).setPosition(SWIM.from.x, SWIM.from.y).setDepth(5).setAngle(0).setFlipX(false);
     fitHeight(turtle, TURTLE.h * 0.7);
-    this.tweens.add({ targets: turtle, x: view().x - 60, duration: 9000, ease: 'Linear' });
-    this.tweens.add({ targets: turtle, y: 436, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    const s0 = turtle.scale;
+    this.tweens.add({ targets: turtle, alpha: 0.95, duration: 500 });
+    this.tweens.add({ targets: turtle, x: SWIM.to.x, y: SWIM.to.y, scale: s0 * 0.5, duration: 7000, ease: 'Sine.easeInOut' });
+    this.tweens.add({ targets: turtle, alpha: 0, delay: 5600, duration: 1400 });
+    this.tweens.add({ targets: turtle, angle: { from: -4, to: 4 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     await this.wait(1400);
     if (!this.alive) return;
     await Voice.say('q1_end');

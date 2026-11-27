@@ -31,6 +31,8 @@ const parentsContent = parentsJson as {
 type SoundMode = 'music' | 'nature' | 'off';
 type MusicVolume = 'quiet' | 'medium';
 type VoiceSpeed = 'slower' | 'normal' | 'faster';
+type LineSource = 'own' | 'file' | 'speech' | 'text';
+const SOURCE_AR: Record<LineSource, string> = { own: 'تسجيلك', file: 'الصوت المسجّل باللعبة', speech: 'صوت الجهاز', text: 'مكتوب بس' };
 interface VoiceTestInfo { speech: boolean; total: number; arabic: string[]; mode: 'voice' | 'lang' | 'text'; unlock: string; session: string | null }
 
 const ICONS = {
@@ -48,7 +50,7 @@ const MISSION_AR: Record<string, string> = {
   A1: 'عمّان: الجرّة المكسورة', A2: 'عمّان: برج المكعّبات', A3: 'عمّان: أغراض ماما', 'QD-A': 'عمّان: عمل الخير الخفي',
   I1: 'إربد: السلّة السرّية', I2: 'إربد: الباقي الزيادة', I3: 'إربد: الولد الجديد',
   J1: 'جرش: بعد المهرجان', J2: 'جرش: البنت الضايعة', J3: 'جرش: الأكل المنسي', 'QD-J': 'جرش: عمل الخير الخفي',
-  D1: 'البحر الميت: الحنفيات', D2: 'البحر الميت: النِّعم', D3: 'البحر الميت: المشي مع سيدو', 'QD-D': 'البحر الميت: عمل الخير الخفي',
+  D1: 'البحر الميت: الحنفيات', D2: 'البحر الميت: النِّعم', D3: 'البحر الميت: المشي مع جدّو', 'QD-D': 'البحر الميت: عمل الخير الخفي',
   Q1: 'العقبة: السلحفاة', Q2: 'العقبة: الميزان', Q3: 'العقبة: الوعد', 'QD-Q': 'العقبة: عمل الخير الخفي',
   WR: 'ليلة وادي رم', 'Wadi Rum closing line': 'ليلة وادي رم', 'Wadi Rum ayah': 'ليلة وادي رم',
 };
@@ -78,7 +80,7 @@ function section(title: string, ...children: HTMLElement[]): HTMLDetailsElement 
  * Parents' corner sections (GAME_SPEC.md section 10). Nothing here is about the
  * child: no statistics, no history of what he chose, nothing tracked.
  */
-function parentSections(): HTMLElement[] {
+function parentSections(lineSource: (id: string) => LineSource, onSourceChange: () => void): HTMLElement[] {
   // Conversation starters: three for every mission, grouped by place.
   const talk: HTMLElement[] = [];
   for (const [id, missions] of Object.entries(parentsContent.starters)) {
@@ -113,7 +115,7 @@ function parentSections(): HTMLElement[] {
   // each one. Recordings stay on this phone only and are never uploaded.
   const note = el('p', '');
   note.textContent = canRecord()
-    ? 'سجّل كل جملة بصوتك: اكبس «سجّل»، احكي الجملة، واكبس «وقّف». التسجيل بيضل على هالجهاز بس، وما بينبعت لأي مكان. اللعبة بتشغّل تسجيلك بدل صوت الجهاز.'
+    ? 'سجّل كل جملة بصوتك: اكبس «سجّل»، احكي الجملة، واكبس «وقّف». التسجيل بيضل على هالجهاز بس، وما بينبعت لأي مكان. اللعبة بتشغّل تسجيلك بدل الصوت المسجّل باللعبة.'
     : 'هالجهاز ما بيقدر يسجّل من هون. بتقدر تسجّل كل جملة بملف باسمها (مثلاً start.m4a) داخل مجلد:';
   const path = el('p', 'fk-path');
   path.textContent = 'public/assets/audio/vo/';
@@ -130,8 +132,12 @@ function parentSections(): HTMLElement[] {
     file.textContent = `${id}.m4a`;
     const txt = el('span', '');
     txt.textContent = line.script;
-    li.append(file, txt);
-    if (canRecord()) li.append(recorder(id));
+    // Which voice this line uses now (it changes when he records or deletes).
+    const src = el('span', 'fk-line-source');
+    const showSource = () => { src.textContent = `الصوت: ${SOURCE_AR[lineSource(id)]}`; };
+    showSource();
+    li.append(file, txt, src);
+    if (canRecord()) li.append(recorder(id, () => { showSource(); onSourceChange(); }, () => SOURCE_AR[lineSource(id)]));
     list.append(li);
   }
   // Review list: every registry entry not yet approved, with the words the
@@ -191,7 +197,7 @@ function isQuranText(id: string): boolean {
 }
 
 /** Record, play and delete buttons for one line. */
-function recorder(id: string): HTMLElement {
+function recorder(id: string, changed: () => void, sourceNow: () => string): HTMLElement {
   const row = el('div', 'fk-rec');
   const rec = el('button', 'fk-rec-btn');
   const play = el('button', 'fk-rec-btn');
@@ -225,6 +231,7 @@ function recorder(id: string): HTMLElement {
     audio.reapplySession();
     busy = false;
     refresh();
+    changed();
   };
   rec.addEventListener('click', async () => {
     if (busy) return;
@@ -259,8 +266,9 @@ function recorder(id: string): HTMLElement {
   });
   del.addEventListener('click', async () => {
     await recordings.remove(id);
-    status.textContent = 'انحذف. رح يرجع صوت الجهاز لهاي الجملة.';
+    status.textContent = `انحذف. هاي الجملة رح ترجع لـ: ${sourceNow()}.`;
     refresh();
+    changed();
   });
   refresh();
   row.append(rec, play, del, status);
@@ -478,6 +486,7 @@ class UI {
     sound: SoundMode; volume: MusicVolume; voice: string | null; speed: VoiceSpeed;
     onSound: (m: SoundMode) => void; onVolume: (v: MusicVolume) => void; onSpeed: (s: VoiceSpeed) => void; onClose: () => void;
     voiceInfo: () => VoiceTestInfo; testVoice: (report: (msg: string) => void) => void;
+    testSpeech: (report: (msg: string) => void) => void; lineSource: (id: string) => LineSource;
     throughSilent: boolean; onThroughSilent: (on: boolean) => void;
   }): void {
     const wrap = el('div', 'fk-parent');
@@ -507,17 +516,35 @@ class UI {
     speedLabel.textContent = 'سرعة الصوت';
     const speeds = this.options<VoiceSpeed>([['slower', 'أبطأ'], ['normal', 'عادي'], ['faster', 'أسرع']], opts.speed, opts.onSpeed);
     speedRow.append(speedLabel, speeds);
+    // The built-in recordings play at their own speed; only the phone's speech follows this.
+    const speedNote = el('p', 'fk-voice-note');
+    speedNote.textContent = 'السرعة بتغيّر صوت الجهاز بس، مش الصوت المسجّل باللعبة.';
     const voice = el('div', 'fk-voice-status');
     const mode = opts.voiceInfo().mode;
-    voice.textContent = opts.voice
+    voice.textContent = 'اللعبة بتحكي بصوت مسجّل داخلها. صوت الجهاز احتياط بس: ' + (opts.voice
       ? `صوت الجهاز العربي: ${opts.voice}`
       : mode === 'lang'
-        ? 'الجهاز ما بيعرض اسم صوت عربي؛ اللعبة بتحكي بالعربي والجهاز بيختار الصوت.'
-        : 'ما في صوت عربي على الجهاز. الكلام بيظهر مكتوب بس.';
-    // Voice test: what the phone offers, and one line spoken now with what happened.
+        ? 'الجهاز ما بيعرض اسم صوت عربي؛ بيحكي بالعربي والجهاز بيختار الصوت.'
+        : 'ما في صوت عربي على الجهاز.');
+    // Voice test: one built-in file played now through the game's own audio, with
+    // what happened; which source each line uses; and, smaller, the phone's speech.
     const test = el('div', 'fk-voice-test');
     const testTitle = el('span', 'fk-voice-test-title');
     testTitle.textContent = 'اختبار الصوت';
+    const sources = el('div', 'fk-voice-facts');
+    const showSources = () => {
+      const n: Record<LineSource, number> = { own: 0, file: 0, speech: 0, text: 0 };
+      for (const id of Object.keys(linesContent)) {
+        const line = getLine(id);
+        if ((!line.speakable && !line.script) || isQuranText(id)) continue;
+        n[opts.lineSource(id)]++;
+      }
+      sources.textContent = (Object.keys(n) as LineSource[])
+        .filter((k) => n[k])
+        .map((k) => `${SOURCE_AR[k]}: ${n[k]} جملة`)
+        .join('\n');
+    };
+    showSources();
     const facts = el('div', 'fk-voice-facts');
     const showFacts = () => {
       const i = opts.voiceInfo();
@@ -526,7 +553,7 @@ class UI {
         `الكلام: ${i.speech ? 'متوفر' : 'غير متوفر'}`,
         `عدد الأصوات: ${i.total}`,
         `الأصوات العربية: ${i.arabic.length ? i.arabic.join('، ') : 'ولا واحد ظاهر'}`,
-        `اللعبة بتحكي: ${how}`,
+        `صوت الجهاز بيحكي: ${how}`,
         `أول كبسة: ${i.unlock}`,
         `وضع الصوت بالمتصفح: ${i.session ?? 'غير موجود'}`,
       ].join('\n');
@@ -537,8 +564,20 @@ class UI {
     const result = el('div', 'fk-voice-result');
     testBtn.addEventListener('click', () => {
       result.textContent = 'جاري…';
-      opts.testVoice((msg) => { result.textContent = msg; showFacts(); });
+      opts.testVoice((msg) => { result.textContent = msg; showSources(); });
     });
+    // The phone's own speech, only used when a line has no file and no recording.
+    const speechRow = el('div', 'fk-voice-speech');
+    const speechLabel = el('span', '');
+    speechLabel.textContent = 'صوت الجهاز (احتياط)';
+    const speechBtn = el('button', 'fk-speed fk-speed-small');
+    speechBtn.textContent = 'جرّب صوت الجهاز';
+    const speechResult = el('div', 'fk-voice-result');
+    speechBtn.addEventListener('click', () => {
+      speechResult.textContent = 'جاري…';
+      opts.testSpeech((msg) => { speechResult.textContent = msg; showFacts(); });
+    });
+    speechRow.append(speechLabel, speechBtn);
     const silentRow = el('div', 'fk-row');
     const silentLabel = el('span', '');
     silentLabel.textContent = 'الصوت مع زر الصامت';
@@ -548,8 +587,8 @@ class UI {
     });
     silentRow.append(silentLabel, silent);
     const silentNote = el('p', 'fk-voice-note');
-    silentNote.textContent = 'إذا الكلام «بدأ وانتهى» بس ما سمعت شي، جرّب «مطفي» واكبس «جرّب الصوت» مرة ثانية.';
-    test.append(testTitle, facts, testBtn, result, silentRow, silentNote);
+    silentNote.textContent = 'إذا قال «اشتغل» بس ما سمعت شي، جرّب «مطفي» واكبس «جرّب الصوت» مرة ثانية.';
+    test.append(testTitle, testBtn, result, sources, silentRow, silentNote, speechRow, speechResult, facts);
     const close = el('button', 'fk-close');
     close.textContent = 'رجوع';
     close.addEventListener('click', () => {
@@ -565,7 +604,7 @@ class UI {
     // Everything between the title and the close button scrolls together, so on a
     // short screen nothing is squeezed out and "رجوع" always stays in reach.
     const scroll = el('div', 'fk-parent-scroll');
-    scroll.append(soundGroup, volumeRow, speedRow, voice, test, ...parentSections(), credit, build);
+    scroll.append(soundGroup, volumeRow, speedRow, speedNote, voice, test, ...parentSections(opts.lineSource, showSources), credit, build);
     card.append(h, scroll, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());

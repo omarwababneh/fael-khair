@@ -7,9 +7,10 @@
     "art": "node scripts/prepare-art.mjs",
     "check:art": "node scripts/check-art.mjs",
     "check:registry": "node scripts/check-registry.mjs",
+    "check:vo": "node scripts/check-vo.mjs",
     "predev": "node scripts/prepare-art.mjs --quiet",
     "dev": "vite",
-    "build": "node scripts/prepare-art.mjs --quiet && node scripts/check-art.mjs --build && node scripts/check-registry.mjs && tsc --noEmit && vite build",
+    "build": "node scripts/prepare-art.mjs --quiet && node scripts/check-art.mjs --build && node scripts/check-registry.mjs && node scripts/check-vo.mjs --build && tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -119,13 +119,25 @@ export class PlazaScene extends BaseScene {
       : lap ? ['bottle', 'paper', 'peel', 'bottle', 'paper', 'peel', 'bottle'] : ['bottle', 'paper', 'peel', 'bottle', 'paper'];
     const spots = Phaser.Utils.Array.Shuffle(SPOTS.slice(1));
     const first = this.bins.find((b) => b.kind === pieces[0]) as Bin;
-    const places = [{ x: first.x, y: 572 }, ...spots.filter((s) => Math.abs(s.x - first.x) > 30 || s.y > 600)];
+    const firstHome = { x: first.x, y: 572 };
+    let open = spots.filter((s) => Math.abs(s.x - first.x) > 30 || s.y > 600);
+    // The broken glass is laid first, on open paving, and the litter only where
+    // it stays clear of it: no piece he must pick up lies on or against the glass.
+    let glassAt: { x: number; y: number } | null = null;
+    if (!this.quiet) {
+      glassAt = this.glassSpot(firstHome, open, count - 1);
+      const clear = open.filter((s) => this.apart(glassAt as { x: number; y: number }, s));
+      if (clear.length >= count - 1) open = clear;
+    }
+    const places = [firstHome, ...open];
     for (let i = 0; i < count; i++) {
       const home = places[i];
       const kind = pieces[i];
       const img = this.add.image(home.x, home.y, `litter_${kind}`).setDepth(30 + home.y / 100);
       fitHeight(img, LITTER_H);
-      img.setAngle(Phaser.Math.Between(-25, 25));
+      // A piece close to the glass lies almost straight, so its tilted corners never reach it.
+      const tilt = glassAt && Math.abs(home.x - glassAt.x) < 100 && Math.abs(home.y - glassAt.y) < 70 ? 8 : 25;
+      img.setAngle(Phaser.Math.Between(-tilt, tilt));
       this.litter.push({ img, kind, home: { ...home }, binned: false });
     }
 
@@ -134,9 +146,8 @@ export class PlazaScene extends BaseScene {
       this.guard = this.add.image(GUARD.x, GUARD.foot, 'guard_stand').setOrigin(0.5, 1).setDepth(25);
       fitHeight(this.guard, BOY.h * 1.35 * depthScale(GUARD.foot));
       breathe(this, this.guard);
-      // The broken glass: one tight cluster on a free spot, glinting now and then.
-      // It lies away from the right edge, so the guard sweeping it stays in sight.
-      const free = places.slice(count).find((s) => s.y < 660 && s.x >= 150 && s.x <= 270) ?? { x: 228, y: 612 };
+      // The broken glass: one tight cluster on open paving, glinting now and then.
+      const free = glassAt ?? { x: 228, y: 612 };
       this.glass = this.add.image(free.x, free.y, 'glass_broken').setDepth(29);
       fitHeight(this.glass, GLASS_H);
       this.time.addEvent({ delay: 1900, loop: true, callback: () => this.glint() });
@@ -159,6 +170,53 @@ export class PlazaScene extends BaseScene {
     this.state = 'play';
     this.setIdle(() => this.showHint());
     this.open(this.quiet ? 'qdj_open' : 'j1_open', this.quiet ? undefined : 'j1_hint');
+  }
+
+  /** Drawn width of a picture at a given height. */
+  private widthAt(key: string, h: number): number {
+    const f = this.textures.getFrame(key);
+    return f ? f.width * h / f.height : h * 2;
+  }
+
+  /** How far apart (sideways, or up and down) a piece of litter and the glass must be to leave a small gap. */
+  private clearance(): { hx: number; vy: number } {
+    const widest = Math.max(...(['bottle', 'paper', 'peel'] as Kind[]).map((k) => this.widthAt(`litter_${k}`, LITTER_H)));
+    const gw = this.widthAt('glass_broken', GLASS_H);
+    // Litter lies tilted by up to 25 degrees, so it needs a little more room above and below.
+    return { hx: (widest + gw) / 2 + 4, vy: (LITTER_H + GLASS_H) / 2 + 8 };
+  }
+
+  /** True if a piece of litter (of any kind) at `s` stays clear of glass at `g`. */
+  private apart(g: { x: number; y: number }, s: { x: number; y: number }): boolean {
+    const { hx, vy } = this.clearance();
+    return Math.abs(g.x - s.x) >= hx || Math.abs(g.y - s.y) >= vy;
+  }
+
+  /**
+   * A spot for the glass in the guard's strip of paving (away from the right
+   * edge, so the guard sweeping it stays in sight) that is clear of the first
+   * piece and leaves at least `need` clear spots for the rest. One is chosen at
+   * random, so the glass is not always in the same place.
+   */
+  private glassSpot(firstHome: { x: number; y: number }, open: Array<{ x: number; y: number }>, need: number): { x: number; y: number } {
+    const ok: Array<{ x: number; y: number }> = [];
+    let best = { x: 228, y: 612 };
+    let bestFree = -1;
+    for (let x = 150; x <= 270; x += 6) {
+      for (let y = 560; y <= 652; y += 6) {
+        const g = { x, y };
+        if (!this.apart(g, firstHome)) continue;
+        const free = open.filter((s) => this.apart(g, s)).length;
+        if (free >= need) ok.push(g);
+        if (free > bestFree) { bestFree = free; best = g; }
+      }
+    }
+    return ok.length ? Phaser.Utils.Array.GetRandom(ok) : best;
+  }
+
+  /** True if a piece of litter at this point would lie on or against the glass (while it is still there). */
+  private nearGlass(x: number, y: number): boolean {
+    return !!this.glass && !this.swept && !this.apart(this.glass, { x, y });
   }
 
   /** A short sparkle on the glass, so he notices it (the glass itself never moves). */
@@ -188,8 +246,10 @@ export class PlazaScene extends BaseScene {
       const d = Phaser.Math.Distance.Between(x, y, l.img.x, l.img.y);
       if (d < bestD) { bestD = d; best = l; }
     }
+    // A piece of litter is drawn above the glass: a touch on the piece itself lifts it.
+    const onPiece = !!best && best.img.getBounds().contains(x, y);
     const glassD = this.glass && !this.swept && !this.sweeping ? Phaser.Math.Distance.Between(x, y, this.glass.x, this.glass.y) : Infinity;
-    if (glassD < HIT && glassD <= bestD) {
+    if (!onPiece && glassD < HIT && glassD <= bestD) {
       void this.touchGlass();
       return;
     }
@@ -223,11 +283,26 @@ export class PlazaScene extends BaseScene {
       sfx('slide', { volume: 0.5 });
       if (!this.quiet && this.wrongSaid++ < 2) void Voice.say('j1_wrong');
     } else {
-      // Dropped on the paving: it stays where he left it.
-      const y = Phaser.Math.Clamp(l.img.y, 548, 694);
-      l.home = { x: l.img.x, y };
+      // Dropped on the paving: it stays where he left it, but never on the glass
+      // (it settles just clear of it).
+      let x = l.img.x;
+      let y = Phaser.Math.Clamp(l.img.y, 548, 694);
+      if (this.glass && this.nearGlass(x, y)) {
+        // The nearest clear place beside, above or below the glass, on the paving.
+        const g = this.glass;
+        const v = view();
+        const { hx, vy } = this.clearance();
+        const tries = [
+          { x: g.x - hx - 1, y }, { x: g.x + hx + 1, y },
+          { x, y: g.y - vy - 1 }, { x, y: g.y + vy + 1 },
+        // Not behind the boy, who stands at the left edge (x up to about 85).
+        ].filter((c) => c.x >= Math.max(v.x + 30, 100) && c.x <= v.right - 30 && c.y >= 548 && c.y <= 694 && !this.nearGlass(c.x, c.y));
+        tries.sort((a, b) => Phaser.Math.Distance.Between(a.x, a.y, x, y) - Phaser.Math.Distance.Between(b.x, b.y, x, y));
+        if (tries[0]) ({ x, y } = tries[0]);
+      }
+      l.home = { x, y };
       sfx('thud', { weight: 0.1, volume: 0.4 });
-      this.tweens.add({ targets: l.img, y, scale: l.img.scale / 1.15, duration: 200, onComplete: () => l.img.setDepth(30 + y / 100) });
+      this.tweens.add({ targets: l.img, x, y, scale: l.img.scale / 1.15, duration: 200, onComplete: () => l.img.setDepth(30 + y / 100) });
     }
     this.kickIdle();
   }
@@ -257,8 +332,16 @@ export class PlazaScene extends BaseScene {
     this.breezeDone = true;
     this.time.delayedCall(700, () => {
       if (!this.alive || paper.binned || paper === this.held) return;
-      const dx = paper.home.x > 195 ? -70 : 70;
-      paper.home = { x: paper.home.x + dx, y: Phaser.Math.Clamp(paper.home.y - 14, 548, 694) };
+      // It blows along the paving, never onto the broken glass.
+      const y = Phaser.Math.Clamp(paper.home.y - 14, 548, 694);
+      const v = view();
+      const pref = paper.home.x > 195 ? -70 : 70;
+      const dx = [pref, -pref].find((d) => {
+        const x = paper.home.x + d;
+        return x > v.x + 30 && x < v.right - 30 && !this.nearGlass(x, y);
+      });
+      if (dx === undefined) return; // no clear way to blow: it simply stays
+      paper.home = { x: paper.home.x + dx, y };
       sfx('whoosh', { volume: 0.5 });
       this.tweens.add({ targets: paper.img, x: paper.home.x, y: paper.home.y, angle: paper.img.angle + dx * 3, duration: 1100, ease: 'Sine.easeOut' });
       void Voice.say('j1_breeze');

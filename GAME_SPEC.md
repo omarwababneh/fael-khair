@@ -517,7 +517,7 @@ Notes for iOS:
 - If the device has no Arabic voice, do not speak with another language's voice. Show the text only.
 - Lines flagged `"tts": false` in the data are never spoken synthetically.
 
-The built-in voice reads Standard Arabic, so each line has two texts: `tts` in simple Standard Arabic for the phone's voice, and `script` in Jordanian Arabic for the father to record. The speech bubble shows `tts` in phase 1 and `script` once a recording exists.
+The built-in voice reads Standard Arabic, so each line has two texts: `tts` in simple Standard Arabic for the phone's voice, and `script` in Jordanian Arabic for the father to record. The speech bubble shows the text the voice is saying: `script` while the parent's own recording plays, `tts` while a built-in file in `public/assets/audio/vo/` or the phone's speech plays (the built-in files speak `tts`).
 
 ### 7.2 Voice lines
 Store these in `content/lines.json`. Religious lines (marked R) take their text from the registry.

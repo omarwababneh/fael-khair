@@ -269,7 +269,11 @@ export class MapScene extends BaseScene {
         void Voice.say('map_next'); // a sample at the new speed
       },
       voiceInfo: () => ({ ...Voice.info(), session: audioSessionType() }),
-      testVoice: (report) => Voice.test(getLine('map_next').tts, report),
+      // The main test plays the built-in file of the start line through the game's
+      // own audio; the smaller one tries the phone's speech.
+      testVoice: (report) => void Voice.testFile('start', report),
+      testSpeech: (report) => Voice.test(getLine('map_next').tts, report),
+      lineSource: (id) => Voice.source(id),
       throughSilent: getThroughSilent(),
       onThroughSilent: (on) => {
         setThroughSilent(on);

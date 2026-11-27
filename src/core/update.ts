@@ -12,6 +12,9 @@ import type Phaser from 'phaser';
 
 export function setupUpdates(game: Phaser.Game): void {
   if (!('serviceWorker' in navigator)) return;
+  // The dev server has no sw.js (it is made by the build); asking for it there
+  // only logs an error.
+  if (import.meta.env.DEV) return;
   // A takeover counts as a new version only if this page was already controlled
   // or an update arrived while another version was active. The very first
   // install is not an update; a newer version published later in that same
