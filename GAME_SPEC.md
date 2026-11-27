@@ -694,13 +694,13 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `d2_baba` | he taps Baba | والحمد لله أننا معاً. | والحمد لله إنّا سوا. |
 | `d2_sea` | he taps the sea | سبحان الله، ما أجمل البحر والجبال! | سبحان الله، شو حلو البحر والجبال! |
 | `d2_end` | the evening light | الحمد لله على كل النعم. | الحمد لله على كل النعم. |
-| `d3_open` | D3 start | بسم الله. نمشي مع جدّو إلى المقعد. | بسم الله. بنمشي مع سيدو للمقعد. |
+| `d3_open` | D3 start | بسم الله. نمشي مع جدّو إلى المقعد. | بسم الله. بنمشي مع جدّو للمقعد. |
 | `d3_hint` | how to walk | اضغط لتمشي، واترك لتنتظر. | اكبس عشان تمشي، واترك عشان تستنّى. |
-| `d3_wait` | he ran ahead | جدّو يمشي على مهله. ننتظره. | سيدو بيمشي على مهله. بنستنّاه. |
-| `d3_stone` | a stone on the path | حجر على الطريق! أبعده قبل أن يصل جدّو. | في حجر عالطريق! بعّده قبل ما يوصل سيدو. |
-| `d3_water` | at the bench | اسكب لجدّو كأس ماء. | كبّ لسيدو كاسة ميّ. |
+| `d3_wait` | he ran ahead | جدّو يمشي على مهله. ننتظره. | جدّو بيمشي على مهله. بنستنّاه. |
+| `d3_stone` | a stone on the path | حجر على الطريق! أبعده قبل أن يصل جدّو. | في حجر عالطريق! بعّده قبل ما يوصل جدّو. |
+| `d3_water` | at the bench | اسكب لجدّو كأس ماء. | كبّ لجدّو كاسة ميّ. |
 | `d3_grandpa` | Grandfather | الله يرضى عليك يا حبيبي. | الله يرضى عليك يا حبيبي. |
-| `d3_end` | Grandfather rests | الحمد لله، جلس جدّو مرتاحاً ينظر إلى البحر. | الحمد لله، قعد سيدو مرتاح بيطلّع عالبحر. |
+| `d3_end` | Grandfather rests | الحمد لله، جلس جدّو مرتاحاً ينظر إلى البحر. | الحمد لله، قعد جدّو مرتاح بيطلّع عالبحر. |
 | `j1_hadith` R | ending | registry `bukhari_2989`, part `harm` | registry `bukhari_2989`, part `harm` |
 | `j2_hadith` R | ending | registry `muslim_2699a` | registry `muslim_2699a` |
 | `j3_hadith` R | ending | registry `bukhari_12` | registry `bukhari_12` |
