@@ -249,6 +249,15 @@ class VoiceSystem {
   }
 
   /**
+   * A button's label, by the same rule as the bubble: the Jordanian label when
+   * the parent's own recording of the line that offers it will play, otherwise
+   * the Standard Arabic label (the built-in voice and the phone speak Standard Arabic).
+   */
+  label(lineId: string, standard: string, jordanian: string): string {
+    return this.source(lineId) === 'own' ? jordanian : standard;
+  }
+
+  /**
    * The parents' corner main voice test: play one built-in file (inside the tap)
    * through the game's own audio, the way every line is played, and report
    * "played" or the exact error.
@@ -266,7 +275,11 @@ class VoiceSystem {
       const r = await fetch(`assets/audio/vo/${id}.m4a`);
       if (!r.ok) return say(`خطأ: ما قدرت أجيب ملف الصوت (${r.status}).`);
       const ab = await r.arrayBuffer();
-      buf = await new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(ab, res, rej));
+      buf = await new Promise<AudioBuffer>((res, rej) => {
+          // Callbacks for older Safari; newer browsers also return a promise, which must not reject unhandled.
+          const p = ctx.decodeAudioData(ab, res, rej) as Promise<AudioBuffer> | undefined;
+          p?.catch?.(() => undefined);
+        });
     } catch (e) {
       return say(`خطأ بقراءة ملف الصوت: ${(e as Error)?.name || ''} ${(e as Error)?.message || String(e)}`.trim());
     }

@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, PourCan, walkTo, type PourTarget } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeSway, pose, PourCan, walkTo, type PourTarget } from '../kit';
 
 // U2. Umm Qais: the olive saplings (value: planting good that others enjoy
 // later; patience; trust in Allah; source muslim_1553a). MISSIONS_V2.md section 5.
@@ -357,6 +357,29 @@ export class OliveScene extends BaseScene {
     await Voice.say('qdu_end');
     if (!this.alive) return;
     await this.finishAdventure('ummqais', null);
+  }
+
+  /**
+   * Free time in the grown grove: the middle olive tree sways in the breeze,
+   * the bird pecking in the left tree hops, and the boy gives a small hop.
+   * The resting stranger is left in peace. Never at dusk (a quiet deed).
+   */
+  protected freeTargets(): FreeTarget[] {
+    if (this.quiet) return [];
+    const out: FreeTarget[] = [];
+    const tree = this.spots[1]?.tree;
+    if (tree) {
+      // Only the crown: the trunk's foot is behind the stranger.
+      const crown = () => {
+        const b = tree.getBounds();
+        return new Phaser.Geom.Rectangle(tree.x - 60, b.y + 10, 120, b.height * 0.45);
+      };
+      out.push({ obj: tree, area: crown, react: () => freeSway(this, tree, 2.5, 0.3) });
+    }
+    const bird = this.children.list.find((o) => o instanceof Phaser.GameObjects.Image && o.texture.key === 'birds_eating') as Phaser.GameObjects.Image | undefined;
+    if (bird) out.push({ obj: bird, react: () => freeHop(this, bird, 'birds', 8, 0.3) });
+    out.push({ obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) });
+    return out;
   }
 
   // ---------------------------------------------------------------- input

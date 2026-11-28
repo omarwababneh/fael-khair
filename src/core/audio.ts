@@ -112,7 +112,11 @@ class AudioEngine {
     if (!p) {
       p = fetch(url)
         .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
-        .then((ab) => new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(ab, res, rej)))
+        .then((ab) => new Promise<AudioBuffer>((res, rej) => {
+          // Callbacks for older Safari; newer browsers also return a promise, which must not reject unhandled.
+          const p = ctx.decodeAudioData(ab, res, rej) as Promise<AudioBuffer> | undefined;
+          p?.catch?.(() => undefined);
+        }))
         .catch(() => null);
       this.buffers.set(url, p);
     }
@@ -129,7 +133,11 @@ class AudioEngine {
     const ctx = this.ctx;
     if (!ctx) return Promise.resolve(null);
     return blob.arrayBuffer()
-      .then((ab) => new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(ab, res, rej)))
+      .then((ab) => new Promise<AudioBuffer>((res, rej) => {
+          // Callbacks for older Safari; newer browsers also return a promise, which must not reject unhandled.
+          const p = ctx.decodeAudioData(ab, res, rej) as Promise<AudioBuffer> | undefined;
+          p?.catch?.(() => undefined);
+        }))
       .catch(() => null);
   }
 

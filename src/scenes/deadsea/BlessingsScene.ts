@@ -5,10 +5,10 @@ import { music } from '../../core/music';
 import { currentLap } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
-import { PIC } from '../../core/viewport';
+import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeRipple, freeWiggle } from '../kit';
 
 // D2. The Dead Sea: seeing the blessings (value: gratitude; source quran_14_7).
 // MISSIONS_V2.md section 5.
@@ -167,6 +167,30 @@ export class BlessingsScene extends BaseScene {
     await Voice.say('d2_end');
     if (!this.alive) return;
     await this.finishAdventure('deadsea', 'd2_hadith');
+  }
+
+  /** Free time on the bench: the sea ripples where he touches it, Baba nods, the boy hops on the bench. */
+  protected freeTargets(): FreeTarget[] {
+    const t: FreeTarget[] = [
+      { obj: this.baba, react: () => freeWiggle(this, this.baba, 'rustle', 3, 0.25) },
+      { obj: this.boy, react: () => freeHop(this, this.boy, 'step', 8) },
+    ];
+    const sea = this.children.list.find((o): o is Phaser.GameObjects.Image => o instanceof Phaser.GameObjects.Image && o.texture.key === 'bg_deadsea_shore');
+    if (sea) t.unshift({ obj: sea, area: () => this.seaArea(), react: () => this.rippleAt(this.seaArea()) });
+    return t;
+  }
+
+  /** The open water, above the salt edge, inside the frame. */
+  private seaArea(): Phaser.Geom.Rectangle {
+    const v = view();
+    const x = Math.max(v.x, 0) + 20, right = Math.min(v.right, 390) - 20;
+    return new Phaser.Geom.Rectangle(x, SEA.top + 20, right - x, 115);
+  }
+
+  /** Two soft rings on the water where he touched it. */
+  private rippleAt(r: Phaser.Geom.Rectangle): number {
+    const p = this.input.activePointer;
+    return freeRipple(this, Phaser.Math.Clamp(p.worldX, r.x, r.right), Phaser.Math.Clamp(p.worldY, r.y, r.bottom), 5, 0.3);
   }
 
   private showHint(): void {

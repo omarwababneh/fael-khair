@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { vp } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, walkTo } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeBounce, freeHop, freeRipple, pose, walkTo } from '../kit';
 
 // Q3. Aqaba: the sandcastle promise (value: keeping a promise; source
 // quran_17_34). MISSIONS_V2.md section 5.
@@ -117,7 +117,11 @@ export class CastleScene extends BaseScene {
     });
 
     // The choice is there at once, while the father and the friends speak.
-    this.removeChoice = ui.showChoice(['بنبني القلعة هلأ', 'بنروح عالطابة'], (i) => {
+    // Standard Arabic labels with the built-in voice, Jordanian with the parent's own recording of q3_open.
+    this.removeChoice = ui.showChoice([
+      Voice.label('q3_open', 'نبني القلعة الآن', 'بنبني القلعة هلأ'),
+      Voice.label('q3_open', 'نلعب بالكرة', 'بنروح عالطابة'),
+    ], (i) => {
       this.removeChoice = null;
       if (i === 0) void this.buildNow();
       else void this.toBall();
@@ -404,6 +408,17 @@ export class CastleScene extends BaseScene {
     await Voice.say('q3_end');
     if (!this.alive) return;
     await this.finishAdventure('aqaba', 'q3_hadith');
+  }
+
+  /** Free time: the ball bounces, the sister gives a small hop, the sea ripples. */
+  protected freeTargets(): FreeTarget[] {
+    const sea = this.children.list.find((o) => o instanceof Phaser.GameObjects.Image && o.texture.key === 'bg_aqaba_beach') as Phaser.GameObjects.Image | undefined;
+    const t: FreeTarget[] = [
+      { obj: this.ball, react: () => freeBounce(this, this.ball, 24) },
+      { obj: this.sister, react: () => freeHop(this, this.sister, 'step', 8) },
+    ];
+    if (sea) t.push({ obj: sea, area: () => new Phaser.Geom.Rectangle(150, 400, 70, 70), react: () => freeRipple(this, 185, 435, 5) });
+    return t;
   }
 
   private showHint(): void {

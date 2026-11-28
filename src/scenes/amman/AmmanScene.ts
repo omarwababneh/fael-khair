@@ -6,8 +6,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, stopBreathing } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeBounce, freeHop, stopBreathing } from '../kit';
 
 // Amman: the broken jar (value: truthfulness, then repair without shame;
 // source muslim_2607c). The accident happens inside play, not through a bad
@@ -245,7 +245,11 @@ export class AmmanScene extends BaseScene {
     await Voice.say('am_choice');
     if (!this.alive) return;
     // Two buttons of identical size, color and weight. Nothing hints at which is right.
-    this.removeButtons = ui.showChoice(['بَحكي لَماما', 'بَخَبّيها'], (i) => {
+    // Standard Arabic labels with the built-in voice, Jordanian with the parent's own recording of am_choice.
+    this.removeButtons = ui.showChoice([
+      Voice.label('am_choice', 'أُخْبِرُ ماما', 'بَحكي لَماما'),
+      Voice.label('am_choice', 'أُخَبِّئُها', 'بَخَبّيها'),
+    ], (i) => {
       this.removeButtons = null;
       sfx('pop', { volume: 0.5 });
       if (i === 0) void this.tell();
@@ -290,7 +294,7 @@ export class AmmanScene extends BaseScene {
     await Voice.say('am_heart');
     if (!this.alive) return;
     // The door back to honesty is always open.
-    this.removeButtons = ui.showAction('بَحكي الحَقيقة', () => {
+    this.removeButtons = ui.showAction(Voice.label('am_heart', 'أَقولُ الحَقيقة', 'بَحكي الحَقيقة'), () => {
       this.removeButtons = null;
       sfx('pop', { volume: 0.5 });
       void this.tellTruth();
@@ -461,6 +465,14 @@ export class AmmanScene extends BaseScene {
     await Voice.say('am_brave');
     if (!this.alive) return;
     await this.finishAdventure('amman', 'am_hadith');
+  }
+
+  /** Free time after the hug (either path): the ball bounces; the boy gives a small hop. */
+  protected freeTargets(): FreeTarget[] {
+    return [
+      { obj: this.ball, react: () => freeBounce(this, this.ball, 30, 0.35) },
+      { obj: this.boy, area: () => this.boyImg.getBounds(), react: () => freeHop(this, this.boy, 'step', 10) },
+    ];
   }
 
   // ------------------------------------------------------------ helpers

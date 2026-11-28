@@ -9,8 +9,8 @@ This file extends `GAME_SPEC.md`. Read `GAME_SPEC.md`, `DECISIONS.md` and this f
 ## 1. What changes
 
 1. Seven places have adventures instead of four: Petra, Umm Qais, Amman, Irbid, Jerash, the Dead Sea and Aqaba. Each place has three missions. Total: 21 missions, 4 built, 17 new.
-2. A day is four missions, then the Wadi Rum night ending (section 3).
-3. The fourth mission of every day is a quiet good deed that nobody sees or thanks (section 6).
+2. A day is four missions (up to six since version 3, the parents' «طول اليوم»), then the Wadi Rum night ending (section 3).
+3. The last mission of every day is a quiet good deed that nobody sees or thanks (section 6).
 4. The Wadi Rum ending is built (section 7).
 5. The music is recorded, cheerful and chosen for a young child. The parents' corner gets a sound choice (section 9).
 6. You deliver a complete art checklist as a spreadsheet before you build anything (section 2).
@@ -38,16 +38,18 @@ Do not draw scenery, characters or objects in code. Code may add light, tint, pa
 
 1. **Map.** All seven places are open from the first second. No locks, no "coming soon", no marks showing what was played.
 2. **One mission per place per day.** When he taps a place, it plays that place's next mission in its rotation (mission 1, then 2, then 3, then 1 again). A place he has played today becomes scenery with a voice for the rest of the day, the way Jerash behaves now: it bounces and says its name.
-3. **The sun** moves one step after each mission, as now.
-4. **The fourth mission of the day is always the quiet deed** of whichever place he opens fourth (section 6). It does not advance that place's rotation.
-5. **After four missions** the map turns to dusk, the Wadi Rum pin glows, and the other places become scenery with a voice. Wadi Rum opens the night ending.
-6. **"خلصنا لليوم"** returns to the start screen. Starting again begins a fresh day at once. There is no waiting, no daily lock and nothing lost by stopping halfway.
-7. **Rotation moves by play, not by the calendar.** A place's rotation advances only when its mission is finished. Missing a day changes nothing.
-8. **Small variation on replay.** Each mission has two or three light variations chosen at random: where objects lie, how many there are, which side a character stands on. The story and the value never change.
+3. **Day length (version 3).** A day has up to six missions before Wadi Rum: five, then the quiet deed. The parents' corner setting «طول اليوم» chooses «طويل» (up to six, the default) or «قصير» (four, as before). Six is a maximum, never an obligation: on a long day, once he has finished three missions, the map shows a button in the choice buttons' style, «خلصنا لليوم؟». If he taps it, the next place he opens plays its quiet deed, and then Wadi Rum opens as usual. Nothing is said about the button and nothing presses him to use it. Only the setting is stored; the day itself lives in memory.
+4. **The sun** moves one equal step after each mission: six steps on a long day, four on a short one. If he ends a long day early, the sun stands where that shorter day puts it.
+5. **The last mission of the day is always the quiet deed** of whichever place he opens last (section 6): the sixth on a long day, the fourth on a short day, or the one after «خلصنا لليوم؟». It does not advance that place's rotation. If the parents switch to a shorter day after he has already played more missions, the next mission is the quiet deed.
+6. **After the quiet deed** the map turns to dusk, the Wadi Rum pin glows, and the other places become scenery with a voice. Wadi Rum opens the night ending.
+7. **Free time (version 3).** After every ordinary mission's closing line (never after a quiet deed, never in Wadi Rum), the scene stays open instead of returning to the map. The father says `free_open` once. Two or three things already in the scene react to a tap with a small motion and a soft sound, the same every time: no hidden surprises, nothing that grows the more he taps, no goal, no counting, no praise, no chime, nothing stored. The home button takes him to the map at any time. After 45 seconds the father says `free_invite` once; nothing forces him out.
+8. **"خلصنا لليوم"** returns to the start screen. Starting again begins a fresh day at once. There is no waiting, no daily lock and nothing lost by stopping halfway.
+9. **Rotation moves by play, not by the calendar.** A place's rotation advances only when its mission is finished. Missing a day changes nothing.
+10. **Small variation on replay.** Each mission has two or three light variations chosen at random: where objects lie, how many there are, which side a character stands on. The story and the value never change.
 
-**Storage.** The game may now store, on the device only, one small number per place: which mission comes next. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. Update the privacy rule in `GAME_SPEC.md` section 2 to say exactly this. (Owner, later: the parent's own recordings of the voice lines, made in the parents' corner, may also be stored on the phone. They are never uploaded or sent anywhere.)
+**Storage.** The game may now store, on the device only, one small number per place: which mission comes next, and (version 3) the parents' day-length setting. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. Update the privacy rule in `GAME_SPEC.md` section 2 to say exactly this. (Owner, later: the parent's own recordings of the voice lines, made in the parents' corner, may also be stored on the phone. They are never uploaded or sent anywhere.)
 
-A full day should take 8 to 10 minutes. Each mission lasts 60 to 120 seconds.
+A short day should take 8 to 10 minutes; a long day longer (see `DECISIONS.md` for the measured length). Each mission lasts 60 to 120 seconds, plus any free time he chooses.
 
 ## 4. Rules added in this version
 
@@ -230,7 +232,7 @@ No change to the scene. The sentence about good and bad secrets goes in the pare
 - Both paths end at the same castle and the same happy sister. Neither path is scolded.
 - Suggested art: `sister_bucket_wait`, `sand_bucket`, `sand_tower`, `shell_a`, `shell_b`. Reuse `sister_happy`, `friend_a`, `friend_b`, `ball`, `boy_kneel`, `boy_kick`.
 
-## 6. The quiet deed (fourth mission of every day)
+## 6. The quiet deed (last mission of every day)
 
 The governing idea of this game is that he does good when there is no screen, no reward and nobody watching. So every day ends its missions with a good deed that nobody sees.
 
@@ -248,7 +250,7 @@ One quiet deed per place. Keep them short (about 60 seconds) and reuse art.
 | Petra | Before sunrise the Siq is empty. He clears the fallen stones and leaves. Later a family walks through without knowing. | P1 scene, cooler dawn tint |
 | Umm Qais | A neighbor's young trees are wilting. He waters them with the can while nobody is there. In the evening they stand up straight. | U2 art |
 | Amman | Before Mama wakes he waters her mint pots on the windowsill and folds the blanket. She smells the mint and smiles at the window, not at him. | `bg_amman_home`, `plant_dry`, `plant_fresh`, `watering_can` |
-| Irbid | The secret basket (I1 as built). On days when Irbid is opened first, second or third, it plays I2 or I3; I1 is kept for the fourth slot. | built |
+| Irbid | The secret basket (I1 as built). On days when Irbid is opened first, second or third, it plays I2 or I3; I1 is kept for the last slot. | built |
 | Jerash | Early morning, the plaza is empty. He bins the safe litter and goes. The first visitors walk in on clean stone. | J1 art, no guard, no glass |
 | Dead Sea | One tap drips with nobody around. He turns it off and walks on. | D1 art |
 | Aqaba | At sunrise he clears plastic from the empty beach. Later a turtle crosses the clean sand to the water. | Q1 art |
@@ -260,7 +262,8 @@ Because I1 is Irbid's quiet deed, Irbid's rotation for the first three slots is 
 Build it as `GAME_SPEC.md` section 4E describes, with these changes:
 
 - **No music at all in Wadi Rum.** Wind and a few crickets only. Remove the generated Wadi Rum melody.
-- After he has brightened the stars for about 30 seconds, or when he stops: input off, sound effects off.
+- **Star drawing (version 3).** After `wr_open`, the father says `wr_draw` and he can drag from star to star to draw glowing lines (a light effect). No target shape, no judgment. It ends when he taps «يلّا», or by itself after 20 seconds without a touch, and at the latest after 90 seconds. All the lines and effects then fade out completely before the closing line.
+- Then input off, sound effects off. Nothing moves or responds to touch while the ayah is on screen.
 - The father's closing line comes **before** the ayah, in his own voice or the phone's voice. `script`, exactly:
   "يا حبيبي، شوف قديش خلق الله جميل. اليوم ساعدنا ناس وحيوانات باللعبة، وبكرا إن شاء الله بنقدر نعمل خير بحياتنا. مش لازم حدا يشوفنا أو يشكرنا، الله بعرف الخير اللي بنعمله."
   This line rests on `quran_2_215` and is pending approval like every religious line. Write a simple Standard Arabic `tts` form of it.
@@ -375,14 +378,14 @@ Work in waves. Each wave is one pull request. At the end of each, list what you 
 - **Wave 3:** Jerash (J1, J2, J3) and the Dead Sea (D1, D2, D3) with their quiet deeds.
 - **Wave 4:** Aqaba (Q1, Q2, Q3) with its quiet deed, all conversation starters, a full pass on motion, sound and pacing.
 
-Until a place's missions are built, that place stays scenery with a voice, as Jerash is now. Until a place's quiet deed is built, its next ordinary mission plays in the fourth slot. Until I2 and I3 exist, I1 plays in any slot.
+Until a place's missions are built, that place stays scenery with a voice, as Jerash is now. Until a place's quiet deed is built, its next ordinary mission plays in the last slot. Until I2 and I3 exist, I1 plays in any slot.
 
 Acceptance for every wave:
 - Each new mission has an easy first win inside 10 seconds, gets a little harder, and ends inside two minutes.
 - The good act visibly changes something for someone else. Nothing changes for the player's status.
 - Every safeguard listed for the mission is in the scene.
-- The fourth mission of a day is always a quiet deed, with no acknowledgment of any kind.
-- A day of four missions plus Wadi Rum runs 8 to 10 minutes.
+- The last mission of a day is always a quiet deed, with no acknowledgment of any kind.
+- A day of four missions plus Wadi Rum runs 8 to 10 minutes (a short day; version 3 adds the long day of up to six).
 - No network request after install. No new stored data beyond section 3.
 - `npm run build` passes with placeholders; `npm run check:art` lists what is still missing.
 

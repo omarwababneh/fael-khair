@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, walkTo } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeWiggle, pose, walkTo } from '../kit';
 
 // U3. Umm Qais: sharing the harvest (value: fairness between two; source
 // bukhari_2989, part "justice"). MISSIONS_V2.md section 5.
@@ -352,6 +352,15 @@ export class HarvestScene extends BaseScene {
     await Promise.all([said, this.wait(3500)]);
     if (!this.alive) return;
     await this.finishAdventure('ummqais', 'u3_hadith');
+  }
+
+  // ---------------------------------------------------------------- free time
+
+  /** The boy hops; each pan of the scale swings a little on its hook. */
+  protected freeTargets(): FreeTarget[] {
+    const list: FreeTarget[] = [{ obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) }];
+    if (this.pans) for (const pan of Object.values(this.pans)) list.push({ obj: pan, react: () => freeWiggle(this, pan, 'creak', 6, 0.25) });
+    return list;
   }
 
   // ---------------------------------------------------------------- hints

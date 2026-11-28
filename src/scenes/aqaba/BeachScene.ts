@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, walkTo } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeRipple, freeWiggle, pose, walkTo } from '../kit';
 
 // Q1. Aqaba: the turtle and the plastic (value: mercy to animals, keeping harm
 // out of their home; source bukhari_2363). MISSIONS_V2.md section 5.
@@ -363,6 +363,17 @@ export class BeachScene extends BaseScene {
     await Voice.say('qdq_end');
     if (!this.alive) return;
     await this.finishAdventure('aqaba', null);
+  }
+
+  /** Free time: the boy hops, the sack rustles, the sea ripples (open water left of the hut). */
+  protected freeTargets(): FreeTarget[] {
+    const sea = this.children.list.find((o) => o instanceof Phaser.GameObjects.Image && o.texture.key === 'bg_aqaba_beach') as Phaser.GameObjects.Image | undefined;
+    const t: FreeTarget[] = [
+      { obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) },
+      { obj: this.sack, react: () => freeWiggle(this, this.sack, 'rustle', 5, 0.3) },
+    ];
+    if (sea) t.push({ obj: sea, area: () => new Phaser.Geom.Rectangle(100, 405, 110, 75), react: () => freeRipple(this, 155, 442, 5) });
+    return t;
   }
 
   private showHint(): void {

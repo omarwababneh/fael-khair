@@ -31,6 +31,7 @@ const parentsContent = parentsJson as {
 type SoundMode = 'music' | 'nature' | 'off';
 type MusicVolume = 'quiet' | 'medium';
 type VoiceSpeed = 'slower' | 'normal' | 'faster';
+type DayLength = 'long' | 'short';
 type LineSource = 'own' | 'file' | 'speech' | 'text';
 const SOURCE_AR: Record<LineSource, string> = { own: 'تسجيلك', file: 'الصوت المسجّل باللعبة', speech: 'صوت الجهاز', text: 'مكتوب بس' };
 interface VoiceTestInfo { speech: boolean; total: number; arabic: string[]; mode: 'voice' | 'lang' | 'text'; unlock: string; session: string | null }
@@ -483,6 +484,7 @@ class UI {
 
   /** Parents' corner (GAME_SPEC.md section 10). */
   openParent(opts: {
+    dayLength: DayLength; onDayLength: (d: DayLength) => void;
     sound: SoundMode; volume: MusicVolume; voice: string | null; speed: VoiceSpeed;
     onSound: (m: SoundMode) => void; onVolume: (v: MusicVolume) => void; onSpeed: (s: VoiceSpeed) => void; onClose: () => void;
     voiceInfo: () => VoiceTestInfo; testVoice: (report: (msg: string) => void) => void;
@@ -493,6 +495,14 @@ class UI {
     const card = el('div', 'fk-parent-card');
     const h = el('h2', '');
     h.textContent = 'للأهل';
+    // Day length: a long day (up to six missions, the default) or a short one (four).
+    const dayGroup = el('div', 'fk-group');
+    const dayLabel = el('span', '');
+    dayLabel.textContent = 'طول اليوم';
+    const day = this.options<DayLength>([['long', 'طويل'], ['short', 'قصير']], opts.dayLength, opts.onDayLength);
+    const dayNote = el('p', 'fk-voice-note');
+    dayNote.textContent = 'طويل: لحد ست مهمات قبل وادي رم، وبعد تلاتة بيقدر يكبس «خلصنا لليوم؟». قصير: أربع مهمات. آخر مهمة باليوم دايماً المهمة الهادية.';
+    dayGroup.append(dayLabel, day, dayNote);
     // Sound choice: cheerful music (default), nature sounds only, or off. Plus the music volume.
     const soundGroup = el('div', 'fk-group');
     const soundLabel = el('span', '');
@@ -604,7 +614,7 @@ class UI {
     // Everything between the title and the close button scrolls together, so on a
     // short screen nothing is squeezed out and "رجوع" always stays in reach.
     const scroll = el('div', 'fk-parent-scroll');
-    scroll.append(soundGroup, volumeRow, speedRow, speedNote, voice, test, ...parentSections(opts.lineSource, showSources), credit, build);
+    scroll.append(dayGroup, soundGroup, volumeRow, speedRow, speedNote, voice, test, ...parentSections(opts.lineSource, showSources), credit, build);
     card.append(h, scroll, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());

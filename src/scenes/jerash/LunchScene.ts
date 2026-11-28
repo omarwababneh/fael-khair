@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, CupPour } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, CupPour, freeHop, freeWiggle } from '../kit';
 
 // J3. Jerash: the forgotten lunch (value: feeding others; source bukhari_12).
 // MISSIONS_V2.md section 5.
@@ -356,6 +356,22 @@ export class LunchScene extends BaseScene {
     await Voice.say('j3_end');
     if (!this.alive) return;
     await this.finishAdventure('jerash', 'j3_hadith');
+  }
+
+  /** Free time on the step: each boy gives a small hop, his water bottle sloshes. */
+  protected freeTargets(): FreeTarget[] {
+    const t: FreeTarget[] = [
+      { obj: this.boy, react: () => freeHop(this, this.boy, 'step', 8) },
+      { obj: this.mate, react: () => freeHop(this, this.mate, 'pop', 8) },
+    ];
+    const bottle = this.bottle();
+    if (bottle) t.push({ obj: bottle, react: () => freeWiggle(this, bottle, 'lap', 5) });
+    return t;
+  }
+
+  /** His own water bottle on the step (looked up, not stored: the mission code is unchanged). */
+  private bottle(): Phaser.GameObjects.Image | undefined {
+    return this.children.list.find((o): o is Phaser.GameObjects.Image => o instanceof Phaser.GameObjects.Image && o.texture.key === 'water_bottle');
   }
 
   private showHint(): void {

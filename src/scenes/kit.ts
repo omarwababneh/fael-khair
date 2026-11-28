@@ -3,7 +3,7 @@
 import Phaser from 'phaser';
 import { fitHeight } from '../core/assets';
 import { waterStream } from '../core/fx';
-import { sfx } from '../core/sfx';
+import { sfx, type SfxName } from '../core/sfx';
 
 /** A gentle breathing motion so a standing figure is never perfectly still. */
 export function breathe(scene: Phaser.Scene, img: Phaser.GameObjects.Image, amount = 0.015): Phaser.Tweens.Tween {
@@ -294,4 +294,89 @@ export class CupPour {
       this.scene.tweens.add({ targets: this.root, alpha: 0, duration: 400, onComplete: () => { this.root.destroy(); res(); } });
     });
   }
+}
+
+// ---------------------------------------------------------------- free time
+// Reactions for free time after an ordinary mission (BaseScene.freeTime). Each
+// is a small motion and a soft sound, the same every time, and returns how long
+// it lasts (touches meanwhile do nothing, so nothing grows the more he taps).
+// They move only what nothing else in the scene is moving at that moment
+// (angle, scaleX, or a y offset when no other motion uses y).
+
+type Moving = Phaser.GameObjects.GameObject & { x: number; y: number; angle: number; scaleX: number; scaleY: number };
+
+/** Is any running tween on this object moving this property? */
+function moves(scene: Phaser.Scene, obj: Phaser.GameObjects.GameObject, prop: string): boolean {
+  return scene.tweens.getTweensOf(obj).some((t) => t.isPlaying() && t.data.some((d) => (d as { key?: string }).key === prop));
+}
+
+/** A quick wag or wiggle on its own spot (a dog wagging, a cat's flick, a figure's little sway). */
+export function freeWiggle(scene: Phaser.Scene, obj: Moving, sound: SfxName | null, deg = 5, volume = 0.3): number {
+  if (moves(scene, obj, 'angle')) return pulse(scene, obj, sound, volume);
+  const a = obj.angle;
+  scene.tweens.add({ targets: obj, angle: { from: a, to: a + deg }, duration: 110, yoyo: true, repeat: 2, ease: 'Sine.easeInOut', onComplete: () => { obj.angle = a; } });
+  if (sound) sfx(sound, { volume });
+  return 800;
+}
+
+/** When the angle is already moving: a small widening and back instead. */
+function pulse(scene: Phaser.Scene, obj: Moving, sound: SfxName | null, volume: number): number {
+  if (moves(scene, obj, 'scaleX')) return 0;
+  const sx = obj.scaleX;
+  scene.tweens.add({ targets: obj, scaleX: sx * 1.05, duration: 160, yoyo: true, ease: 'Sine.easeInOut', onComplete: () => { obj.scaleX = sx; } });
+  if (sound) sfx(sound, { volume });
+  return 500;
+}
+
+/** A small hop on the spot (a bird, a figure's happy bounce). Falls back to a wiggle if y is moving. */
+export function freeHop(scene: Phaser.Scene, obj: Moving, sound: SfxName | null, h = 10, volume = 0.3): number {
+  if (moves(scene, obj, 'y')) return freeWiggle(scene, obj, sound, 4, volume);
+  const y = obj.y;
+  scene.tweens.add({ targets: obj, y: y - h, duration: 160, yoyo: true, ease: 'Quad.easeOut', onComplete: () => { obj.y = y; } });
+  if (sound) sfx(sound, { volume });
+  return 500;
+}
+
+/** A ball's bounce: up and down twice, smaller the second time. */
+export function freeBounce(scene: Phaser.Scene, obj: Moving, h = 34, volume = 0.35): number {
+  if (moves(scene, obj, 'y')) return freeWiggle(scene, obj, 'bounce', 8, volume);
+  const y = obj.y;
+  scene.tweens.chain({
+    targets: obj,
+    tweens: [
+      { y: y - h, duration: 220, ease: 'Quad.easeOut' },
+      { y, duration: 220, ease: 'Quad.easeIn', onComplete: () => sfx('bounce', { volume }) },
+      { y: y - h * 0.4, duration: 150, ease: 'Quad.easeOut' },
+      { y, duration: 150, ease: 'Quad.easeIn', onComplete: () => { obj.y = y; sfx('bounce', { volume: volume * 0.6 }); } },
+    ],
+  });
+  return 900;
+}
+
+/** A slow stretch (a cat stretching, a plant or a tree swelling a little in the breeze). */
+export function freeStretch(scene: Phaser.Scene, obj: Moving, sound: SfxName | null, amount = 0.06, volume = 0.3): number {
+  if (moves(scene, obj, 'scaleX')) return moves(scene, obj, 'angle') ? 0 : freeWiggle(scene, obj, sound, 3, volume);
+  const sx = obj.scaleX;
+  scene.tweens.add({ targets: obj, scaleX: sx * (1 + amount), duration: 420, yoyo: true, ease: 'Sine.easeInOut', onComplete: () => { obj.scaleX = sx; } });
+  if (sound) sfx(sound, { volume });
+  return 900;
+}
+
+/** A sway from its base (a tree, a plant, a flag): a few slow swings. */
+export function freeSway(scene: Phaser.Scene, obj: Moving, deg = 3, volume = 0.3): number {
+  if (moves(scene, obj, 'angle')) return pulse(scene, obj, 'rustle', volume);
+  const a = obj.angle;
+  scene.tweens.add({ targets: obj, angle: { from: a - deg, to: a + deg }, duration: 380, yoyo: true, repeat: 1, ease: 'Sine.easeInOut', onComplete: () => { obj.angle = a; } });
+  sfx('rustle', { volume });
+  return 1600;
+}
+
+/** Water ripples where he touched: two soft rings spreading out (a light effect, nothing drawn). */
+export function freeRipple(scene: Phaser.Scene, x: number, y: number, depth = 5, volume = 0.3): number {
+  for (let i = 0; i < 2; i++) {
+    const r = scene.add.image(x, y, 'fx_ring').setDepth(depth).setAlpha(0).setDisplaySize(16, 8).setBlendMode(Phaser.BlendModes.ADD);
+    scene.tweens.add({ targets: r, displayWidth: 110, displayHeight: 40, alpha: { from: 0.7, to: 0 }, delay: i * 260, duration: 1100, ease: 'Sine.easeOut', onComplete: () => r.destroy() });
+  }
+  sfx('splash', { volume });
+  return 1200;
 }

@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view, vp } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, walkTo } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeWiggle, pose, walkTo } from '../kit';
 
 // I2. Irbid: too much change (value: trust, giving people what is theirs;
 // source quran_4_58). MISSIONS_V2.md section 5.
@@ -311,6 +311,17 @@ export class BakeryScene extends BaseScene {
     await Voice.say('i2_end');
     if (!this.alive) return;
     await this.finishAdventure('irbid', 'i2_hadith');
+  }
+
+  // ---------------------------------------------------------------- free time
+
+  /** The boy hops; the bag of bread rustles; the baker gives a little nod. */
+  protected freeTargets(): FreeTarget[] {
+    const list: FreeTarget[] = [{ obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) }];
+    const bread = this.children.list.find((o): o is Phaser.GameObjects.Image => o instanceof Phaser.GameObjects.Image && o.texture.key === 'bread_bag');
+    if (bread) list.push({ obj: bread, react: () => freeWiggle(this, bread, 'rustle', 5, 0.3) });
+    list.push({ obj: this.baker, react: () => freeWiggle(this, this.baker, 'knock', 3, 0.25) });
+    return list;
   }
 
   private showHint(): void {

@@ -6,8 +6,8 @@ import { completeMission, currentLap } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, stopBreathing } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeStretch, pose, stopBreathing } from '../kit';
 
 // A3. Amman: Mama's shopping (value: kindness to parents, noticing without
 // being asked; source quran_17_23). MISSIONS_V2.md section 5.
@@ -277,6 +277,16 @@ export class StairsScene extends BaseScene {
     await Voice.say('a3_end');
     if (!this.alive) return;
     await this.finishAdventure('amman', 'a3_hadith');
+  }
+
+  // ---------------------------------------------------------------- free time
+
+  /** The boy hops at the top; the sleeping cat stretches in its sleep. */
+  protected freeTargets(): FreeTarget[] {
+    const list: FreeTarget[] = [{ obj: this.boy, react: () => freeHop(this, this.boy, 'step', 8) }];
+    const c = this.cat;
+    if (c) list.push({ obj: c, react: () => freeStretch(this, c, 'rustle', 0.12, 0.2) });
+    return list;
   }
 
   // ---------------------------------------------------------------- input

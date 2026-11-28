@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { COVER_FACTOR, DESIGN_H, DESIGN_W, vp } from '../core/viewport';
 import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
-import { completeMission, type Place } from '../core/session';
+import { completeMission, session, type Place } from '../core/session';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
 
@@ -20,6 +20,26 @@ export const onMap = (x: number, y: number): { x: number; y: number } => ({
   y: DESIGN_H / 2 + (y - DESIGN_H / 2) * MAP_SCALE,
 });
 
+/** After the closing line, free time begins this long after. */
+const FREE_START_MS = 1200;
+/** In free time, the father asks once whether to go on after this long. Nothing forces him out. */
+const FREE_INVITE_MS = 45000;
+/** The smallest touch area of a free-time thing, in points (the touch-size rule). */
+const FREE_MIN_HIT = 56;
+
+/**
+ * Something in the scene that reacts in free time. A reaction is small, soft and
+ * the same every time: no goal, no count, no praise, nothing stored.
+ */
+export interface FreeTarget {
+  /** What he touches. */
+  obj: Phaser.GameObjects.GameObject & { getBounds: () => Phaser.Geom.Rectangle; visible: boolean };
+  /** A touch area other than the picture's bounds, in world points. */
+  area?: () => Phaser.Geom.Rectangle;
+  /** The motion and sound; returns how long it lasts. Touches meanwhile do nothing. */
+  react: () => number;
+}
+
 /** Shared camera fitting, background covering and scene changes. */
 export abstract class BaseScene extends Phaser.Scene {
   /** False once the scene is leaving; async steps check it before acting. */
@@ -31,9 +51,12 @@ export abstract class BaseScene extends Phaser.Scene {
   /** Until his first touch, the hint comes sooner: the first easy win within ten seconds. */
   private touched = false;
   private earlyHint = true;
+  /** Free time after an ordinary mission: the scene stays open until he taps home. */
+  protected inFreeTime = false;
 
   protected setup(): void {
     this.alive = true;
+    this.inFreeTime = false;
     this.covers = [];
     this.baseIdleTimer = undefined;
     this.idleAction = null;
@@ -146,9 +169,85 @@ export abstract class BaseScene extends Phaser.Scene {
       await Voice.say(closingLine);
       if (!this.alive) return;
     }
-    await this.wait(2600);
+    await this.afterClosing(2600);
+  }
+
+  /**
+   * What the scene can offer in free time (two or three things). Scenes with an
+   * ordinary mission override this; a quiet deed and Wadi Rum never have free time.
+   */
+  protected freeTargets(): FreeTarget[] {
+    return [];
+  }
+
+  /**
+   * Called once as free time begins: a scene may settle its view first, and
+   * returns how long that takes (free time and free_open start after it).
+   */
+  protected onFreeTime(): number {
+    return 0;
+  }
+
+  /**
+   * After an ordinary mission's closing line: free time if the scene offers it,
+   * otherwise (and always after a quiet deed) back to the map after `ms`.
+   */
+  protected async afterClosing(ms: number): Promise<void> {
+    const run = session.current;
+    const targets = run && !run.quiet ? this.freeTargets() : [];
+    if (!targets.length) {
+      await this.wait(ms);
+      if (!this.alive) return;
+      this.goTo('map');
+      return;
+    }
+    await this.wait(FREE_START_MS);
     if (!this.alive) return;
-    this.goTo('map');
+    this.freeTime(targets);
+  }
+
+  /**
+   * Free time: the scene stays open. The father says free_open once; the
+   * things in `targets` react to a touch; after 45 seconds he says free_invite
+   * once. The home button takes him to the map whenever he wants.
+   */
+  private freeTime(targets: FreeTarget[]): void {
+    this.setIdle(null);
+    ui.setHome(() => this.goTo('map'));
+    const settle = this.onFreeTime();
+    if (settle > 0) {
+      this.time.delayedCall(settle, () => this.alive && this.freeTimeNow(targets));
+      return;
+    }
+    this.freeTimeNow(targets);
+  }
+
+  private freeTimeNow(targets: FreeTarget[]): void {
+    this.inFreeTime = true;
+    const busyUntil = new Map<FreeTarget, number>();
+    const areaOf = (t: FreeTarget): Phaser.Geom.Rectangle => {
+      const r = t.area ? t.area() : t.obj.getBounds();
+      const w = Math.max(r.width, FREE_MIN_HIT), h = Math.max(r.height, FREE_MIN_HIT);
+      return new Phaser.Geom.Rectangle(r.centerX - w / 2, r.centerY - h / 2, w, h);
+    };
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      if (!this.alive || !this.inFreeTime) return;
+      let best: FreeTarget | null = null;
+      let bestD = Infinity;
+      for (const t of targets) {
+        if (!t.obj.active || !t.obj.visible || ((t.obj as unknown as { alpha?: number }).alpha ?? 1) < 0.05) continue;
+        const r = areaOf(t);
+        if (!r.contains(p.worldX, p.worldY)) continue;
+        const d = Phaser.Math.Distance.Between(p.worldX, p.worldY, r.centerX, r.centerY);
+        if (d < bestD) { bestD = d; best = t; }
+      }
+      if (!best || this.time.now < (busyUntil.get(best) ?? 0)) return;
+      busyUntil.set(best, this.time.now + best.react());
+    });
+    void Voice.say('free_open');
+    this.time.delayedCall(FREE_INVITE_MS, () => {
+      if (this.alive && this.inFreeTime) void Voice.say('free_invite');
+    });
   }
 
   /** Leave for another scene with a soft fade. */

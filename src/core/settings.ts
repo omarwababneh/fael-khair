@@ -1,4 +1,4 @@
-// Stored on the device only (GAME_SPEC.md section 2): the parents' sound settings
+// Stored on the device only (GAME_SPEC.md section 2): the parents' day length and sound settings
 // (sound choice, music volume, voice speed, the silent switch) and one number per place: which
 // mission comes next and whether he has been around once. Nothing about what he
 // chose or how he played.
@@ -109,4 +109,21 @@ export function getNextIndex(place: string): number {
 
 export function setNextIndex(place: string, n: number): void {
   if (Number.isInteger(n) && n >= 0 && n <= 5) write(ROT_PREFIX + place, String(n));
+}
+
+// ---------------------------------------------------------------- day length
+
+/**
+ * "طول اليوم": a long day (the default) has up to six missions before Wadi Rum,
+ * five and then the quiet deed; a short day has four, as before version 3.
+ */
+export type DayLength = 'long' | 'short';
+const DAY_KEY = 'fk.dayLength';
+
+export function getDayLength(): DayLength {
+  return read(DAY_KEY) === 'short' ? 'short' : 'long';
+}
+
+export function setDayLength(v: DayLength): void {
+  write(DAY_KEY, v);
 }
