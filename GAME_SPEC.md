@@ -46,7 +46,7 @@ Never trade test 2 or 3 for test 1.
 
 ### Privacy
 - The repository is public. Never commit names, photos or personal details of the family.
-- **Storage.** The game may store, on the device only, the day length («طول اليوم», version 3), the sound choice, the music volume, the voice speed, whether sound plays through the silent switch, one number per place (which mission comes next and whether he has been around once), and the parent's own recordings of the voice lines made in the parents' corner. Nothing about what he chose or how he played. It is never shown, never counted and never sent anywhere; the recordings are never uploaded. (Confirmed by the owner for version 2; recordings added by the owner later.)
+- **Storage.** The game may store, on the device only, the day length («طول اليوم», version 3), the road and moving-background switches («الطريق»، «حركة الخلفية», version 3 part B), the sound choice, the music volume, the voice speed, whether sound plays through the silent switch, one number per place (which mission comes next and whether he has been around once), and the parent's own recordings of the voice lines made in the parents' corner. Nothing about what he chose or how he played. It is never shown, never counted and never sent anywhere; the recordings are never uploaded. (Confirmed by the owner for version 2; recordings added by the owner later.)
 
 ### Rules added by MISSIONS_V2
 Every rule above still holds. `MISSIONS_V2.md` section 4 adds rules that apply to every mission, old and new: mercy with wisdom (a trusted adult whenever a stranger, an animal in trouble, broken glass, a leak or a lost child is involved; never alone with a stranger; never touching a wild or unfamiliar animal; light loads only; food shared only after asking, never a shared cup; good and bad secrets), no shame, the father describes and does not grade, everyday remembrance (only بسم الله، الحمد لله، إن شاء الله، ما شاء الله، سبحان الله، الله يرضى عليك are used freely; any other religious sentence comes from the registry), Quran in missions only as the short paraphrase, no jingle or musical sting for a moral choice or a good deed, and short two-form voice lines.
@@ -61,16 +61,19 @@ From the map on, a day works as follows (copied word for word from `MISSIONS_V2.
 
 1. **Map.** All seven places are open from the first second. No locks, no "coming soon", no marks showing what was played.
 2. **One mission per place per day.** When he taps a place, it plays that place's next mission in its rotation (mission 1, then 2, then 3, then 1 again). A place he has played today becomes scenery with a voice for the rest of the day, the way Jerash behaves now: it bounces and says its name.
-3. **Day length (version 3).** A day has up to six missions before Wadi Rum: five, then the quiet deed. The parents' corner setting «طول اليوم» chooses «طويل» (up to six, the default) or «قصير» (four, as before). Six is a maximum, never an obligation: on a long day, once he has finished three missions, the map shows a button in the choice buttons' style, «خلصنا لليوم؟». If he taps it, the next place he opens plays its quiet deed, and then Wadi Rum opens as usual. Nothing is said about the button and nothing presses him to use it. Only the setting is stored; the day itself lives in memory.
+3. **Day length (version 3).** A day has up to six missions before Wadi Rum: five, then the quiet deed. The parents' corner setting «طول اليوم» chooses «طويل» (up to six, the default) or «قصير» (four, as before). Six is a maximum, never an obligation: on a long day, once he has finished three missions, the map shows a button in the choice buttons' style, «خلصنا لليوم؟». If he taps it, the father says «حسناً، مكانٌ أخير لليوم.» (`day_last`), the next place he opens plays its quiet deed, and then Wadi Rum opens as usual. Nothing presses him to use it. Only the setting is stored; the day itself lives in memory.
 4. **The sun** moves one equal step after each mission: six steps on a long day, four on a short one. If he ends a long day early, the sun stands where that shorter day puts it.
 5. **The last mission of the day is always the quiet deed** of whichever place he opens last (section 6): the sixth on a long day, the fourth on a short day, or the one after «خلصنا لليوم؟». It does not advance that place's rotation. If the parents switch to a shorter day after he has already played more missions, the next mission is the quiet deed.
 6. **After the quiet deed** the map turns to dusk, the Wadi Rum pin glows, and the other places become scenery with a voice. Wadi Rum opens the night ending.
 7. **Free time (version 3).** After every ordinary mission's closing line (never after a quiet deed, never in Wadi Rum), the scene stays open instead of returning to the map. The father says `free_open` once. Two or three things already in the scene react to a tap with a small motion and a soft sound, the same every time: no hidden surprises, nothing that grows the more he taps, no goal, no counting, no praise, no chime, nothing stored. The home button takes him to the map at any time. After 45 seconds the father says `free_invite` once; nothing forces him out.
-8. **"خلصنا لليوم"** returns to the start screen. Starting again begins a fresh day at once. There is no waiting, no daily lock and nothing lost by stopping halfway.
-9. **Rotation moves by play, not by the calendar.** A place's rotation advances only when its mission is finished. Missing a day changes nothing.
-10. **Small variation on replay.** Each mission has two or three light variations chosen at random: where objects lie, how many there are, which side a character stands on. The story and the value never change.
+8. **The road (version 3 part B).** After he taps a place and before an ordinary mission opens, a short drive of about 25 to 30 seconds: the northern road for Umm Qais, Irbid, Jerash and Amman, the southern road for the Dead Sea, Petra and Aqaba. The landscape scrolls, the family car stays in view and its wheels turn. He rides in the back as a passenger: nothing lets him steer or speed up. The father says `road_look` once, then three sights from that road's set pass by, different each trip. If he taps a sight it gives a small friendly motion and the father names it; if he does not, the father names it anyway as it passes. No score, no count, no "found" mark, nothing stored. No road before a quiet deed or before Wadi Rum. The parents' corner switch «الطريق» turns it off (on by default).
+9. **The world remembers (version 3 part B).** A place he has visited shows nature growing there (an olive tree, the mint at home, oleander, poppies, jasmine, a date palm, the planter at the Dead Sea), chosen only from the place's stored rotation number. It is nature growing, never his achievement: no sparkle, no sound, no count, nothing to touch, and never in a quiet deed. The father says `world_grown` once, on arrival, the first time a place shows a bigger stage.
+10. **Free-time animals and moving backgrounds (version 3 part B).** In free time, small animals of the place come out (a lizard, a butterfly, a hoopoe, a crab, a pigeon, a jumping fish, a hedgehog); each reacts to a touch with a small motion and a soft sound, the same every time, and settles; nothing lets him catch, hold or collect one. Transparent layers over the backgrounds move gently (clouds, far birds, a branch, foam, glints, a glow): on arrival and in free time; still during a moral choice, the father's key lines and every quiet deed's final moment; in Wadi Rum all motion stops before the ayah. They respect the phone's reduce-motion setting, and the parents' corner switch «حركة الخلفية» stops them (on by default).
+11. **"خلصنا لليوم"** returns to the start screen. Starting again begins a fresh day at once. There is no waiting, no daily lock and nothing lost by stopping halfway.
+12. **Rotation moves by play, not by the calendar.** A place's rotation advances only when its mission is finished. Missing a day changes nothing.
+13. **Small variation on replay.** Each mission has two or three light variations chosen at random: where objects lie, how many there are, which side a character stands on. The story and the value never change.
 
-**Storage.** The game may now store, on the device only, one small number per place: which mission comes next, and (version 3) the parents' day-length setting. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. Update the privacy rule in `GAME_SPEC.md` section 2 to say exactly this. (Owner, later: the parent's own recordings of the voice lines, made in the parents' corner, may also be stored on the phone. They are never uploaded or sent anywhere.)
+**Storage.** The game may now store, on the device only, one small number per place: which mission comes next, and (version 3) the parents' day-length, road and moving-background settings. Nothing else about play is stored. It is never shown, never counted and never sent anywhere. Update the privacy rule in `GAME_SPEC.md` section 2 to say exactly this. (Owner, later: the parent's own recordings of the voice lines, made in the parents' corner, may also be stored on the phone. They are never uploaded or sent anywhere.)
 
 A short day should take 8 to 10 minutes; a long day longer (see `DECISIONS.md` for the measured length). Each mission lasts 60 to 120 seconds, plus any free time he chooses.
 
@@ -569,6 +572,21 @@ Store these in `content/lines.json`. Religious lines (marked R) take their text 
 | `wr_draw` | star drawing (version 3) | ارسم بين النجوم ما تحبّ. | ارسم بين النجوم اللي بتحبّه. |
 | `free_open` | free time starts (version 3) | معنا وقت. العب قليلاً إن أردت. | معنا وقت. العب شوي إذا بدّك. |
 | `free_invite` | 45 s into free time (version 3) | هيّا نكمل الرحلة؟ | يلّا نكمّل الرحلة؟ |
+| `day_last` | «خلصنا لليوم؟» tapped (part B) | حسناً، مكانٌ أخير لليوم. | ماشي، آخر مكان لليوم. |
+| `road_look` | the road starts (part B) | انظر من النافذة. ماذا ترى؟ | اطّلع من الشبّاك. شو شايف؟ |
+| `road_camel` | a sight: camel | هذا جمل. يمشي في الصحراء أياماً دون ماء. | هاد جمل. بيمشي بالصحرا أيام بدون ميّ. |
+| `road_goats` | a sight: shepherd and goats | هذا راعٍ مع ماعزه. | هاد راعي مع معزاته. |
+| `road_olives` | a sight: olive grove | هذه أشجار زيتون، وبعضها قديم جداً. | هدول شجر زيتون، وبعضهم قديم كتير. |
+| `road_tent` | a sight: Bedouin tent | هذا بيت شَعر، يسكنه أهل البادية. | هاد بيت شَعر، بيسكنوه أهل البادية. |
+| `road_iris` | a sight: black iris | هذه السوسنة السوداء، زهرة الأردن. | هاي السوسنة السودا، زهرة الأردن. |
+| `road_rosefinch` | a sight: Sinai rosefinch | هذا العصفور الوردي، طائر الأردن. | هاد العصفور الوردي، طير الأردن. |
+| `road_oryx` | a sight: Arabian oryx | هذا المها العربي. انظر إلى قرنيه الطويلين. | هاد المها العربي. شوف قرونه الطوال. |
+| `road_column` | a sight: Roman column | هذا عمود قديم جداً، بناه الناس قبل ألفي سنة. | هاد عمود قديم كتير، بنوه الناس قبل ألفين سنة. |
+| `road_mosque` | a sight: village mosque | هذا مسجد القرية. | هاد جامع القرية. |
+| `road_falafel` | a sight: falafel stand | هذا كشك الفلافل. ما أطيب رائحته! | هاد كشك الفلافل. ما أطيب ريحته! |
+| `road_spring` | a sight: hot spring | هذا ماء ساخن يخرج من الأرض. سبحان الله! | هاي ميّ سخنة بتطلع من الأرض. سبحان الله! |
+| `road_turbine` | a sight: wind turbine | هذه مروحة كبيرة تصنع الكهرباء من الريح. | هاي مروحة كبيرة بتعمل كهربا من الهوا. |
+| `world_grown` | a plant has grown (part B) | انظر كم كبرت! ما شاء الله. | شوف قدّيش كبرت! ما شاء الله. |
 | `qdp_open` | Petra quiet deed start | ما زال الفجر، والطريق فارغ. سقطت حجارة في الليل. بسم الله. | لسّا الفجر، والطريق فاضية. وقعت حجار بالليل. بسم الله. |
 | `qdp_end` | after the family passes | مرّت العائلة، والطريق نظيف. | مرقت العيلة، والطريق نظيفة. |
 | `p2_open` | P2 start | بسم الله. انظر، هناك شيء على الرمل! | بسم الله. شوف، في إشي عالرمل! |
@@ -845,6 +863,7 @@ He is starting to read, so short words help him; long text does not.
 Opened by holding the small lock button on the map for 3 seconds (a ring fills while holding). Contents:
 
 - **Day length (version 3):** «طول اليوم»: «طويل» (up to six missions before Wadi Rum, the default) or «قصير» (four). Section 3.
+- **The road and moving backgrounds (version 3 part B):** «الطريق» (the short drive before an ordinary mission) and «حركة الخلفية» (the gently moving layers), each «شغّال» (the default) or «مطفي». Section 3.
 - **Sound:** the sound choice and music volume (section 7.3), and the voice speed.
 - **Conversation starters:** after each mission, three questions for father and son to talk through (text below).
 - **An optional invitation:** one small real-life act of kindness. It is never tracked, confirmed, reported or tied to anything in the game.
