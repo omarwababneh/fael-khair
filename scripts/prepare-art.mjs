@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import {
-  ROOT, INCOMING, OUT_ART, OUT_ICONS, REQUIRED, ICON, isBackground,
+  ROOT, INCOMING, OUT_ART, OUT_ICONS, REQUIRED, ICON, isBackground, isRoad, isLayer,
   scanIncoming, loadRaw, removeBackground, alphaBounds, cropRaw, rawToSharp, printTable,
 } from './art-lib.mjs';
 
@@ -25,8 +25,18 @@ for (const [name, src] of sources) {
   if (name === ICON) continue;
   const outFile = path.join(OUT_ART, `${name}.webp`);
   let img;
-  if (isBackground(name)) {
+  if (isRoad(name)) {
+    // The road strips scroll sideways: kept wide, at most 1536 high.
+    img = sharp(path.join(INCOMING, src.file)).resize({ height: 1536, withoutEnlargement: true });
+  } else if (isBackground(name)) {
     img = sharp(path.join(INCOMING, src.file)).resize({ width: 1170 });
+  } else if (isLayer(name)) {
+    // Moving layers: up to 1024 (the foam line, which tiles, up to 2048 wide).
+    let raw = removeBackground(await loadRaw(path.join(INCOMING, src.file)));
+    const b = alphaBounds(raw);
+    if (b) raw = cropRaw(raw, b);
+    const max = name === 'layer_foam_line' ? 2048 : 1024;
+    img = rawToSharp(raw).resize({ width: max, height: max, fit: 'inside', withoutEnlargement: true });
   } else {
     let raw = src.fromSheet ? cropRaw(src.raw, src.box) : removeBackground(await loadRaw(path.join(INCOMING, src.file)));
     const b = alphaBounds(raw);

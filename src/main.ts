@@ -21,6 +21,7 @@ import { MorningScene } from './scenes/amman/MorningScene';
 import { IrbidScene } from './scenes/irbid/IrbidScene';
 import { BakeryScene } from './scenes/irbid/BakeryScene';
 import { AlleyScene } from './scenes/irbid/AlleyScene';
+import { RoadScene } from './scenes/road/RoadScene';
 import { WadiRumScene } from './scenes/wadirum/WadiRumScene';
 import { JerashMorningScene, PlazaScene } from './scenes/jerash/PlazaScene';
 import { CardoScene } from './scenes/jerash/CardoScene';
@@ -62,7 +63,7 @@ async function boot(): Promise<void> {
     scene: [BootScene, StartScene, MapScene, PetraScene, PouchScene, CartScene, PetraDawnScene, UmmQaisScene, OliveScene, HarvestScene, UmmQaisDuskScene,
       AmmanScene, BlocksScene, StairsScene, MorningScene, IrbidScene, BakeryScene, AlleyScene,
       PlazaScene, CardoScene, LunchScene, JerashMorningScene, TapsScene, BlessingsScene, WalkScene, DeadSeaTapScene,
-      BeachScene, HarborScene, CastleScene, AqabaSunriseScene, WadiRumScene],
+      BeachScene, HarborScene, CastleScene, AqabaSunriseScene, WadiRumScene, RoadScene],
   });
 
   let pending = 0;

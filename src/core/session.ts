@@ -47,6 +47,9 @@ const ROTATION: Record<Place, Array<MissionDef | null>> = {
   aqaba: [{ id: 'Q1', scene: 'aqaba' }, { id: 'Q2', scene: 'q2' }, { id: 'Q3', scene: 'q3' }],
 };
 
+/** How many ordinary missions each place has (its rotation's length). */
+export const ROTATION_LENGTH = Object.fromEntries(PLACES.map((p) => [p, ROTATION[p].length])) as Record<Place, number>;
+
 // Each place's quiet deed (always the last mission of the day). null: not built yet.
 const QUIET: Record<Place, MissionDef | null> = {
   petra: { id: 'QD-P', scene: 'petra-dawn' },

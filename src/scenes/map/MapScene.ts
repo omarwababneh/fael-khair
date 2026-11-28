@@ -4,7 +4,7 @@ import { addButton, addLabel, replay } from '../../core/labels';
 import { music } from '../../core/music';
 import { applyAudioSession, audioSessionType } from '../../core/audio';
 import { getLine } from '../../core/content';
-import { getDayLength, getThroughSilent, getVoiceSpeed, setDayLength, setThroughSilent, setVoiceSpeed } from '../../core/settings';
+import { getDayLength, getLayersOn, getRoadOn, getThroughSilent, getVoiceSpeed, setDayLength, setLayersOn, setRoadOn, setThroughSilent, setVoiceSpeed } from '../../core/settings';
 import { canEndEarly, dayComplete, dayLength, missionFor, session, sunStep, type Place } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
@@ -161,7 +161,7 @@ export class MapScene extends BaseScene {
 
   /**
    * A long day can end early: after three missions the map offers "خلصنا لليوم؟".
-   * It is never pressed on him and nothing is said about it. If he taps it, the
+   * It is never pressed on him. If he taps it, the father says day_last and the
    * next place he opens plays its quiet deed, and Wadi Rum opens after that.
    */
   private showEndEarly(): void {
@@ -177,6 +177,8 @@ export class MapScene extends BaseScene {
       if (this.busy || !this.alive) return;
       session.endEarly = true;
       sfx('pop', { volume: 0.4 });
+      // The father answers: one last place today.
+      void Voice.say('day_last');
       // The day is shorter now: the sun stands where this shorter day puts it.
       const t = sunNow();
       this.placeSun(t, true);
@@ -311,7 +313,10 @@ export class MapScene extends BaseScene {
     const said = Voice.say(p.line);
     await Promise.race([said, this.wait(3500)]);
     if (!this.alive) return;
-    this.goTo(scene);
+    // An ordinary mission is reached by the road (when the parents have it on);
+    // a quiet deed and Wadi Rum never are.
+    if (run && !run.quiet && getRoadOn()) this.goTo('road', { next: scene, place: run.place });
+    else this.goTo(scene);
   }
 
   private openParent(): void {
@@ -320,6 +325,10 @@ export class MapScene extends BaseScene {
     ui.openParent({
       dayLength: getDayLength(),
       onDayLength: (d) => setDayLength(d),
+      road: getRoadOn(),
+      onRoad: (on) => setRoadOn(on),
+      layers: getLayersOn(),
+      onLayers: (on) => setLayersOn(on),
       sound: music.soundMode,
       volume: music.musicVolume,
       voice: Voice.voiceLabel,

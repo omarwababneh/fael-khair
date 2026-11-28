@@ -104,7 +104,7 @@ export class AmmanScene extends BaseScene {
     this.input.on('pointerupoutside', (p: Phaser.Input.Pointer) => this.onUp(p));
 
     this.playStart = this.time.now;
-    void Voice.say('am_open');
+    void this.sayOpening('am_open');
     this.setIdle(() => this.showHint());
   }
 

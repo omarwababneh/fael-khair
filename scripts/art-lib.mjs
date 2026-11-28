@@ -22,6 +22,8 @@ export const BACKGROUNDS = [
   'bg_deadsea_shore',
   // MISSIONS_V2, wave 4
   'bg_aqaba_beach', 'bg_aqaba_harbor',
+  // Version 3 part B: the road (wide strips, a picture joined to its mirror image)
+  'bg_road_north', 'bg_road_south',
 ];
 
 export const CHARACTERS = [
@@ -45,6 +47,9 @@ export const CHARACTERS = [
   // MISSIONS_V2, wave 4
   'turtle_tangled', 'turtle_free', 'ranger_stand', 'ranger_kneel',
   'fisherman_stand', 'customer_basket', 'sister_bucket_wait',
+  // Version 3 part B: free-time animals
+  'free_lizard', 'free_butterfly_open', 'free_butterfly_closed', 'free_hoopoe',
+  'free_crab', 'free_pigeon', 'free_fish_jump', 'free_hedgehog',
 ];
 
 export const OBJECTS = [
@@ -69,6 +74,24 @@ export const OBJECTS = [
   // MISSIONS_V2, wave 4
   'plastic_bag', 'litter_sack', 'fish_big', 'fish_small', 'weight_iron',
   'sand_bucket', 'sand_tower', 'shell',
+  // Version 3 part B: the road
+  'car_family_side', 'car_wheel', 'sight_camel', 'sight_goats_shepherd',
+  'sight_olive_grove', 'sight_bedouin_tent', 'sight_black_iris',
+  'sight_rosefinch', 'sight_oryx', 'sight_roman_column', 'sight_mosque',
+  'sight_falafel_stand', 'sight_hot_spring', 'sight_wind_turbine',
+  // Version 3 part B: the world remembers
+  'olive_age_1', 'olive_age_2', 'olive_age_3', 'mint_full', 'plant_lush',
+  'oleander_young', 'oleander_flowering', 'poppies_few', 'poppies_many',
+  'jasmine_young', 'jasmine_flowering', 'palm_young', 'palm_grown',
+];
+
+/** Version 3 part B: transparent moving layers over the backgrounds. */
+export const LAYERS = [
+  'layer_cloud_small', 'layer_cloud_large', 'layer_cloud_wisp', 'layer_birds_far',
+  'layer_olive_branch', 'layer_grass_tuft', 'layer_vine_sprig',
+  'layer_bougainvillea_sprig', 'layer_glow_warm', 'layer_oven_steam',
+  'layer_foam_line', 'layer_foam_curve', 'layer_water_glints',
+  'layer_palm_frond', 'layer_sand_wisp', 'layer_shooting_star',
 ];
 
 export const ICON = 'icon_app';
@@ -77,19 +100,25 @@ export const ICON = 'icon_app';
 // See DECISIONS.md.
 export const OPTIONAL = ['bird'];
 
-export const REQUIRED = [...BACKGROUNDS, ...CHARACTERS, ...OBJECTS, ICON];
+export const REQUIRED = [...BACKGROUNDS, ...CHARACTERS, ...OBJECTS, ...LAYERS, ICON];
 export const ALL_NAMES = [...REQUIRED, ...OPTIONAL];
 
 export const EXTS = ['.png', '.jpg', '.jpeg', '.webp'];
 
 export const isBackground = (name) => name.startsWith('bg_');
+/** The road strips: kept wide (they scroll), never cut to the portrait width. */
+export const isRoad = (name) => name.startsWith('bg_road_');
+export const isLayer = (name) => name.startsWith('layer_');
 
 // Minimum source sizes (section 6.5).
 export function minSizeProblem(name, w, h, fromSheet = false) {
   if (name === ICON) return (w < 1024 || h < 1024) ? `needs 1024 x 1024, got ${w} x ${h}` : null;
+  if (isRoad(name)) return (w < 3072 || h < 1024) ? `needs at least 3072 x 1024 (a wide strip), got ${w} x ${h}` : null;
   if (isBackground(name)) {
     return (w < 1024 || h < 1536) ? `needs at least 1024 x 1536, got ${w} x ${h}` : null;
   }
+  // Layers come in the sizes the checklist gives (a 512 glow, a 69-pixel-high foam line).
+  if (isLayer(name)) return Math.max(w, h) < 432 ? `needs at least 432 px on the long side, got ${Math.max(w, h)}` : null;
   const long = Math.max(w, h);
   const need = fromSheet ? 384 : 1024;
   return long < need ? `needs at least ${need} px on the long side, got ${long}` : null;

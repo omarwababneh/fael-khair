@@ -1,4 +1,4 @@
-// Stored on the device only (GAME_SPEC.md section 2): the parents' day length and sound settings
+// Stored on the device only (GAME_SPEC.md section 2): the parents' day length, road, moving-layer and sound settings
 // (sound choice, music volume, voice speed, the silent switch) and one number per place: which
 // mission comes next and whether he has been around once. Nothing about what he
 // chose or how he played.
@@ -126,4 +126,24 @@ export function getDayLength(): DayLength {
 
 export function setDayLength(v: DayLength): void {
   write(DAY_KEY, v);
+}
+
+// ---------------------------------------------------------------- road and moving layers
+
+/** «الطريق»: the short drive before an ordinary mission. On by default. */
+const ROAD_KEY = 'fk.road';
+export const getRoadOn = (): boolean => read(ROAD_KEY) !== 'off';
+export function setRoadOn(on: boolean): void {
+  write(ROAD_KEY, on ? 'on' : 'off');
+}
+
+/**
+ * «حركة الخلفية»: the gently moving layers over the backgrounds (clouds, foam,
+ * a swaying branch). On by default; they never move when the phone asks for
+ * reduced motion.
+ */
+const LAYERS_KEY = 'fk.layers';
+export const getLayersOn = (): boolean => read(LAYERS_KEY) !== 'off';
+export function setLayersOn(on: boolean): void {
+  write(LAYERS_KEY, on ? 'on' : 'off');
 }

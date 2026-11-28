@@ -176,7 +176,7 @@ export class PetraScene extends BaseScene {
     // P1 safeguard: only loose stones and fallen branches; the carved rock is never touched.
     if (this.quiet) void Voice.say('qdp_open');
     // One opening line, then straight to what to do; the care line comes after his first stone.
-    else void Voice.say('petra_open').then((ended) => { if (ended && this.alive && !this.finished && !this.placedOne) void Voice.say('petra_hint'); });
+    else void this.sayOpening('petra_open').then((ended) => { if (ended && this.alive && !this.finished && !this.placedOne) void Voice.say('petra_hint'); });
     this.resetIdle();
   }
 
@@ -592,6 +592,8 @@ export class PetraScene extends BaseScene {
    * helped. One plain line about what changed, then the map.
    */
   private async dawnEnding(): Promise<void> {
+    // A quiet deed's final moment: the background goes still.
+    this.layers?.still(true);
     // The spare nooks stop glowing: there is nothing left to do.
     for (const n of this.nooks) if (!n.used && n.ring.active) this.tweens.add({ targets: n.ring, alpha: 0, duration: 600, onComplete: () => n.ring.destroy() });
     this.walk(true);

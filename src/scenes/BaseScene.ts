@@ -4,6 +4,9 @@ import { clearLabels, fadeLabels, layoutLabels } from '../core/labels';
 import { completeMission, session, type Place } from '../core/session';
 import { ui } from '../core/ui';
 import { Voice } from '../core/voice';
+import { addAnimals } from './animals';
+import { addGrowth } from './growth';
+import { LayerSet } from './layers';
 
 /** Before his first touch in a scene, the hint hand shows after this long. */
 const FIRST_HINT_MS = 3000;
@@ -53,10 +56,19 @@ export abstract class BaseScene extends Phaser.Scene {
   private earlyHint = true;
   /** Free time after an ordinary mission: the scene stays open until he taps home. */
   protected inFreeTime = false;
+  /** Everything that reacts in free time now (the scene's things and its animals). */
+  freeActive: FreeTarget[] = [];
+  /** The moving layers over this scene's background (version 3 part B). */
+  protected layers: LayerSet | null = null;
+  /** The father says world_grown before the first line (a plant here has grown). */
+  private grownPending = false;
 
   protected setup(): void {
     this.alive = true;
     this.inFreeTime = false;
+    this.layers = null;
+    this.grownPending = false;
+    this.freeActive = [];
     this.covers = [];
     this.baseIdleTimer = undefined;
     this.idleAction = null;
@@ -108,7 +120,24 @@ export abstract class BaseScene extends Phaser.Scene {
     const img = this.add.image(DESIGN_W / 2, DESIGN_H / 2, key).setDepth(depth);
     this.covers.push({ img, factor });
     this.sizeCover(img, factor);
+    if (!this.layers) {
+      // The background's moving layers, and (an ordinary mission only) the plant
+      // that shows how the place has grown.
+      this.layers = new LayerSet(this, img, key);
+      const run = session.current;
+      this.grownPending = addGrowth(this, this.scene.key, run?.place, !run || run.quiet);
+    }
     return img;
+  }
+
+  /**
+   * The scene's first line. If a plant here has reached its first bigger stage,
+   * the father says world_grown first (once, on arrival).
+   */
+  protected sayOpening(id: string): Promise<boolean> {
+    if (!this.grownPending) return Voice.say(id);
+    this.grownPending = false;
+    return Voice.say('world_grown').then((ended) => (this.alive && ended ? Voice.say(id) : false));
   }
 
   /**
@@ -163,6 +192,8 @@ export abstract class BaseScene extends Phaser.Scene {
    */
   protected async finishAdventure(place: Place, closingLine: string | null): Promise<void> {
     this.setIdle(null);
+    // The layers go still for the father's closing line, and for good at a quiet deed's final moment.
+    this.layers?.still(true);
     // The story's consequence is done: the place counts even if he taps home now.
     completeMission(place);
     if (closingLine) {
@@ -224,6 +255,10 @@ export abstract class BaseScene extends Phaser.Scene {
 
   private freeTimeNow(targets: FreeTarget[]): void {
     this.inFreeTime = true;
+    // The layers move again, and the place's small animals come out.
+    this.layers?.still(false);
+    targets = [...targets, ...addAnimals(this, this.scene.key)];
+    this.freeActive = targets;
     const busyUntil = new Map<FreeTarget, number>();
     const areaOf = (t: FreeTarget): Phaser.Geom.Rectangle => {
       const r = t.area ? t.area() : t.obj.getBounds();
@@ -268,7 +303,7 @@ export abstract class BaseScene extends Phaser.Scene {
    * do. Never awaited: he can act as soon as the scene is visible.
    */
   protected open(first: string, then?: string): void {
-    void Voice.say(first).then((ended) => {
+    void this.sayOpening(first).then((ended) => {
       // Only after the opening ended by itself (a replay or another line cancels it).
       if (this.alive && then && ended) void Voice.say(then);
     });

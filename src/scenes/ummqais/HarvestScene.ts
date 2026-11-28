@@ -107,7 +107,7 @@ export class HarvestScene extends BaseScene {
 
   /** Briefly: the two friends picking together, the pile growing between them. */
   private async intro(): Promise<void> {
-    const said = Voice.say('u3_open');
+    const said = this.sayOpening('u3_open');
     for (const f of Object.values(this.friends)) {
       this.tweens.add({ targets: f, angle: { from: -3, to: 3 }, duration: 380, yoyo: true, repeat: 5, ease: 'Sine.easeInOut' });
     }

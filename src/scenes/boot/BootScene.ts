@@ -13,6 +13,7 @@ const SCENES: Record<string, string> = {
   jerash: 'jerash', j2: 'j2', j3: 'j3', 'jerash-morning': 'jerash-morning',
   deadsea: 'deadsea', d2: 'd2', d3: 'd3', 'deadsea-tap': 'deadsea-tap',
   aqaba: 'aqaba', q2: 'q2', q3: 'q3', 'aqaba-sunrise': 'aqaba-sunrise',
+  road: 'road',
 };
 
 export class BootScene extends Phaser.Scene {
@@ -33,7 +34,7 @@ export class BootScene extends Phaser.Scene {
     if (want) {
       const key = SCENES[want] ?? 'map';
       session.current = debugRun(key, new URLSearchParams(location.search).get('lap') === '1' ? 1 : 0);
-      this.scene.start(key);
+      this.scene.start(key); // ?scene=road&to=<mission> drives to that mission
     }
     else this.scene.start('start');
   }

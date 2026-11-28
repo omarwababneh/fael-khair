@@ -141,7 +141,7 @@ export class UmmQaisScene extends BaseScene {
 
     this.time.addEvent({ delay: 7000, loop: true, callback: () => Math.random() < 0.7 && sfx('birds', { volume: 0.45 }) });
 
-    void Voice.say('uq_open').then(() => { if (this.alive && this.state === 'pull') void Voice.say('bismillah'); });
+    void this.sayOpening('uq_open').then(() => { if (this.alive && this.state === 'pull') void Voice.say('bismillah'); });
     this.setIdle(() => this.showHint());
   }
 
