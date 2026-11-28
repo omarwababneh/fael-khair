@@ -123,10 +123,13 @@ export class CastleScene extends BaseScene {
       Voice.label('q3_open', 'نلعب بالكرة', 'بنروح عالطابة'),
     ], (i) => {
       this.removeChoice = null;
+      this.motionStill(false);
       if (i === 0) void this.buildNow();
       else void this.toBall();
     });
-    void Voice.say('q3_open').then((ended) => { if (ended && this.alive && this.state === 'choose') void Voice.say('q3_friends'); });
+    // A moral choice: the background holds still until he chooses.
+    this.motionStill(true);
+    void this.sayOpening('q3_open').then((ended) => { if (ended && this.alive && this.state === 'choose') void Voice.say('q3_friends'); });
   }
 
   /** The camera keeps its framing after a resize. */

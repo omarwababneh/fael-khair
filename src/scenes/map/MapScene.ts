@@ -4,8 +4,8 @@ import { addButton, addLabel, replay } from '../../core/labels';
 import { music } from '../../core/music';
 import { applyAudioSession, audioSessionType } from '../../core/audio';
 import { getLine } from '../../core/content';
-import { getDayLength, getThroughSilent, getVoiceSpeed, setDayLength, setThroughSilent, setVoiceSpeed } from '../../core/settings';
-import { canEndEarly, dayComplete, dayLength, missionFor, session, sunStep, type Place } from '../../core/session';
+import { getDayLength, getLayersOn, getThroughSilent, getTrialOn, getVoiceSpeed, setDayLength, setLayersOn, setThroughSilent, setTrialOn, setVoiceSpeed } from '../../core/settings';
+import { canEndEarly, dayComplete, dayLength, EARLY_END_AFTER, missionFor, session, sunStep, type Place } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
@@ -80,6 +80,8 @@ const sunNow = (): number => Math.max(session.shownSunStep, dayComplete() ? 1 : 
 
 export class MapScene extends BaseScene {
   private busy = false;
+  /** He has tapped a place since the map opened. */
+  private pinTapped = false;
   private idleTimer?: Phaser.Time.TimerEvent;
   private sun!: Phaser.GameObjects.Container;
   private sunDisc!: Phaser.GameObjects.Arc;
@@ -101,6 +103,7 @@ export class MapScene extends BaseScene {
     this.hits = [];
     this.setup();
     this.busy = false;
+    this.pinTapped = false;
     ui.setPill(null);
     ui.setHome(null);
     ui.clearBubble();
@@ -150,6 +153,13 @@ export class MapScene extends BaseScene {
       await this.wait(1600);
       if (!this.alive) return;
     }
+    // If he tapped a place during the sun's step, its line stands: no greeting over it,
+    // and Wadi Rum's early «خلصنا لليوم؟» stays where it is.
+    if (this.pinTapped) {
+      if (!this.removeEndEarly) this.showEndEarly();
+      this.resetIdle();
+      return;
+    }
     this.showEndEarly();
     if (!this.busy) {
       const first = !session.greeted;
@@ -161,14 +171,20 @@ export class MapScene extends BaseScene {
 
   /**
    * A long day can end early: after three missions the map offers "خلصنا لليوم؟".
-   * It is never pressed on him and nothing is said about it. If he taps it, the
+   * It is never pressed on him. If he taps it, the father says day_last and the
    * next place he opens plays its quiet deed, and Wadi Rum opens after that.
    */
-  private showEndEarly(): void {
+  private showEndEarly(fromWadiRum = false): void {
     this.removeEndEarly?.();
     this.removeEndEarly = null;
     // Not while a place is opening (he may have tapped one during the sun's step).
-    if (this.busy || !this.alive || !canEndEarly()) return;
+    if (this.busy || !this.alive) return;
+    // On its own: a long day after three missions. When he taps Wadi Rum too early:
+    // any day once three missions are done.
+    const ok = fromWadiRum
+      ? !session.quietDone && !session.endEarly && session.done.size >= EARLY_END_AFTER
+      : canEndEarly();
+    if (!ok) return;
     // In the empty desert at the lower right, clear of every place and its name,
     // and above the speech bubble.
     const at = onMap(312, 684);
@@ -177,6 +193,8 @@ export class MapScene extends BaseScene {
       if (this.busy || !this.alive) return;
       session.endEarly = true;
       sfx('pop', { volume: 0.4 });
+      // The father answers: one last place today.
+      void Voice.say('day_last');
       // The day is shorter now: the sun stands where this shorter day puts it.
       const t = sunNow();
       this.placeSun(t, true);
@@ -290,6 +308,7 @@ export class MapScene extends BaseScene {
 
   private async tapPin(p: Pin, c: Phaser.GameObjects.Container, label: HTMLElement): Promise<void> {
     if (this.busy) return;
+    this.pinTapped = true;
     sfx('pop', { volume: 0.5 });
     this.tweens.add({ targets: c, scale: { from: 1.3, to: 1 }, duration: 450, ease: 'Back.easeOut' });
     this.tweens.add({ targets: c, y: { from: p.y - 14, to: p.y }, duration: 450, ease: 'Bounce.easeOut' });
@@ -299,6 +318,13 @@ export class MapScene extends BaseScene {
     // scenery with a voice: it bounces and says its name.
     const run = p.place ? missionFor(p.place) : null;
     const scene = p.id === 'wadirum' ? (dayComplete() ? 'wadirum' : undefined) : run?.scene;
+    if (p.id === 'wadirum' && !scene) {
+      // Too early for Wadi Rum: the father says so, and once three missions are
+      // done he can end the day now (on a short day too).
+      void Voice.say('wr_later');
+      this.showEndEarly(true);
+      return;
+    }
     if (!scene) {
       void Voice.say(p.line);
       return;
@@ -311,7 +337,8 @@ export class MapScene extends BaseScene {
     const said = Voice.say(p.line);
     await Promise.race([said, this.wait(3500)]);
     if (!this.alive) return;
-    this.goTo(scene);
+    // The trial version plays U1 as the Umm Qais walk.
+    this.goTo(scene === 'ummqais' && getTrialOn() ? 'ummqais-walk' : scene);
   }
 
   private openParent(): void {
@@ -320,6 +347,10 @@ export class MapScene extends BaseScene {
     ui.openParent({
       dayLength: getDayLength(),
       onDayLength: (d) => setDayLength(d),
+      layers: getLayersOn(),
+      onLayers: (on) => setLayersOn(on),
+      trial: getTrialOn(),
+      onTrial: (on) => setTrialOn(on),
       sound: music.soundMode,
       volume: music.musicVolume,
       voice: Voice.voiceLabel,

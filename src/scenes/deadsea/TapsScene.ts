@@ -380,6 +380,8 @@ export class TapsScene extends BaseScene {
     await this.wait(3600);
     steps.remove();
     if (!this.alive) return;
+    // A quiet deed's final moment: the background goes still.
+    this.motionStill(true);
     await Voice.say('qdd_end');
     if (!this.alive) return;
     await this.finishAdventure('deadsea', null);

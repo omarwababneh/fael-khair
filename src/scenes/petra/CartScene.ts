@@ -156,7 +156,7 @@ export class CartScene extends BaseScene {
 
   /** The old man lifts the big sack himself (the boy carries only light things). */
   private async intro(big: Phaser.GameObjects.Image): Promise<void> {
-    await Voice.say('p3_open');
+    await this.sayOpening('p3_open');
     if (!this.alive) return;
     const said = Voice.say('p3_big');
     this.tweens.add({ targets: this.elder, angle: -5, duration: 400, yoyo: true, hold: 500 });

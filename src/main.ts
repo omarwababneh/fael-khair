@@ -12,6 +12,7 @@ import { PetraDawnScene, PetraScene } from './scenes/petra/PetraScene';
 import { PouchScene } from './scenes/petra/PouchScene';
 import { CartScene } from './scenes/petra/CartScene';
 import { UmmQaisScene } from './scenes/ummqais/UmmQaisScene';
+import { UmmQaisWalkScene } from './scenes/ummqais/UmmQaisWalkScene';
 import { OliveScene, UmmQaisDuskScene } from './scenes/ummqais/OliveScene';
 import { HarvestScene } from './scenes/ummqais/HarvestScene';
 import { AmmanScene } from './scenes/amman/AmmanScene';
@@ -59,7 +60,7 @@ async function boot(): Promise<void> {
     render: { antialias: true, powerPreference: 'high-performance' },
     input: { activePointers: 2 },
     fps: { target: 60 },
-    scene: [BootScene, StartScene, MapScene, PetraScene, PouchScene, CartScene, PetraDawnScene, UmmQaisScene, OliveScene, HarvestScene, UmmQaisDuskScene,
+    scene: [BootScene, StartScene, MapScene, PetraScene, PouchScene, CartScene, PetraDawnScene, UmmQaisScene, UmmQaisWalkScene, OliveScene, HarvestScene, UmmQaisDuskScene,
       AmmanScene, BlocksScene, StairsScene, MorningScene, IrbidScene, BakeryScene, AlleyScene,
       PlazaScene, CardoScene, LunchScene, JerashMorningScene, TapsScene, BlessingsScene, WalkScene, DeadSeaTapScene,
       BeachScene, HarborScene, CastleScene, AqabaSunriseScene, WadiRumScene],

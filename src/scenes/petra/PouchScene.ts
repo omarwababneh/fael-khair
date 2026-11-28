@@ -119,7 +119,7 @@ export class PouchScene extends BaseScene {
 
     this.time.addEvent({ delay: 8000, loop: true, callback: () => Math.random() < 0.6 && sfx('birds', { volume: 0.45 }) });
     // One opening line, then straight to what to do.
-    void Voice.say('p2_open').then((ended) => {
+    void this.sayOpening('p2_open').then((ended) => {
       if (!ended || !this.alive || this.state !== 'find' || this.hintSaid) return;
       this.hintSaid = true;
       void Voice.say('p2_hint');

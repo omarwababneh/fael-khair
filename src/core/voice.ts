@@ -14,6 +14,10 @@ import { music } from './music';
 import { recordings } from './recordings';
 import { ui } from './ui';
 import { getVoiceSpeed, VOICE_RATES } from './settings';
+import voiceConfig from '../../content/voice.json';
+
+/** Which wording the built-in files speak (content/voice.json): Standard Arabic `tts` or the everyday `script`. */
+export const BUILTIN_WORDING: 'tts' | 'script' = voiceConfig.builtin === 'script' ? 'script' : 'tts';
 
 const synth: SpeechSynthesis | null = 'speechSynthesis' in window ? window.speechSynthesis : null;
 const APPLE = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && /Apple/.test(navigator.vendor || '');
@@ -250,11 +254,16 @@ class VoiceSystem {
 
   /**
    * A button's label, by the same rule as the bubble: the Jordanian label when
-   * the parent's own recording of the line that offers it will play, otherwise
-   * the Standard Arabic label (the built-in voice and the phone speak Standard Arabic).
+   * the parent's own recording of the line that offers it will play, or when the
+   * built-in files speak the everyday wording (content/voice.json); otherwise the
+   * Standard Arabic label (the phone's speech always says Standard Arabic).
    */
   label(lineId: string, standard: string, jordanian: string): string {
-    return this.source(lineId) === 'own' ? jordanian : standard;
+    const src = this.source(lineId);
+    if (src === 'own') return jordanian;
+    // The built-in file speaks the wording content/voice.json names.
+    if (src === 'file') return BUILTIN_WORDING === 'script' ? jordanian : standard;
+    return standard;
   }
 
   /**
@@ -322,10 +331,13 @@ class VoiceSystem {
     const recorded = own || hasAudio('vo', id);
     const canPlay = audio.ready && !!audio.ctx;
     // The bubble shows what the voice says: the parent's own recording says the
-    // everyday words (`script`); the built-in file and the phone's speech say the
-    // Standard Arabic `tts` text. Lines with no `tts` show `script`.
+    // everyday words (`script`); the phone's speech says the Standard Arabic `tts`
+    // text; a built-in file says the wording content/voice.json names (`tts` by
+    // default). Lines with no `tts` show `script`.
     const ttsText = line.tts || line.script;
-    let text = own && canPlay ? line.script : ttsText;
+    // The built-in file speaks the wording content/voice.json names.
+    const fileText = BUILTIN_WORDING === 'script' ? line.script || ttsText : ttsText;
+    let text = own && canPlay ? line.script : hasAudio('vo', id) && canPlay ? fileText : ttsText;
     const show = (t: string) => {
       text = t;
       ui.showBubble(t, () => void this.say(id));
@@ -367,7 +379,11 @@ class VoiceSystem {
       };
       const playBuffer = (buf: AudioBuffer | null) => {
         if (token !== this.token || done) return;
-        if (!buf) return speak();
+        if (!buf) {
+          // Nothing could be played: the phone says the `tts` text, so the bubble shows that.
+          if (text !== ttsText) show(ttsText);
+          return speak();
+        }
         const p = audio.playVoiceBuffer(buf);
         this.stopSource = p.stop;
         void p.done.then(() => finish());
@@ -386,7 +402,7 @@ class VoiceSystem {
             if (buf && version === this.recVersion) this.decoded.set(id, buf);
             // The recording could not be read: the built-in file or the phone says
             // the `tts` text, so the bubble shows that instead.
-            if (!buf && token === this.token && !done) show(ttsText);
+            if (!buf && token === this.token && !done) show(hasAudio('vo', id) ? fileText : ttsText);
             if (buf || !hasAudio('vo', id)) return playBuffer(buf);
             return audio.load(`assets/audio/vo/${id}.m4a`).then(playBuffer);
             });

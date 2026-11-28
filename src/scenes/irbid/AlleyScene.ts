@@ -227,8 +227,11 @@ export class AlleyScene extends BaseScene {
     pose(this, this.boy, 'boy_idle', BOY_H * DEPTH(to.y));
     this.state = 'invite';
     // The speech button: he says it himself.
+    // The moment to invite him: the background holds still until he does.
+    this.motionStill(true);
     this.removeAction = ui.showAction('تعال العب معنا!', () => {
       this.removeAction = null;
+      this.motionStill(false);
       void this.invite();
     });
   }

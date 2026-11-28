@@ -7,7 +7,7 @@ import { debugRun, session } from '../../core/session';
 // Petra's other missions and its quiet deed.
 const SCENES: Record<string, string> = {
   map: 'map', petra: 'petra', p2: 'p2', p3: 'p3', 'petra-dawn': 'petra-dawn',
-  ummqais: 'ummqais', u2: 'u2', u3: 'u3', 'ummqais-dusk': 'ummqais-dusk',
+  ummqais: 'ummqais', 'ummqais-walk': 'ummqais-walk', u2: 'u2', u3: 'u3', 'ummqais-dusk': 'ummqais-dusk',
   amman: 'amman', a2: 'a2', a3: 'a3', 'amman-morning': 'amman-morning',
   irbid: 'irbid', i2: 'i2', i3: 'i3', wadirum: 'wadirum',
   jerash: 'jerash', j2: 'j2', j3: 'j3', 'jerash-morning': 'jerash-morning',

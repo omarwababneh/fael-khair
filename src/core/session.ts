@@ -47,6 +47,9 @@ const ROTATION: Record<Place, Array<MissionDef | null>> = {
   aqaba: [{ id: 'Q1', scene: 'aqaba' }, { id: 'Q2', scene: 'q2' }, { id: 'Q3', scene: 'q3' }],
 };
 
+/** How many ordinary missions each place has (its rotation's length). */
+export const ROTATION_LENGTH = Object.fromEntries(PLACES.map((p) => [p, ROTATION[p].length])) as Record<Place, number>;
+
 // Each place's quiet deed (always the last mission of the day). null: not built yet.
 const QUIET: Record<Place, MissionDef | null> = {
   petra: { id: 'QD-P', scene: 'petra-dawn' },
@@ -159,6 +162,8 @@ export function completeMission(place: Place): void {
  * moves a rotation. Add &lap=1 to the address to play the later-lap version.
  */
 export function debugRun(scene: string, lap: 0 | 1 = 0): MissionRun | null {
+  // The Umm Qais walk (the trial version) is U1's run.
+  if (scene === 'ummqais-walk') return debugRun('ummqais', lap);
   for (const place of PLACES) {
     const q = QUIET[place];
     if (q && q.scene === scene && q.id !== 'I1') return { ...q, place, quiet: true, lap };

@@ -1,4 +1,4 @@
-// Stored on the device only (GAME_SPEC.md section 2): the parents' day length and sound settings
+// Stored on the device only (GAME_SPEC.md section 2): the parents' day length, moving-background, trial and sound settings
 // (sound choice, music volume, voice speed, the silent switch) and one number per place: which
 // mission comes next and whether he has been around once. Nothing about what he
 // chose or how he played.
@@ -126,4 +126,29 @@ export function getDayLength(): DayLength {
 
 export function setDayLength(v: DayLength): void {
   write(DAY_KEY, v);
+}
+
+// ---------------------------------------------------------------- moving layers
+
+/**
+ * «حركة الخلفية»: the gently moving layers over the backgrounds (clouds, foam,
+ * a swaying branch). On by default; they never move when the phone asks for
+ * reduced motion.
+ */
+const LAYERS_KEY = 'fk.layers';
+export const getLayersOn = (): boolean => read(LAYERS_KEY) !== 'off';
+export function setLayersOn(on: boolean): void {
+  write(LAYERS_KEY, on ? 'on' : 'off');
+}
+
+// ---------------------------------------------------------------- the trial version
+
+/**
+ * «النسخة التجريبية»: the Umm Qais walk in place of U1 (the thirsty dog), as a
+ * trial. Off by default; U1 itself is unchanged.
+ */
+const TRIAL_KEY = 'fk.trial';
+export const getTrialOn = (): boolean => read(TRIAL_KEY) === 'on';
+export function setTrialOn(on: boolean): void {
+  write(TRIAL_KEY, on ? 'on' : 'off');
 }

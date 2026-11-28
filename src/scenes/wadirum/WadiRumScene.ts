@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { fitHeight, hasAudio } from '../../core/assets';
+import { fitHeight, hasArt, hasAudio } from '../../core/assets';
 import { audio } from '../../core/audio';
 import { registry } from '../../core/content';
 import { addButton } from '../../core/labels';
@@ -9,6 +9,7 @@ import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
 import { BaseScene } from '../BaseScene';
+import { layersMove } from '../layers';
 
 // Wadi Rum: the night sky (value: reflection on creation and gratitude;
 // source quran_3_190). Slow and quiet: no goal, no count.
@@ -296,9 +297,23 @@ export class WadiRumScene extends BaseScene {
     void this.ayah();
   }
 
-  /** Now and then a shooting star crosses (particles). */
+  /**
+   * Now and then a shooting star crosses: nature only, never tied to a wish,
+   * luck or a reward, and nobody says anything about it. It is a moving layer:
+   * none when the parents switch «حركة الخلفية» off or the phone asks for less motion.
+   */
   private shootingStar(): void {
+    if (!layersMove()) return;
     const v = view();
+    if (hasArt(this, 'layer_shooting_star')) {
+      const x0 = Phaser.Math.Between(v.x + 160, v.right - 10), y0 = Phaser.Math.Between(v.y + 70, 220);
+      const star = this.add.image(x0, y0, 'layer_shooting_star').setDepth(11).setAlpha(0).setBlendMode(Phaser.BlendModes.ADD);
+      star.setScale(150 / star.frame.width);
+      this.sparks.push(star);
+      this.tweens.add({ targets: star, alpha: { from: 0, to: 0.9 }, duration: 250, yoyo: true, hold: 600 });
+      this.tweens.add({ targets: star, x: x0 - 200, y: y0 + 110, duration: 1100, ease: 'Sine.easeIn', onComplete: () => { star.destroy(); this.sparks = this.sparks.filter((x) => x !== star); } });
+      return;
+    }
     const x0 = Phaser.Math.Between(v.x + 80, v.right - 20), y0 = Phaser.Math.Between(v.y + 80, 260);
     const head = this.add.image(x0, y0, 'fx_dot').setDepth(11).setBlendMode(Phaser.BlendModes.ADD).setScale(0.3);
     const trail = this.add.particles(0, 0, 'fx_dot', {
@@ -313,6 +328,8 @@ export class WadiRumScene extends BaseScene {
   private async ayah(): Promise<void> {
     if (!this.alive) return;
     this.playing = false;
+    // Everything that moves by itself goes still before the ayah.
+    this.motionStill(true);
     // Input off, sound effects off. The crickets stop; a soft wind stays.
     this.input.enabled = false;
     ui.setHome(null);
@@ -350,6 +367,7 @@ export class WadiRumScene extends BaseScene {
     if (!this.alive) return;
     // The ayah has gone: the night breathes again, as before.
     for (const t of this.calm) t.resume();
+    this.motionStill(false);
     this.twinkle?.start();
 
     // The father's goodnight line, then the end of the day.

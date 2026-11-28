@@ -1,0 +1,4 @@
+{
+  "_note": "Which wording the built-in voice files in public/assets/audio/vo speak: \"tts\" (Standard Arabic, the files made so far) or \"script\" (the owner's own Jordanian wording, once his recordings replace them). The speech bubble and the choice buttons follow it.",
+  "builtin": "tts"
+}
