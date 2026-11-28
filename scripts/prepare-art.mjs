@@ -26,8 +26,9 @@ for (const [name, src] of sources) {
   const outFile = path.join(OUT_ART, `${name}.webp`);
   let img;
   if (isRoad(name)) {
-    // The road strips scroll sideways: kept wide, at most 1536 high.
-    img = sharp(path.join(INCOMING, src.file)).resize({ height: 1536, withoutEnlargement: true });
+    // The road strips scroll sideways: kept wide (at most 4096 x 1536).
+    // At most 4096 wide: older phones cannot load a wider picture.
+    img = sharp(path.join(INCOMING, src.file)).resize({ width: 4096, height: 1536, fit: 'inside', withoutEnlargement: true });
   } else if (isBackground(name)) {
     img = sharp(path.join(INCOMING, src.file)).resize({ width: 1170 });
   } else if (isLayer(name)) {

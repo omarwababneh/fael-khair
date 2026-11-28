@@ -145,9 +145,13 @@ export class RoadScene extends BaseScene {
     this.tweens.add({ targets: body, y: -1.5, duration: 420, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     // Three sights from this road's set, not the ones of last trip where possible.
+    // At least two that were not on the last trip, and a third from all the rest,
+    // so trips differ without simply alternating between two sets.
     const pool = Phaser.Utils.Array.Shuffle(SIGHTS[road].slice());
     const fresh = pool.filter((s) => !lastTrip[road].includes(s.key));
-    this.queue = [...fresh, ...pool.filter((s) => lastTrip[road].includes(s.key))].slice(0, 3);
+    const two = fresh.slice(0, 2);
+    const third = Phaser.Utils.Array.Shuffle(pool.filter((s) => !two.includes(s)))[0];
+    this.queue = Phaser.Utils.Array.Shuffle([...two, third].filter(Boolean));
     lastTrip[road] = this.queue.map((s) => s.key);
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.tap(p.worldX, p.worldY));
@@ -193,8 +197,7 @@ export class RoadScene extends BaseScene {
   private name(s: Sight): void {
     if (s.named) return;
     s.named = true;
-    const ends = Voice.say(s.def.line);
-    void ends.then(() => { this.lastNamedEnds = this.time.now; });
+    void Voice.say(s.def.line).then(() => { this.lastNamedEnds = this.time.now; });
   }
 
   /** A touch on a sight: a small friendly motion and its name (the same every time). */
@@ -224,7 +227,9 @@ export class RoadScene extends BaseScene {
       this.tweens.add({ targets: img, angle: { from: 0, to: deg }, duration: 140, yoyo: true, repeat: 1, ease: 'Sine.easeInOut', onComplete: () => img.setAngle(0) });
     }
     sfx(s.def.sound, { volume: 0.3 });
-    this.name(s);
+    // The father names it (again, if it was already named and nothing is being said).
+    if (!s.named) this.name(s);
+    else if (!Voice.busy) void Voice.say(s.def.line).then(() => { this.lastNamedEnds = this.time.now; });
   }
 
   /** The drive ends a moment after the last sight has been named, and no sooner than 27 seconds. */

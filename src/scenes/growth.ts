@@ -32,8 +32,10 @@ const PLANTS: Partial<Record<Place, PlantDef>> = {
 
 /**
  * Where each ordinary mission's plant stands (its foot, in design points),
- * clear of everything he touches and of the people. Missions not listed have no
- * plant (A3 is not at home; D2 and D3 are on the open shore, with no planters).
+ * clear of everything he touches and of the people. Every ordinary mission has
+ * one, so the arrival at the first bigger stage always shows it (A3: the mint
+ * among the pots by the stairs on the way home; D2 and D3: a planter at the edge
+ * of the shore path).
  */
 const SPOTS: Record<string, { x: number; foot: number; depth?: number; flip?: boolean }> = {
   petra: { x: 352, foot: 548, depth: 12 },
@@ -44,12 +46,15 @@ const SPOTS: Record<string, { x: number; foot: number; depth?: number; flip?: bo
   u3: { x: 335, foot: 470, depth: 3 },
   amman: { x: 372, foot: 270, depth: 6 },
   a2: { x: 350, foot: 270, depth: 6 },
+  a3: { x: 332, foot: 560, depth: 6 }, // among the pots by the stairs, on the way home
   i2: { x: 340, foot: 702, depth: 8 },
   i3: { x: 30, foot: 565, depth: 6 },
   jerash: { x: 40, foot: 478, depth: 8 }, // by the colonnade, away from every litter spot
   j2: { x: 340, foot: 622, depth: 8 },
   j3: { x: 330, foot: 562, depth: 8 },
   deadsea: { x: 40, foot: 466, depth: 8 }, // on the wall top, clear of the three pots he waters
+  d2: { x: 362, foot: 612, depth: 8 }, // a planter at the edge of the shore path
+  d3: { x: 362, foot: 612, depth: 8 },
   aqaba: { x: 22, foot: 472, depth: 3 },
   q2: { x: 368, foot: 470, depth: 3 },
   q3: { x: 22, foot: 472, depth: 3 },
@@ -62,8 +67,15 @@ export function stageOf(place: Place): 0 | 1 | 2 {
   return n >= L ? 2 : n >= L - 1 ? 1 : 0;
 }
 
-/** Is this arrival the first time the place shows a bigger stage? */
-export const firstBiggerStage = (place: Place): boolean => getNextIndex(place) === ROTATION_LENGTH[place] - 1;
+/** Places whose growth the father has mentioned since the app was opened (memory only). */
+const mentioned = new Set<Place>();
+
+/**
+ * Is this arrival the first time the place shows a bigger stage? (If he left
+ * that mission before its end, the number has not moved; the line is still said
+ * only once while the app is open.)
+ */
+export const firstBiggerStage = (place: Place): boolean => getNextIndex(place) === ROTATION_LENGTH[place] - 1 && !mentioned.has(place);
 
 /**
  * Put this mission's plant in the scene (nothing for a quiet deed or a mission
@@ -81,5 +93,7 @@ export function addGrowth(scene: Phaser.Scene, sceneKey: string, place: Place | 
   fitHeight(img, def.h[stage]);
   if (spot.flip) img.setFlipX(true);
   img.setData('growth', true);
-  return stage > 0 && firstBiggerStage(place);
+  const say = stage > 0 && firstBiggerStage(place);
+  if (say) mentioned.add(place);
+  return say;
 }

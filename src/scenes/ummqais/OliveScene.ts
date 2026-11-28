@@ -354,6 +354,8 @@ export class OliveScene extends BaseScene {
     completeMission('ummqais');
     await this.wait(1800);
     if (!this.alive) return;
+    // A quiet deed's final moment: the background goes still.
+    this.layers?.still(true);
     await Voice.say('qdu_end');
     if (!this.alive) return;
     await this.finishAdventure('ummqais', null);

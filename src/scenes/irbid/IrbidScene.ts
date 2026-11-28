@@ -418,6 +418,8 @@ export class IrbidScene extends BaseScene {
     sfx('door', { volume: 0.4 });
     await this.wait(500);
     if (!this.alive) return;
+    // A quiet deed's final moment: the background goes still.
+    this.layers?.still(true);
     await Voice.say('ir_secret');
     if (!this.alive) return;
     await this.finishAdventure('irbid', 'ir_hadith');

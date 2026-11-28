@@ -200,6 +200,7 @@ export class LayerSet {
         onComplete: () => { img.setAlpha(0); this.birds(img, 60000 + Math.random() * 60000); },
       }));
     });
+    this.timers = this.timers.filter((x) => x.getRemaining() > 0 && !x.hasDispatched);
     this.timers.push(t);
     if (this.stillNow) t.paused = true;
   }

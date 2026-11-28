@@ -13,7 +13,7 @@ import type { FreeTarget } from './BaseScene';
 import { freeRipple } from './kit';
 
 type Kind = 'lizard' | 'butterfly' | 'hoopoe' | 'crab' | 'pigeon' | 'fish' | 'hedgehog';
-interface Spot { kind: Kind; x: number; y: number; flip?: boolean }
+interface Spot { kind: Kind; x: number; y: number; flip?: boolean; depth?: number }
 
 /** Heights on screen: the checklist's sizes, but at least big enough to see and touch. */
 const HEIGHT: Record<Kind, number> = { lizard: 26, butterfly: 34, hoopoe: 44, crab: 26, pigeon: 38, fish: 40, hedgehog: 30 };
@@ -24,7 +24,8 @@ const PICTURE: Record<Kind, string> = {
 
 /** Where each ordinary mission's animals settle in free time (x, foot), clear of the other free-time things. */
 const SPOTS: Record<string, Spot[]> = {
-  petra: [{ kind: 'lizard', x: 300, y: 640 }, { kind: 'butterfly', x: 250, y: 520 }],
+  // P1's free time is on the Treasury plaza, drawn at depth 100: the animals go above it.
+  petra: [{ kind: 'lizard', x: 300, y: 640, depth: 103 }, { kind: 'butterfly', x: 250, y: 520, depth: 103 }],
   p2: [{ kind: 'lizard', x: 300, y: 662 }, { kind: 'butterfly', x: 300, y: 520 }],
   p3: [{ kind: 'lizard', x: 112, y: 560 }, { kind: 'butterfly', x: 300, y: 470 }],
   ummqais: [{ kind: 'butterfly', x: 150, y: 560 }, { kind: 'hoopoe', x: 80, y: 650 }],
@@ -59,7 +60,7 @@ export function addAnimals(scene: Phaser.Scene, sceneKey: string): FreeTarget[] 
       out.push(fish(scene, s));
       continue;
     }
-    const img = scene.add.image(s.x, s.y, key).setOrigin(0.5, 1).setDepth(58).setAlpha(0);
+    const img = scene.add.image(s.x, s.y, key).setOrigin(0.5, 1).setDepth(s.depth ?? 58).setAlpha(0);
     fitHeight(img, HEIGHT[s.kind]);
     if (s.flip) img.setFlipX(true);
     scene.tweens.add({ targets: img, alpha: 1, duration: 900, ease: 'Sine.easeOut' });

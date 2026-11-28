@@ -137,7 +137,12 @@ export abstract class BaseScene extends Phaser.Scene {
   protected sayOpening(id: string): Promise<boolean> {
     if (!this.grownPending) return Voice.say(id);
     this.grownPending = false;
-    return Voice.say('world_grown').then((ended) => (this.alive && ended ? Voice.say(id) : false));
+    // The opening line always follows, even if world_grown was cut short (a replay
+    // tap on the bubble): once nothing is speaking.
+    return Voice.say('world_grown').then(async () => {
+      for (let i = 0; i < 40 && this.alive && Voice.busy; i++) await this.wait(200);
+      return this.alive ? Voice.say(id) : false;
+    });
   }
 
   /**
