@@ -7,13 +7,12 @@ import { debugRun, session } from '../../core/session';
 // Petra's other missions and its quiet deed.
 const SCENES: Record<string, string> = {
   map: 'map', petra: 'petra', p2: 'p2', p3: 'p3', 'petra-dawn': 'petra-dawn',
-  ummqais: 'ummqais', u2: 'u2', u3: 'u3', 'ummqais-dusk': 'ummqais-dusk',
+  ummqais: 'ummqais', 'ummqais-walk': 'ummqais-walk', u2: 'u2', u3: 'u3', 'ummqais-dusk': 'ummqais-dusk',
   amman: 'amman', a2: 'a2', a3: 'a3', 'amman-morning': 'amman-morning',
   irbid: 'irbid', i2: 'i2', i3: 'i3', wadirum: 'wadirum',
   jerash: 'jerash', j2: 'j2', j3: 'j3', 'jerash-morning': 'jerash-morning',
   deadsea: 'deadsea', d2: 'd2', d3: 'd3', 'deadsea-tap': 'deadsea-tap',
   aqaba: 'aqaba', q2: 'q2', q3: 'q3', 'aqaba-sunrise': 'aqaba-sunrise',
-  road: 'road',
 };
 
 export class BootScene extends Phaser.Scene {
@@ -34,7 +33,7 @@ export class BootScene extends Phaser.Scene {
     if (want) {
       const key = SCENES[want] ?? 'map';
       session.current = debugRun(key, new URLSearchParams(location.search).get('lap') === '1' ? 1 : 0);
-      this.scene.start(key); // ?scene=road&to=<mission> drives to that mission
+      this.scene.start(key);
     }
     else this.scene.start('start');
   }

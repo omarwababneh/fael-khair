@@ -32,6 +32,11 @@ export interface Line {
 const lines = linesJson as Record<string, RawLine>;
 export const registry = registryJson as RegistryEntry[];
 
+/** A key line: one from the reviewed registry (a hadith, an ayah, the father's taught words). */
+export function isKeyLine(id: string): boolean {
+  return !!lines[id]?.registry;
+}
+
 export function getLine(id: string): Line {
   const raw = lines[id];
   if (!raw) throw new Error(`Unknown voice line: ${id}`);

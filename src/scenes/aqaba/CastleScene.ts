@@ -123,12 +123,12 @@ export class CastleScene extends BaseScene {
       Voice.label('q3_open', 'نلعب بالكرة', 'بنروح عالطابة'),
     ], (i) => {
       this.removeChoice = null;
-      this.layers?.still(false);
+      this.motionStill(false);
       if (i === 0) void this.buildNow();
       else void this.toBall();
     });
     // A moral choice: the background holds still until he chooses.
-    this.layers?.still(true);
+    this.motionStill(true);
     void this.sayOpening('q3_open').then((ended) => { if (ended && this.alive && this.state === 'choose') void Voice.say('q3_friends'); });
   }
 

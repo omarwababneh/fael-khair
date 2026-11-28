@@ -328,6 +328,8 @@ export class WadiRumScene extends BaseScene {
   private async ayah(): Promise<void> {
     if (!this.alive) return;
     this.playing = false;
+    // Everything that moves by itself goes still before the ayah.
+    this.motionStill(true);
     // Input off, sound effects off. The crickets stop; a soft wind stays.
     this.input.enabled = false;
     ui.setHome(null);
@@ -365,6 +367,7 @@ export class WadiRumScene extends BaseScene {
     if (!this.alive) return;
     // The ayah has gone: the night breathes again, as before.
     for (const t of this.calm) t.resume();
+    this.motionStill(false);
     this.twinkle?.start();
 
     // The father's goodnight line, then the end of the day.

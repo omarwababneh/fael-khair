@@ -242,6 +242,8 @@ export class AmmanScene extends BaseScene {
   private async choose(): Promise<void> {
     if (!this.alive) return;
     this.state = 'choice';
+    // A moral choice: nothing moves by itself until he has chosen.
+    this.motionStill(true);
     await Voice.say('am_choice');
     if (!this.alive) return;
     // Two buttons of identical size, color and weight. Nothing hints at which is right.
@@ -251,6 +253,7 @@ export class AmmanScene extends BaseScene {
       Voice.label('am_choice', 'أُخَبِّئُها', 'بَخَبّيها'),
     ], (i) => {
       this.removeButtons = null;
+      this.motionStill(false);
       sfx('pop', { volume: 0.5 });
       if (i === 0) void this.tell();
       else this.startHiding();
@@ -291,11 +294,13 @@ export class AmmanScene extends BaseScene {
     }
     await this.wait(900);
     if (!this.alive) return;
+    this.motionStill(true);
     await Voice.say('am_heart');
     if (!this.alive) return;
     // The door back to honesty is always open.
     this.removeButtons = ui.showAction(Voice.label('am_heart', 'أَقولُ الحَقيقة', 'بَحكي الحَقيقة'), () => {
       this.removeButtons = null;
+      this.motionStill(false);
       sfx('pop', { volume: 0.5 });
       void this.tellTruth();
     });

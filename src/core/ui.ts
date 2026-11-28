@@ -485,7 +485,8 @@ class UI {
   /** Parents' corner (GAME_SPEC.md section 10). */
   openParent(opts: {
     dayLength: DayLength; onDayLength: (d: DayLength) => void;
-    road: boolean; onRoad: (on: boolean) => void; layers: boolean; onLayers: (on: boolean) => void;
+    layers: boolean; onLayers: (on: boolean) => void;
+    trial: boolean; onTrial: (on: boolean) => void;
     sound: SoundMode; volume: MusicVolume; voice: string | null; speed: VoiceSpeed;
     onSound: (m: SoundMode) => void; onVolume: (v: MusicVolume) => void; onSpeed: (s: VoiceSpeed) => void; onClose: () => void;
     voiceInfo: () => VoiceTestInfo; testVoice: (report: (msg: string) => void) => void;
@@ -504,17 +505,20 @@ class UI {
     const dayNote = el('p', 'fk-voice-note');
     dayNote.textContent = 'طويل: لحد ست مهمات قبل وادي رم، وبعد تلاتة بيقدر يكبس «خلصنا لليوم؟». قصير: أربع مهمات. آخر مهمة باليوم دايماً المهمة الهادية.';
     dayGroup.append(dayLabel, day, dayNote);
-    // The road before an ordinary mission, and the gently moving backgrounds.
-    const roadRow = el('div', 'fk-row');
-    const roadLabel = el('span', '');
-    roadLabel.textContent = 'الطريق';
-    roadRow.append(roadLabel, this.options<'on' | 'off'>([['on', 'شغّال'], ['off', 'مطفي']], opts.road ? 'on' : 'off', (v) => opts.onRoad(v === 'on')));
+    // The gently moving backgrounds, figures and camera.
     const layersRow = el('div', 'fk-row');
     const layersLabel = el('span', '');
     layersLabel.textContent = 'حركة الخلفية';
     layersRow.append(layersLabel, this.options<'on' | 'off'>([['on', 'شغّال'], ['off', 'مطفي']], opts.layers ? 'on' : 'off', (v) => opts.onLayers(v === 'on')));
     const moveNote = el('p', 'fk-voice-note');
-    moveNote.textContent = 'الطريق: مشوار قصير بالسيارة قبل كل مهمة عادية. حركة الخلفية: غيوم وموج وأغصان بتتحرك بهدوء؛ بتوقف لحالها إذا الجهاز طالب حركة أقل.';
+    moveNote.textContent = 'حركة الخلفية: غيوم وموج وأغصان وناس بيتنفّسوا وكاميرا بتتحرك بهدوء؛ بتوقف لحالها إذا الجهاز طالب حركة أقل.';
+    // The trial version: the Umm Qais walk in place of the thirsty-dog mission.
+    const trialRow = el('div', 'fk-row');
+    const trialLabel = el('span', '');
+    trialLabel.textContent = 'النسخة التجريبية';
+    trialRow.append(trialLabel, this.options<'on' | 'off'>([['on', 'شغّال'], ['off', 'مطفي']], opts.trial ? 'on' : 'off', (v) => opts.onTrial(v === 'on')));
+    const trialNote = el('p', 'fk-voice-note');
+    trialNote.textContent = 'النسخة التجريبية: مهمة الكلب العطشان بأم قيس بتصير مشوار بعالم عريض، الولد بيمشي لحاله ليلاقي الكلب والبير. تجربة، والمهمات التانية زي ما هي.';
     // Sound choice: cheerful music (default), nature sounds only, or off. Plus the music volume.
     const soundGroup = el('div', 'fk-group');
     const soundLabel = el('span', '');
@@ -626,7 +630,7 @@ class UI {
     // Everything between the title and the close button scrolls together, so on a
     // short screen nothing is squeezed out and "رجوع" always stays in reach.
     const scroll = el('div', 'fk-parent-scroll');
-    scroll.append(dayGroup, roadRow, layersRow, moveNote, soundGroup, volumeRow, speedRow, speedNote, voice, test, ...parentSections(opts.lineSource, showSources), credit, build);
+    scroll.append(dayGroup, layersRow, moveNote, trialRow, trialNote, soundGroup, volumeRow, speedRow, speedNote, voice, test, ...parentSections(opts.lineSource, showSources), credit, build);
     card.append(h, scroll, close);
     wrap.append(card);
     wrap.addEventListener('pointerdown', (e) => e.stopPropagation());

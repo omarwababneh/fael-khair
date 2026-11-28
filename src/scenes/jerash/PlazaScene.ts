@@ -464,7 +464,7 @@ export class PlazaScene extends BaseScene {
     await this.passersBy();
     if (!this.alive) return;
     // A quiet deed's final moment: the background goes still.
-    this.layers?.still(true);
+    this.motionStill(true);
     await Voice.say('qdj_end');
     if (!this.alive) return;
     await this.finishAdventure('jerash', null);

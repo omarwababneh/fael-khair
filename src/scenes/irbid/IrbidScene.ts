@@ -419,7 +419,7 @@ export class IrbidScene extends BaseScene {
     await this.wait(500);
     if (!this.alive) return;
     // A quiet deed's final moment: the background goes still.
-    this.layers?.still(true);
+    this.motionStill(true);
     await Voice.say('ir_secret');
     if (!this.alive) return;
     await this.finishAdventure('irbid', 'ir_hadith');

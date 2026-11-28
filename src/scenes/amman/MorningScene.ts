@@ -190,7 +190,7 @@ export class MorningScene extends BaseScene {
     await this.wait(1800);
     if (!this.alive) return;
     // A quiet deed's final moment: the background goes still.
-    this.layers?.still(true);
+    this.motionStill(true);
     await Voice.say('qda_end');
     if (!this.alive) return;
     await this.finishAdventure('amman', null);

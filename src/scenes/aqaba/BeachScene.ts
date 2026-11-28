@@ -361,7 +361,7 @@ export class BeachScene extends BaseScene {
     dustPuff(this, t.x, SHORE_Y + 6, 6, 0xffffff, 36);
     this.tweens.add({ targets: t, alpha: 0, duration: 800 });
     // A quiet deed's final moment: the background goes still.
-    this.layers?.still(true);
+    this.motionStill(true);
     await Voice.say('qdq_end');
     if (!this.alive) return;
     await this.finishAdventure('aqaba', null);

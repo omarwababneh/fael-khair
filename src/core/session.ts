@@ -162,6 +162,8 @@ export function completeMission(place: Place): void {
  * moves a rotation. Add &lap=1 to the address to play the later-lap version.
  */
 export function debugRun(scene: string, lap: 0 | 1 = 0): MissionRun | null {
+  // The Umm Qais walk (the trial version) is U1's run.
+  if (scene === 'ummqais-walk') return debugRun('ummqais', lap);
   for (const place of PLACES) {
     const q = QUIET[place];
     if (q && q.scene === scene && q.id !== 'I1') return { ...q, place, quiet: true, lap };

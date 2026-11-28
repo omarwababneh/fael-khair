@@ -7,6 +7,7 @@ import { Voice } from '../core/voice';
 import { addAnimals } from './animals';
 import { addGrowth } from './growth';
 import { LayerSet } from './layers';
+import { Life } from './life';
 
 /** Before his first touch in a scene, the hint hand shows after this long. */
 const FIRST_HINT_MS = 3000;
@@ -60,6 +61,8 @@ export abstract class BaseScene extends Phaser.Scene {
   freeActive: FreeTarget[] = [];
   /** The moving layers over this scene's background (version 3 part B). */
   protected layers: LayerSet | null = null;
+  /** Breathing figures, the drifting camera and soft touches (version 3, every mission scene). */
+  protected life: Life | null = null;
   /** The father says world_grown before the first line (a plant here has grown). */
   private grownPending = false;
 
@@ -67,6 +70,7 @@ export abstract class BaseScene extends Phaser.Scene {
     this.alive = true;
     this.inFreeTime = false;
     this.layers = null;
+    this.life = this.scene.key === 'map' || this.scene.key === 'start' ? null : new Life(this, () => this.covers.map((c) => c.img));
     this.grownPending = false;
     this.freeActive = [];
     this.covers = [];
@@ -106,6 +110,16 @@ export abstract class BaseScene extends Phaser.Scene {
     for (const c of this.covers) this.sizeCover(c.img, c.factor);
     layoutLabels();
     this.onLayout();
+  }
+
+  /**
+   * Everything that moves by itself (the layers, the figures' breathing, the
+   * camera) goes still, or comes alive again: a moral choice, the father's key
+   * lines, a quiet deed's final moment, before the Wadi Rum ayah.
+   */
+  protected motionStill(on: boolean): void {
+    this.layers?.still(on);
+    this.life?.still(on);
   }
 
   /** Scenes override to re-place things anchored to the screen edges. */
@@ -198,7 +212,7 @@ export abstract class BaseScene extends Phaser.Scene {
   protected async finishAdventure(place: Place, closingLine: string | null): Promise<void> {
     this.setIdle(null);
     // The layers go still for the father's closing line, and for good at a quiet deed's final moment.
-    this.layers?.still(true);
+    this.motionStill(true);
     // The story's consequence is done: the place counts even if he taps home now.
     completeMission(place);
     if (closingLine) {
@@ -261,7 +275,7 @@ export abstract class BaseScene extends Phaser.Scene {
   private freeTimeNow(targets: FreeTarget[]): void {
     this.inFreeTime = true;
     // The layers move again, and the place's small animals come out.
-    this.layers?.still(false);
+    this.motionStill(false);
     targets = [...targets, ...addAnimals(this, this.scene.key)];
     this.freeActive = targets;
     const busyUntil = new Map<FreeTarget, number>();

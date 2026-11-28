@@ -182,7 +182,14 @@ const makers: Record<SfxName, (ctx: AudioContext, t: number, o: Required<Opts>) 
   },
 };
 
+let lastAt = 0;
+/** When the last sound effect was asked for (performance.now). */
+export function lastSfxAt(): number {
+  return lastAt;
+}
+
 export function sfx(name: SfxName, opts: Opts = {}): void {
+  lastAt = performance.now();
   const ctx = audio.ctx;
   if (!ctx || ctx.state !== 'running') return;
   const o = { weight: opts.weight ?? 0.5, volume: opts.volume ?? 1 };

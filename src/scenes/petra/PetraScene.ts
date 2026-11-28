@@ -593,7 +593,7 @@ export class PetraScene extends BaseScene {
    */
   private async dawnEnding(): Promise<void> {
     // A quiet deed's final moment: the background goes still.
-    this.layers?.still(true);
+    this.motionStill(true);
     // The spare nooks stop glowing: there is nothing left to do.
     for (const n of this.nooks) if (!n.used && n.ring.active) this.tweens.add({ targets: n.ring, alpha: 0, duration: 600, onComplete: () => n.ring.destroy() });
     this.walk(true);
