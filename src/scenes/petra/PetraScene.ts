@@ -628,11 +628,6 @@ export class PetraScene extends BaseScene {
   }
 
   /**
-   * Free time over the Treasury: by then the camera has risen over the facade
-   * and nobody is in the frame, so the old stone itself answers: the urn on top
-   * and a column each give a soft knock and a faint ring where he touched.
-   */
-  /**
    * Free time after P1: the view eases back down from the facade to the plaza,
    * where the boy stands. He hops when touched; a touch on the Treasury's doorway
    * gives a soft echo, and he turns to look at it.
@@ -652,10 +647,10 @@ export class PetraScene extends BaseScene {
     const door = (): Phaser.Geom.Rectangle => {
       const bg = plaza.list[0] as Phaser.GameObjects.Image;
       const b = bg.getBounds();
-      return new Phaser.Geom.Rectangle(b.x + b.width * 0.5 - 40, b.y + plaza.y + b.height * 0.68 - 70, 80, 140);
+      return new Phaser.Geom.Rectangle(b.x + b.width * 0.5 - 40, b.y + b.height * 0.68 - 70, 80, 140);
     };
     return [
-      { obj: boy, area: () => { const b = boy.getBounds(); return new Phaser.Geom.Rectangle(b.x, b.y + plaza.y, b.width, b.height); }, react: () => freeHop(this, boy, 'step', 10) },
+      { obj: boy, react: () => freeHop(this, boy, 'step', 10) },
       {
         obj: boy, area: door,
         react: () => {

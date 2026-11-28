@@ -191,8 +191,9 @@ export class WadiRumScene extends BaseScene {
 
   /** A star he reaches glows a little brighter for a moment (the same every time). */
   private glowStar(s: Star): void {
+    // Stopping its tweens also stops a fade-in still under way: show it fully.
     this.tweens.killTweensOf(s.dot);
-    s.dot.setScale(0.4);
+    s.dot.setScale(0.4).setAlpha(0.95);
     this.tweens.add({ targets: s.dot, scale: 0.62, duration: 160, yoyo: true, ease: 'Sine.easeOut' });
   }
 

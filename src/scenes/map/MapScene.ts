@@ -71,8 +71,12 @@ function sunAt(t: number): { x: number; y: number; color: number; warmth: number
   };
 }
 
-/** Where the sun stands now: one equal step of the day for each mission done. */
-const sunNow = (): number => (dayComplete() ? 1 : sunStep() / dayLength());
+/**
+ * Where the sun stands now: one equal step of the day for each mission done. It
+ * never goes back toward morning: if the parents make the day longer mid-day,
+ * it waits where it is until the new steps pass it.
+ */
+const sunNow = (): number => Math.max(session.shownSunStep, dayComplete() ? 1 : sunStep() / dayLength());
 
 export class MapScene extends BaseScene {
   private busy = false;
@@ -163,7 +167,8 @@ export class MapScene extends BaseScene {
   private showEndEarly(): void {
     this.removeEndEarly?.();
     this.removeEndEarly = null;
-    if (!canEndEarly()) return;
+    // Not while a place is opening (he may have tapped one during the sun's step).
+    if (this.busy || !this.alive || !canEndEarly()) return;
     // In the empty desert at the lower right, clear of every place and its name,
     // and above the speech bubble.
     const at = onMap(312, 684);
