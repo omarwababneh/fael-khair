@@ -15,19 +15,22 @@ Every change merged into the project publishes itself in about 2 minutes. The re
 
 **Updates install themselves.** When a new version is published, the game switches to it the next time the start screen shows, never in the middle of a day. The version line in the parents' corner shows which version the phone has. (Only a device that still runs a version from before 24 November 2026 needs one manual refresh: close and reopen the game twice on the iPhone, or press Ctrl+Shift+R on a computer.)
 
-## How a day goes (8 to 10 minutes)
+## How a day goes (a short day 8 to 10 minutes; a long day longer)
 
 1. The start screen: tap **يَلّا**.
 2. The map: tap a place to play its mission. Each place plays one mission a day and takes its turn through its three missions (Petra, Umm Qais, Amman, Jerash, the Dead Sea, Aqaba; Irbid has two ordinary ones plus the secret basket). The first time round each mission is a little easier. A place already played today just says its name.
-3. After each mission the sun moves a step toward sunset. That is the only sign of progress.
-4. **The fourth mission of every day is a quiet good deed** that nobody sees or thanks: in Petra the boy clears the Siq at dawn; in Umm Qais he waters a neighbor's wilting trees; in Amman he waters Mama's mint and folds the blanket before she wakes; in Irbid he leaves the secret basket; in Jerash he clears the empty plaza early in the morning; at the Dead Sea he turns off a dripping tap with nobody around; in Aqaba he clears the plastic from the empty beach at sunrise.
-5. After four missions, the map turns to dusk and **وادي رَمّ** glows. Tapping it opens the night ending: stars, then the father's closing line, then the ayah in still text, then the goodnight line and the button **خلصنا لليوم**.
-6. Starting again begins a fresh day. Nothing is lost by closing the game at any point.
+3. **Free time.** After every ordinary mission, once the father's closing line has been said, the scene stays open for a while: «معنا وقت. العب قليلاً إن أردت.» Two or three things in the scene answer a tap with a small motion and a soft sound (the same every time; nothing to win or count). Tap the home button to go back to the map whenever he likes. After 45 seconds the father asks once «هيّا نكمل الرحلة؟»; nothing forces him out. There is no free time after a quiet deed or in Wadi Rum.
+4. After each mission the sun moves a step toward sunset: six steps on a long day, four on a short day. That is the only sign of progress.
+5. **A day has up to six missions** on a long day (the default; four on a short day, see «طول اليوم» below). Six is never an obligation: after three missions on a long day the map shows **خلصنا لليوم؟**. If he taps it, the next place he opens plays its quiet deed, and then Wadi Rum opens.
+6. **The last mission of every day is a quiet good deed** that nobody sees or thanks: in Petra the boy clears the Siq at dawn; in Umm Qais he waters a neighbor's wilting trees; in Amman he waters Mama's mint and folds the blanket before she wakes; in Irbid he leaves the secret basket; in Jerash he clears the empty plaza early in the morning; at the Dead Sea he turns off a dripping tap with nobody around; in Aqaba he clears the plastic from the empty beach at sunrise.
+7. After the quiet deed, the map turns to dusk and **وادي رَمّ** glows. Tapping it opens the night ending: the stars, then «ارسم بين النجوم ما تحبّ.»: he can drag from star to star to draw glowing lines, with no shape to find and nothing judged. It ends when he taps **يلّا**, or by itself after 20 seconds without a touch (at the latest after 90 seconds). The lines fade away, then come the father's closing line, the ayah in still text (nothing moves while it shows), the goodnight line and the button **خلصنا لليوم**.
+8. Starting again begins a fresh day. Nothing is lost by closing the game at any point.
 
 ## Parents' corner
 
 Press and hold the small lock at the top left of the map for **3 seconds**. Inside:
 
+- **طول اليوم:** **طويل** (up to six missions before Wadi Rum, the default) or **قصير** (four, as before). On a long day he can still end after three with **خلصنا لليوم؟**. The quiet deed is always the last mission of the day. A change applies at once: if he has already played more missions than the new length, the next one is the quiet deed.
 - **الصوت بالخلفية:** cheerful music (the default), nature sounds only, or nothing (بدون). With music or nature sounds, **علوّ الموسيقى** sets the volume: quiet or medium.
 - **سرعة الصوت:** slower, normal or faster speech. Tap one to hear a sample. It changes only the phone's own speech; the game's recorded voice files play at their own speed.
 - **The phone's Arabic voice:** which one the phone has, or that it has none. A higher-quality "Enhanced" or "Premium" Arabic voice can be downloaded free in the iPhone's settings (look under Accessibility, then Spoken Content, then Voices, then Arabic), and the game will use it.
@@ -38,7 +41,7 @@ Press and hold the small lock at the top left of the map for **3 seconds**. Insi
 - **مراجعة النصوص الدينية:** every text still waiting for your review, with its source in Arabic, where it is used, and the words the game says.
 - At the bottom, in small text: the music credit, which the music license requires.
 
-The game keeps no statistics about your son and no history of what he chose. The only things saved on the phone are the sound choice, the music volume, the voice speed, the silent-switch choice, one number per place for which mission comes next and whether he has been around once, and your own recordings (below). Nothing is sent anywhere.
+The game keeps no statistics about your son and no history of what he chose. The only things saved on the phone are the day length, the sound choice, the music volume, the voice speed, the silent-switch choice, one number per place for which mission comes next and whether he has been around once, and your own recordings (below). Nothing is sent anywhere.
 
 ## Recording your own voice (recommended)
 

@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeWiggle, pose } from '../kit';
 
 // A2. Amman: the block tower (value: self-control when angry; source
 // bukhari_6114). MISSIONS_V2.md section 5.
@@ -309,6 +309,18 @@ export class BlocksScene extends BaseScene {
     await Voice.say('a2_end');
     if (!this.alive) return;
     await this.finishAdventure('amman', 'a2_hadith');
+  }
+
+  // ---------------------------------------------------------------- free time
+
+  /** He and his sister each give a small hop; the top block of their tower rocks a little. */
+  protected freeTargets(): FreeTarget[] {
+    const list: FreeTarget[] = [{ obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) }];
+    const s = this.sister;
+    if (s) list.push({ obj: s, react: () => freeHop(this, s, 'step', 8) });
+    const top = this.tower[this.tower.length - 1];
+    if (top) list.push({ obj: top, react: () => freeWiggle(this, top, 'knock', 4, 0.3) });
+    return list;
   }
 
   // ---------------------------------------------------------------- input

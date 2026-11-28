@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeStretch, freeWiggle, pose } from '../kit';
 
 // J2. Jerash: the lost little girl (value: helping someone in distress; source
 // muslim_2699a). MISSIONS_V2.md section 5.
@@ -223,6 +223,15 @@ export class CardoScene extends BaseScene {
     await Voice.say('j2_end');
     if (!this.alive) return;
     await this.finishAdventure('jerash', 'j2_hadith');
+  }
+
+  /** Free time after the hug: the boy hops, mother and daughter hug a little tighter, the guide nods. */
+  protected freeTargets(): FreeTarget[] {
+    return [
+      { obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) },
+      { obj: this.girl, react: () => freeStretch(this, this.girl, 'rustle', 0.04, 0.25) },
+      { obj: this.guide, react: () => freeWiggle(this, this.guide, 'step', 3) },
+    ];
   }
 
   private showHint(): void {

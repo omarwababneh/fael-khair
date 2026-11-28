@@ -8,7 +8,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { DESIGN_H, PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { freeHop } from '../kit';
 
 // Petra: clearing the road (P1; value: removing harm from people's path; source bukhari_2472).
 //
@@ -96,6 +97,9 @@ export class PetraScene extends BaseScene {
   /** The dawn quiet deed rather than P1. */
   private quiet = false;
   private dawn: Phaser.GameObjects.Rectangle | null = null;
+  /** The Treasury plaza at the end of P1 (it rises over the facade), and the boy on it. */
+  private plaza: Phaser.GameObjects.Container | null = null;
+  private plazaBoy: Phaser.GameObjects.Image | null = null;
 
   constructor(key = 'petra') {
     super(key);
@@ -535,6 +539,8 @@ export class PetraScene extends BaseScene {
     const elder = this.add.image(v.x - 140, ground, 'elder_cart').setOrigin(0.5, 1);
     fitWidth(elder, 138 * 1.6); // the old man's cart: 1.6 times the boy wide (art checklist)
     plaza.add([bg, boy, elder]);
+    this.plaza = plaza;
+    this.plazaBoy = boy;
     this.tweens.add({ targets: boy, scaleY: boy.scaleY * 1.02, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     // Warm light over the plaza.
@@ -576,9 +582,8 @@ export class PetraScene extends BaseScene {
     completeMission('petra');
     await Promise.all([Voice.say('petra_hadith'), this.wait(6600)]);
     if (!this.alive) return;
-    await this.wait(1800);
-    if (!this.alive) return;
-    this.goTo('map');
+    // Free time (BaseScene.afterClosing), or the map.
+    await this.afterClosing(1800);
   }
 
   /**
@@ -620,6 +625,44 @@ export class PetraScene extends BaseScene {
     steps.remove();
     if (!this.alive) return;
     this.goTo('map');
+  }
+
+  /**
+   * Free time after P1: the view eases back down from the facade to the plaza,
+   * where the boy stands. He hops when touched; a touch on the Treasury's doorway
+   * gives a soft echo, and he turns to look at it.
+   */
+  protected onFreeTime(): number {
+    if (this.quiet || !this.plaza) return 0;
+    this.tweens.killTweensOf(this.plaza);
+    this.tweens.add({ targets: this.plaza, y: 0, duration: 2600, ease: 'Sine.easeInOut' });
+    return 2700;
+  }
+
+  protected freeTargets(): FreeTarget[] {
+    const boy = this.plazaBoy;
+    const plaza = this.plaza;
+    if (this.quiet || !boy || !plaza) return [];
+    // The doorway of bg_petra_treasury, at the foot of the facade (as fractions of the picture).
+    const door = (): Phaser.Geom.Rectangle => {
+      const bg = plaza.list[0] as Phaser.GameObjects.Image;
+      const b = bg.getBounds();
+      return new Phaser.Geom.Rectangle(b.x + b.width * 0.5 - 40, b.y + b.height * 0.68 - 70, 80, 140);
+    };
+    return [
+      { obj: boy, react: () => freeHop(this, boy, 'step', 10) },
+      {
+        obj: boy, area: door,
+        react: () => {
+          // A soft knock comes back off the rock, and the boy turns toward the door, then back.
+          sfx('knock', { volume: 0.3 });
+          this.time.delayedCall(320, () => this.alive && sfx('knock', { volume: 0.12 }));
+          boy.setFlipX(true);
+          this.time.delayedCall(1100, () => this.alive && boy.setFlipX(false));
+          return 1300;
+        },
+      },
+    ];
   }
 
   /** Birds crossing the sky. Uses the optional `bird` art; without it, only their sound. */

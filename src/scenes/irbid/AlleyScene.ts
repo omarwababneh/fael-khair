@@ -6,8 +6,8 @@ import { completeMission, currentLap } from '../../core/session';
 import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, stopBreathing, walkTo } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeBounce, freeHop, pose, stopBreathing, walkTo } from '../kit';
 
 // I3. Irbid: the new boy (value: a kind word; including the one left out;
 // source bukhari_2989, part "good_word"). MISSIONS_V2.md section 5.
@@ -293,6 +293,18 @@ export class AlleyScene extends BaseScene {
     await Voice.say('i3_end');
     if (!this.alive) return;
     await this.finishAdventure('irbid', 'i3_hadith');
+  }
+
+  // ---------------------------------------------------------------- free time
+
+  /** The ball bounces where it landed; the new boy and a friend each give a small hop. */
+  protected freeTargets(): FreeTarget[] {
+    const list: FreeTarget[] = [];
+    if (this.ball.visible) list.push({ obj: this.ball, react: () => freeBounce(this, this.ball, 26) });
+    const nb = this.people.new, a = this.people.a;
+    list.push({ obj: nb, react: () => freeHop(this, nb, 'step', 10) });
+    list.push({ obj: a, react: () => freeHop(this, a, 'step', 10) });
+    return list;
   }
 
   private showHint(): void {

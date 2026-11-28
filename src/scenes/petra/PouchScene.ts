@@ -7,7 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { freeHop, freeWiggle } from '../kit';
 
 // P2. Petra: the lost pouch (value: trust, returning what is lost to its true
 // owner; source bukhari_2427). MISSIONS_V2.md section 5.
@@ -482,6 +483,14 @@ export class PouchScene extends BaseScene {
     await Promise.all([said, this.wait(1800)]);
     if (!this.alive) return;
     await this.finishAdventure('petra', 'p2_hadith');
+  }
+
+  /** Free time on the plaza: the boy gives a small hop; the guard nods. */
+  protected freeTargets(): FreeTarget[] {
+    return [
+      { obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) },
+      { obj: this.guard, react: () => freeWiggle(this, this.guard, 'step', 3, 0.25) },
+    ];
   }
 
   // ---------------------------------------------------------------- hints

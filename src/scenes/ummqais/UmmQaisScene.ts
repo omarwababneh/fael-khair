@@ -6,7 +6,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { freeHop, freeRipple } from '../kit';
 
 // Umm Qais: the thirsty dog (value: mercy to animals; source bukhari_2363).
 // The boy pulls the rope standing back from the well and never leans over it.
@@ -443,6 +444,16 @@ export class UmmQaisScene extends BaseScene {
     await this.wait(1500);
     if (!this.alive) return;
     await this.finishAdventure('ummqais', 'uq_hadith');
+  }
+
+  // ------------------------------------------------------------ free time
+
+  /** After the dog has gone: the boy hops, the trough's water ripples. */
+  protected freeTargets(): FreeTarget[] {
+    return [
+      { obj: this.boyImg, react: () => freeHop(this, this.boyImg, 'step', 10) },
+      { obj: this.troughWater, react: () => freeRipple(this, this.troughWater.x, this.troughWater.y, this.troughWater.depth + 1) },
+    ];
   }
 
   // ------------------------------------------------------------ helpers

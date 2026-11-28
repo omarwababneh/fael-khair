@@ -1,14 +1,22 @@
 // The day (MISSIONS_V2.md section 3). The day itself lives in memory only:
 // closing the app loses nothing that matters, and starting again begins a fresh
-// day. The only thing kept on the device is one number per place, which of its
-// missions comes next (see settings.ts).
-import { getNextIndex, setNextIndex } from './settings';
+// day. The only things kept on the device are one number per place, which of its
+// missions comes next, and the parents' day-length setting (see settings.ts).
+import { getDayLength, getNextIndex, setNextIndex } from './settings';
 
 export const PLACES = ['petra', 'ummqais', 'amman', 'irbid', 'jerash', 'deadsea', 'aqaba'] as const;
 export type Place = (typeof PLACES)[number];
 
-/** Missions in a day before the Wadi Rum night ending. */
-export const MISSIONS_PER_DAY = 4;
+/**
+ * Missions in a day before the Wadi Rum night ending, the quiet deed included:
+ * a long day (the default) has up to six, a short day four. Six is a maximum,
+ * never an obligation: after three missions on a long day the map offers
+ * "خلصنا لليوم؟", and the next place then plays its quiet deed.
+ */
+export const LONG_DAY = 6;
+export const SHORT_DAY = 4;
+/** On a long day, the map offers to end the day early once this many missions are done. */
+export const EARLY_END_AFTER = 3;
 
 export interface MissionDef {
   id: string;
@@ -19,7 +27,7 @@ export interface MissionDef {
 /** What the map opened, so the scene knows how to end. */
 export interface MissionRun extends MissionDef {
   place: Place;
-  /** The fourth mission of the day: no acknowledgment of any kind (section 6). */
+  /** The day's last mission, the quiet deed: no acknowledgment of any kind (section 6). */
   quiet: boolean;
   /** Position in the place's rotation, for ordinary missions. */
   index?: number;
@@ -39,7 +47,7 @@ const ROTATION: Record<Place, Array<MissionDef | null>> = {
   aqaba: [{ id: 'Q1', scene: 'aqaba' }, { id: 'Q2', scene: 'q2' }, { id: 'Q3', scene: 'q3' }],
 };
 
-// Each place's quiet deed (the fourth mission of the day). null: not built yet.
+// Each place's quiet deed (always the last mission of the day). null: not built yet.
 const QUIET: Record<Place, MissionDef | null> = {
   petra: { id: 'QD-P', scene: 'petra-dawn' },
   ummqais: { id: 'QD-U', scene: 'ummqais-dusk' },
@@ -59,6 +67,10 @@ export const session = {
   greeted: false,
   /** Sun step the map last showed, so the map can animate the next step. */
   shownSunStep: 0,
+  /** He tapped "خلصنا لليوم؟" on the map: the next place plays its quiet deed. */
+  endEarly: false,
+  /** Today's quiet deed is done: the day is complete and Wadi Rum opens. */
+  quietDone: false,
 };
 
 export function newDay(): void {
@@ -66,13 +78,39 @@ export function newDay(): void {
   session.current = null;
   session.greeted = false;
   session.shownSunStep = 0;
+  session.endEarly = false;
+  session.quietDone = false;
 }
 
+/** The parents' setting: six missions on a long day, four on a short one. */
+export const dayTarget = (): number => (getDayLength() === 'short' ? SHORT_DAY : LONG_DAY);
+
+/**
+ * How many missions today has, for the sun's steps. It follows the parents'
+ * setting, but never ends the day before the quiet deed (if the setting changes
+ * to a shorter day after more missions, the next one is the quiet deed), and an
+ * early end makes the day as long as it actually was.
+ */
+export function dayLength(): number {
+  if (session.quietDone) return session.done.size;
+  if (session.endEarly) return session.done.size + 1;
+  return Math.max(dayTarget(), session.done.size + 1);
+}
+
+/** The sun's step now (0: morning) and the number of steps the day has. */
 export function sunStep(): number {
   return session.done.size;
 }
 
-export const dayComplete = (): boolean => session.done.size >= MISSIONS_PER_DAY;
+/** The day is complete once its quiet deed is done (all seven places have one). */
+export const dayComplete = (): boolean => session.quietDone;
+
+/** Does the next place opened play its quiet deed? */
+export const quietNext = (): boolean => !session.quietDone && (session.endEarly || session.done.size >= dayLength() - 1);
+
+/** Should the map offer "خلصنا لليوم؟" now? Only on a long day, after three missions, before the quiet deed is due. */
+export const canEndEarly = (): boolean =>
+  dayTarget() === LONG_DAY && !session.quietDone && !session.endEarly && session.done.size >= EARLY_END_AFTER && !quietNext();
 
 /**
  * What tapping a place opens today, or null when the place is scenery with a
@@ -81,14 +119,14 @@ export const dayComplete = (): boolean => session.done.size >= MISSIONS_PER_DAY;
  */
 export function missionFor(place: Place): MissionRun | null {
   if (session.done.has(place) || dayComplete()) return null;
-  const fourth = session.done.size === MISSIONS_PER_DAY - 1;
+  const fourth = quietNext();
   const quiet = QUIET[place];
   const n = getNextIndex(place);
   const list = ROTATION[place];
   const lap: 0 | 1 = n >= list.length ? 1 : 0;
   if (fourth && quiet) return { ...quiet, place, quiet: true, lap };
   // The ordinary rotation. Until a place's quiet deed is built, its next
-  // ordinary mission plays in the fourth slot (section 12).
+  // ordinary mission plays in the last slot (section 12).
   const start = n % list.length;
   for (let k = 0; k < list.length; k++) {
     const i = (start + k) % list.length;
@@ -108,6 +146,7 @@ export function missionFor(place: Place): MissionRun | null {
 export function completeMission(place: Place): void {
   session.done.add(place);
   const run = session.current;
+  if (run && run.place === place && run.quiet) session.quietDone = true;
   if (run && run.place === place && !run.quiet && run.index !== undefined) {
     // The next mission; finishing the last one starts (or restarts) the second lap.
     const L = ROTATION[place].length;

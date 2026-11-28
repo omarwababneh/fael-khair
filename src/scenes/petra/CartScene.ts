@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeWiggle, pose } from '../kit';
 
 // P3. Petra: loading the cart (value: helping someone with his load; source
 // bukhari_2989, part "mount"). MISSIONS_V2.md section 5.
@@ -422,6 +422,19 @@ export class CartScene extends BaseScene {
     creak.remove();
     if (!this.alive) return;
     await this.finishAdventure('petra', 'p3_hadith');
+  }
+
+  /**
+   * Free time once the cart has gone: the boy gives a small hop, the donkey's
+   * bucket sloshes, and the sack left by the wall for the next trip wiggles.
+   */
+  protected freeTargets(): FreeTarget[] {
+    const out: FreeTarget[] = [{ obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) }];
+    const bucket = this.bucket;
+    if (bucket) out.push({ obj: bucket, react: () => freeWiggle(this, bucket, 'splash', 4, 0.25) });
+    const extra = this.sacks.find((s) => s.home === WALL_SPOT && !s.side);
+    if (extra) out.push({ obj: extra.img, react: () => freeWiggle(this, extra.img, 'rustle', 5, 0.3) });
+    return out;
   }
 
   // ---------------------------------------------------------------- hints

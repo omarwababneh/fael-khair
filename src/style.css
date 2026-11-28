@@ -509,3 +509,11 @@ button {
 .fk-done { font-size: 32px; }
 
 .fk-section h4.fk-mission { margin: 10px 0 2px; font-size: 16px; opacity: 0.8; }
+
+/* A small button placed on the picture in design coordinates, in the choice
+   buttons' style: the map's "خلصنا لليوم؟" (empty desert, lower right) and
+   Wadi Rum's "يلّا" (on the sand, lower right). */
+.fk-label-btn { pointer-events: auto; animation: fk-fade-in 0.5s ease-out; }
+@keyframes fk-fade-in { from { opacity: 0; } }
+.fk-small-btn { min-height: 56px; min-width: 150px; padding: 6px 16px 2px; font-size: 22px; border-width: 3px; box-shadow: 0 4px 0 var(--ink); }
+.fk-narrow-btn { min-width: 96px; }

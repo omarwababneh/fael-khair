@@ -36,6 +36,31 @@ export function addLabel(text: string, x: number, y: number, cls: string): HTMLD
   return el;
 }
 
+/**
+ * A button centred on (x, y) in design coordinates, so it stays on the same spot
+ * of the picture at every screen size (the map's "خلصنا لليوم؟").
+ */
+export function addButton(text: string, x: number, y: number, cls: string, onTap: () => void): () => void {
+  const wrap = document.createElement('div');
+  wrap.className = 'fk-label fk-label-btn';
+  wrap.style.left = `${x}px`;
+  wrap.style.top = `${y}px`;
+  const b = document.createElement('button');
+  b.className = cls;
+  b.textContent = text;
+  // The canvas underneath never sees this touch.
+  b.addEventListener('pointerdown', (e) => e.stopPropagation());
+  b.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    wrap.remove();
+    onTap();
+  });
+  wrap.append(b);
+  layer.append(wrap);
+  return () => wrap.remove();
+}
+
 /** Restart a CSS animation class on an element. */
 export function replay(el: HTMLElement, cls: string): void {
   el.classList.remove(cls);

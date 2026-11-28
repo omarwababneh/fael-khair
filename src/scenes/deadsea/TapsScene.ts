@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, PourCan, walkTo, type PourTarget } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeSway, freeWiggle, pose, PourCan, walkTo, type PourTarget } from '../kit';
 
 // D1. The Dead Sea: the dripping taps (value: not wasting water; source
 // quran_7_31). MISSIONS_V2.md section 5.
@@ -383,6 +383,21 @@ export class TapsScene extends BaseScene {
     await Voice.say('qdd_end');
     if (!this.alive) return;
     await this.finishAdventure('deadsea', null);
+  }
+
+  /**
+   * Free time by the watered plants (never at the quiet tap: the framework skips
+   * it). The middle plant sways, the attendant nods, the boy hops.
+   */
+  protected freeTargets(): FreeTarget[] {
+    const a = this.attendant;
+    const plant = this.plants[1]?.img;
+    if (this.quiet || !a || !plant) return [];
+    return [
+      { obj: plant, react: () => freeSway(this, plant, 4, 0.3) },
+      { obj: a, react: () => freeWiggle(this, a, 'step', 3) },
+      { obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) },
+    ];
   }
 
   private showHint(): void {

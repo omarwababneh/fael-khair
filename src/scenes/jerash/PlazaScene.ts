@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose, walkTo } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeWiggle, pose, walkTo } from '../kit';
 
 // J1. Jerash: after the festival (value: removing harm from where people walk;
 // source bukhari_2989, part "harm"). MISSIONS_V2.md section 5.
@@ -466,6 +466,21 @@ export class PlazaScene extends BaseScene {
     await Voice.say('qdj_end');
     if (!this.alive) return;
     await this.finishAdventure('jerash', null);
+  }
+
+  /**
+   * Free time on the clean plaza (never in the quiet morning: the framework skips
+   * it). The guard nods, the leftmost bin rocks on its base, the boy hops.
+   */
+  protected freeTargets(): FreeTarget[] {
+    const guard = this.guard;
+    const bin = this.bins.find((b) => b.x === BIN_X[0]);
+    if (this.quiet || !guard || !bin) return [];
+    return [
+      { obj: guard, react: () => freeWiggle(this, guard, 'step', 3) },
+      { obj: bin.img, react: () => freeWiggle(this, bin.img, 'knock', 3) },
+      { obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) },
+    ];
   }
 
   private showHint(): void {

@@ -7,8 +7,8 @@ import { sfx } from '../../core/sfx';
 import { ui } from '../../core/ui';
 import { PIC, view } from '../../core/viewport';
 import { Voice } from '../../core/voice';
-import { BaseScene } from '../BaseScene';
-import { breathe, pose } from '../kit';
+import { BaseScene, type FreeTarget } from '../BaseScene';
+import { breathe, freeHop, freeRipple, freeWiggle, pose } from '../kit';
 
 // Q2. Aqaba: the honest scale (value: honest weight; source quran_55_9).
 // MISSIONS_V2.md section 5.
@@ -332,6 +332,21 @@ export class HarborScene extends BaseScene {
     steps.remove();
     if (!this.alive) return;
     await this.finishAdventure('aqaba', 'q2_hadith');
+  }
+
+  /**
+   * Free time: the boy hops, the fisherman nods behind his counter (his sway is
+   * running, so the helper gives a small widening), the water behind the stall ripples.
+   */
+  protected freeTargets(): FreeTarget[] {
+    const find = (key: string) => this.children.list.find((o) => o instanceof Phaser.GameObjects.Image && o.texture.key === key) as Phaser.GameObjects.Image | undefined;
+    const fisher = find('fisherman_stand');
+    const sea = find('bg_aqaba_harbor');
+    const t: FreeTarget[] = [{ obj: this.boy, react: () => freeHop(this, this.boy, 'step', 10) }];
+    // Only what is above the counter shows: touch that part, not the cropped picture's bounds.
+    if (fisher) t.push({ obj: fisher, area: () => new Phaser.Geom.Rectangle(FISHER.x - 36, FISHER.foot - FISHER.h, 72, COUNTER_Y - (FISHER.foot - FISHER.h)), react: () => freeWiggle(this, fisher, 'knock', 4, 0.3) });
+    if (sea) t.push({ obj: sea, area: () => new Phaser.Geom.Rectangle(90, 470, 64, 66), react: () => freeRipple(this, 122, 506, 5) });
+    return t;
   }
 
   private showHint(): void {
